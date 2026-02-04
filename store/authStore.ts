@@ -1,0 +1,144 @@
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+// import { logout } from '@/service/authApi'
+
+import { setTokens } from '@/services/axios';
+import { Tokens, User } from '@/types';
+
+interface AuthState {
+  user: User | null;
+  avatarUrl?: string | null;
+  tokens: Tokens | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  hasHydrated: boolean;
+  // Actions
+
+  setAuth: (user: User, tokens: Tokens) => Promise<void>;
+  updateUser: (userData: Partial<User>) => Promise<User>;
+  updateToken: (tokens: Partial<Tokens>) => Promise<Tokens>;
+  updateUserLoanStatus: (loanStatus: boolean) => Promise<User>;
+  updateUserAvatar: (avatarUrl: string) => void;
+  clearAuth: () => Promise<void>;
+  loadAuth: () => Promise<void>;
+  setHasHydrated: (state: boolean) => void;
+}
+
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set, get) => ({
+      user: null,
+      tokens: null,
+      isAuthenticated: false,
+      isLoading: false,
+      hasHydrated: false,
+      avatarUrl: null,
+
+      setHasHydrated: (state) => set({ hasHydrated: state }),
+
+      setAuth: async (user, tokens) => {
+        try {
+          set({ isLoading: true });
+
+          await setTokens(tokens.accessToken, tokens.refreshToken);
+
+          set({
+            user: user,
+            tokens: tokens,
+            isAuthenticated: true,
+            isLoading: false,
+          });
+        } catch (error) {
+          console.error('Failed to set authentication:', error);
+          set({ isLoading: false });
+        }
+      },
+
+      updateUser: async (userData) => {
+        const currentUser = get().user;
+        if (!currentUser) throw new Error('No user to update');
+
+        const updatedUser = { ...currentUser, ...userData };
+        set({ user: updatedUser });
+        return updatedUser;
+      },
+
+      updateToken: async (tokens) => {
+        const currentTokens = get().tokens;
+        if (!currentTokens) throw new Error('No tokens to update');
+
+        const updatedTokens = { ...currentTokens, ...tokens };
+        await setTokens(updatedTokens.accessToken, updatedTokens.refreshToken);
+
+        set({ tokens: updatedTokens });
+        return updatedTokens;
+      },
+      updateUserLoanStatus: async (loanStatus) => {
+        const currentUser = get().user;
+        if (!currentUser) throw new Error('No user to update');
+
+        const updatedUser = { ...currentUser, hasBacsLoan: loanStatus };
+        set({ user: updatedUser });
+        return updatedUser;
+      },
+
+      clearAuth: async () => {
+        try {
+          set({ isLoading: true });
+          // await logout()
+          set({
+            user: null,
+            tokens: null,
+            isAuthenticated: false,
+            isLoading: false,
+          });
+          localStorage.removeItem('user');
+        } catch (error) {
+          console.error('Failed to clear authentication:', error);
+          set({ isLoading: false });
+        }
+      },
+      updateUserAvatar: (avatarUrl: string) => {
+        const currentUser = get().user;
+        if (!currentUser) return;
+
+        set({ avatarUrl: avatarUrl });
+      },
+      loadAuth: async () => {
+        try {
+          set({ isLoading: true });
+          const userData = localStorage.getItem('user');
+          const tokens = localStorage.getItem('tokens');
+          if (!userData && !tokens) {
+            set({ isLoading: false });
+            return;
+          }
+
+          const user = JSON.parse(userData!) as User;
+          const token = JSON.parse(tokens!) as Tokens;
+          set({
+            user,
+            tokens: token,
+            isAuthenticated: true,
+            isLoading: false,
+          });
+        } catch (error) {
+          console.error('Failed to load authentication:', error);
+          set({ isLoading: false });
+        }
+      },
+    }),
+    {
+      name: 'auth-store',
+      partialize: (state) => ({
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
+        avatarUrl: state.avatarUrl,
+      }),
+      onRehydrateStorage: () => (state) => {
+        // This runs when Zustand finishes loading from storage
+        state?.setHasHydrated(true);
+      },
+    },
+  ),
+);

@@ -1,0 +1,63 @@
+/**
+ * Format a date to a readable string
+ */
+export function formatDate(date: Date | string): string {
+  const d = new Date(date)
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(d)
+}
+
+/**
+ * Format a number as currency
+ */
+export function formatCurrency(amount: number, currency = 'USD'): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency,
+  }).format(amount)
+}
+
+/**
+ * Mask email address showing first 2 characters and domain
+ */
+export function maskEmail(email: string): string {
+  const [localPart, domain] = email.split('@')
+  if (!domain) return email
+
+  const visibleChars = Math.min(3, localPart.length)
+  const masked = localPart.slice(0, visibleChars) + '***'
+
+  return `${masked}@${domain}`
+}
+/**
+ * Truncate text with ellipsis
+ */
+export function truncate(text: string, length: number): string {
+  if (text.length <= length) return text
+  return text.slice(0, length) + '...'
+}
+
+/**
+ * Debounce function
+ */
+export function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout | null = null
+
+  return function executedFunction(...args: Parameters<T>) {
+    const later = () => {
+      timeout = null
+      func(...args)
+    }
+
+    if (timeout) {
+      clearTimeout(timeout)
+    }
+    timeout = setTimeout(later, wait)
+  }
+}
