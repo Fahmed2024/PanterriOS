@@ -1,5 +1,20 @@
 import { ChildMenu, MenuItem } from '@/interface';
-import { LucideIcon, Menu, Settings } from 'lucide-react';
+import {
+  Bot,
+  Calendar,
+  ChartColumn,
+  FileSearchCorner,
+  FileText,
+  LayoutDashboard,
+  LucideIcon,
+  MapPin,
+  Menu,
+  Settings,
+  Shield,
+  TrendingUp,
+  Users2,
+  Wallet,
+} from 'lucide-react';
 
 export const USER_ROLES = [
   { value: 'Admin.Officer', title: 'Admin Officer' },
@@ -22,26 +37,26 @@ export type Role = 'Admin.Officer' | 'Real.Estate.Analyst' | 'Content.Editor';
 
 // Common menu items shared across all roles
 export const COMMON_MENU: MenuItem[] = [
-  { name: 'Dashboard', icon: Menu, link: '/dashboard' },
+  { name: 'Dashboard', icon: LayoutDashboard, link: '/dashboard' },
 ];
 
 // Role-specific menu items
 export const ROLE_SPECIFIC_MENUS: Record<Role, MenuItem[]> = {
   'Admin.Officer': [
-    { name: 'Investors', icon: Menu, link: '/dashboard/investors' },
-    { name: 'Investments', icon: Menu, link: '/dashboard/investments' },
+    { name: 'Investors', icon: Users2, link: '/investors' },
+    { name: 'Investments', icon: TrendingUp, link: '/investments' },
     {
       name: 'Wallet & Finace',
-      icon: Menu,
-      link: '/dashboard/finace',
+      icon: Wallet,
+      link: '/finace',
     },
-    { name: 'Market Data', icon: Menu, link: '/dashboard/market-data' },
-    { name: 'Analytics', icon: Menu, link: '/dashboard/analytics' },
-    { name: 'Articles', icon: Menu, link: '/dashboard/articles' },
-    { name: 'Events', icon: Menu, link: '/dashboard/events' },
-    { name: 'Ai Agents', icon: Menu, link: '/dashboard/ai-agents' },
-    { name: 'Users & Roles', icon: Menu, link: '/dashboard/users' },
-    { name: 'Audit Log', icon: Menu, link: '/dashboard/audit-log' },
+    { name: 'Market Data', icon: MapPin, link: '/market-data' },
+    { name: 'Analytics', icon: ChartColumn, link: '/analytics' },
+    { name: 'Articles', icon: FileText, link: '/articles' },
+    { name: 'Events', icon: Calendar, link: '/events' },
+    { name: 'Ai Agents', icon: Bot, link: '/ai-agents' },
+    { name: 'Users & Roles', icon: Shield, link: '/users' },
+    { name: 'Audit Log', icon: FileSearchCorner, link: '/audit-log' },
   ],
   'Real.Estate.Analyst': [],
   'Content.Editor': [],

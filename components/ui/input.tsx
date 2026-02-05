@@ -1,21 +1,95 @@
-import * as React from "react"
+import * as React from 'react';
+import { Eye, EyeOff, Check, LetterText, Lock, Mail } from 'lucide-react';
 
-import { cn } from "@/lib/utils"
+import { cn } from '../../lib/utils';
+import { Spinner } from './spinner';
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
-  return (
-    <input
-      type={type}
-      data-slot="input"
-      className={cn(
-        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-        "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-        className
-      )}
-      {...props}
-    />
-  )
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  variant?: 'default' | 'error' | 'success';
+  password?: boolean;
+  loading?: boolean;
+  email?: boolean;
 }
 
-export { Input }
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  (
+    {
+      className,
+      type,
+      password,
+      email,
+      variant = 'default',
+      loading,
+      ...props
+    },
+    ref,
+  ) => {
+    const [showPassword, setShowPassword] = React.useState(false);
+
+    const variantStyles = {
+      default: 'border-input ',
+      error: ' border-destructive ',
+      success: 'border-[#55DD99]',
+    };
+
+    const inputType = password
+      ? showPassword
+        ? 'text'
+        : 'password'
+      : email
+        ? 'email'
+        : type;
+
+    return (
+      <div className="relative">
+        {password && (
+          <Lock
+            size={18}
+            className="absolute bottom-1/2 left-3 translate-y-1/2 text-[#757A80] hover:text-gray-600"
+          />
+        )}
+        {email && (
+          <Mail
+            size={18}
+            className="absolute bottom-1/2 left-3 translate-y-1/2 text-[#757A80] hover:text-gray-600"
+          />
+        )}
+        <input
+          type={inputType}
+          className={cn(
+            ' placeholder:text-text-placeholder flex h-10 w-full rounded-md px-3 py-2 font-sans text-sm outline-none disabled:cursor-not-allowed disabled:opacity-50 ',
+            variantStyles[variant],
+            'aria-[invalid=true]:border-destructive',
+            className,
+            (password || email) && 'px-10',
+          )}
+          ref={ref}
+          suppressHydrationWarning
+          {...props}
+        />
+        {password && (
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute top-1/2 right-3 -translate-y-1/2 text-[#757A80] hover:text-gray-600"
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        )}
+        {loading && (
+          <div className="absolute top-1/2 right-3 -translate-y-1/2">
+            <Spinner height={20} width={20} />
+          </div>
+        )}
+        {variant === 'success' && (
+          <div className="absolute top-1/2 right-3 -translate-y-1/2 text-[#55DD99]">
+            <Check size={20} />
+          </div>
+        )}
+      </div>
+    );
+  },
+);
+Input.displayName = 'Input';
+
+export { Input };

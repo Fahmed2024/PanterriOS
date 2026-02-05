@@ -1,10 +1,9 @@
 import AuthWrapper from '@/components/auth/authWrapper';
-import LoginForm from '@/components/auth/loginForm';
 
-export default function LoginPage() {
+export default function ResetPasswordPage() {
   return (
     <AuthWrapper pageTitle="Welcome back">
-      <LoginForm />
+      <div></div>
     </AuthWrapper>
   );
 }

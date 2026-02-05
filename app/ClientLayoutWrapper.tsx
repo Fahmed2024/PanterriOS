@@ -18,7 +18,7 @@ export default function ClientLayoutWrapper({
   const noDashboardRoutes = [
     '/',
     '/login',
-    '/login/verify-two-fa',
+    '/login/verify-2fa',
     '/create-password',
     '/forgot-password',
     '/forgot-password/reset-password',

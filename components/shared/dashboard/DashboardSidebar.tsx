@@ -77,7 +77,6 @@ export function DashboardSidebar({
     const isActive = item.link
       ? pathname === item.link || pathname.startsWith(item.link + '/')
       : false;
-    const isChildActive = hasChildren && isParentActive(item);
 
     if (hasChildren) {
       return (
@@ -88,12 +87,19 @@ export function DashboardSidebar({
                 'text-accent-foreground flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                 level > 0 && 'pl-9',
                 isActive
-                  ? 'text-accent-foreground'
-                  : 'text-accent-foreground hover:bg-accent',
+                  ? 'bg-blue-100   py-4 text-[#155DFC] font-bold'
+                  : 'text-accent-foreground hover:bg-blue-50',
                 isCollapsed && !isMobile && 'justify-center px-2',
               )}
               title={isCollapsed && !isMobile ? item.name : undefined}
             >
+              {isActive && (
+                <span
+                  className={cn(
+                    'h-[80%] rounded-2xl w-4 py-4 -left-2 absolute bg-[#155DFC',
+                  )}
+                ></span>
+              )}
               {Icon && <Icon className="text-icon h-5 w-5 shrink-0" />}
               {(!isCollapsed || isMobile) && (
                 <>
@@ -123,18 +129,25 @@ export function DashboardSidebar({
         href={item.link || '#'}
         onClick={isMobile ? onClose : undefined}
         className={cn(
-          'flex items-center gap-3 rounded-2xl p-3 transition-colors',
+          'flex items-center gap-3 rounded-md p-3 transition-colors relative overflow-hidden',
           level > 0 && 'pl-9',
           isActive
-            ? 'bg-primary-brand-alt py-4 text-[#E5F1FF]'
-            : 'text-accent-foreground hover:bg-accent',
+            ? 'bg-blue-100   py-4 text-[#155DFC] font-bold'
+            : 'text-gray-500 hover:bg-blue-50',
           isCollapsed && !isMobile && level === 0 && 'justify-center px-2',
         )}
         title={isCollapsed && !isMobile && level === 0 ? item.name : undefined}
       >
+        {isActive && (
+          <span
+            className={cn(
+              'h-[80%] rounded-2xl w-4 -left-2 absolute bg-[#155DFC] py-4',
+            )}
+          ></span>
+        )}
         {Icon && (
           <Icon
-            className={`h-5 w-5 shrink-0 ${isActive ? 'text-[#E5F1FF]' : 'text-icon'} `}
+            className={`h-5 w-5 shrink-0 ${isActive ? 'text-[#155DFC] font-bold' : 'text-icon'} `}
           />
         )}
         {(!isCollapsed || isMobile || level > 0) && (

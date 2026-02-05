@@ -45,20 +45,20 @@ export function Header() {
               </div>
             </Link>
 
-            <div className="hidden items-center gap-4 md:flex">
+            <div className=" items-center gap-4 md:flex">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant={'outline'}
                     size={'lg'}
-                    className="flex items-center py-6"
+                    className="flex items-center lg:py-6 py-3"
                   >
                     {' '}
                     <span> login</span> <MoveRight />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-32 border-none shadow-lg space-y-6 flex flex-col justify-center items-center">
-                  <Link href={'/'}>
+                  <Link href={'/login'}>
                     <Button
                       variant={'outline'}
                       size={'lg'}
@@ -82,7 +82,10 @@ export function Header() {
             </div>
 
             {/* Mobile Menu Button */}
-            <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
+            <button
+              className="hidden text-white"
+              onClick={() => setIsOpen(!isOpen)}
+            >
               {isOpen ? (
                 <X className="h-6 w-6 " />
               ) : (
