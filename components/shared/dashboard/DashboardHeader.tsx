@@ -1,10 +1,5 @@
-import {
-  PanelLeft,
-  LogOut,
-  UserCircle,
-  ChevronDown,
-  Search,
-} from 'lucide-react';
+'use client';
+import { PanelLeft, LogOut, ChevronDown, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 import {
@@ -113,7 +108,7 @@ export function DashboardHeader({
 
         {/* Notifications */}
         <Notification />
-        <div className="p-3 pb-6">
+        <div className="p-3 pb-6 lg:flex hidden">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
@@ -123,10 +118,12 @@ export function DashboardHeader({
                 )}
                 title={isCollapsed && !isMobile ? 'My Account' : undefined}
               >
-                <UserCircle className="text-icon h-5 w-5 shrink-0" />
+                <span className="lg:text-2xl text-lg rounded-full border-2 p-2">
+                  AH
+                </span>
                 {(!isCollapsed || isMobile) && (
                   <>
-                    <span className="flex-1 text-left">My Account</span>
+                    <span className="flex-1 text-left">Ahmed Hakimi</span>
                     <ChevronDown className="h-4 w-4 shrink-0" />
                   </>
                 )}

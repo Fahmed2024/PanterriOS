@@ -6,12 +6,11 @@ import {
   FileSearchCorner,
   FileText,
   LayoutDashboard,
-  LucideIcon,
   MapPin,
-  Menu,
   Settings,
   Shield,
   TrendingUp,
+  User,
   Users2,
   Wallet,
 } from 'lucide-react';
@@ -85,8 +84,13 @@ export const MOBILE_SIDE_BAR_MENU: Record<Role, MenuItem[]> = Object.keys(
 
 export const accountMenu: ChildMenu[] = [
   {
+    name: 'Profile',
+    link: '/profile',
+    icon: User,
+  },
+  {
     name: 'Settings',
-    link: '/dahsboard/settings',
+    link: '/settings',
     icon: Settings,
   },
 ];

@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { DashboardLayout } from '@/components/shared/dashboard/DashboardLayout';
+import { DashboardLayout } from '@/components/shared';
 import { DashboardUser } from '@/interface/dashboard';
 import { useAuthStore } from '@/store/authStore';
 import { ProtectedRoute } from '@/hook/protectedRoute';

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { X, ChevronDown, ChevronRight } from 'lucide-react';
+import { X, ChevronDown, ChevronRight, LogOut } from 'lucide-react';
 import {
   Collapsible,
   CollapsibleContent,
@@ -15,10 +15,19 @@ import dashboardLogo from '@/assets/logo.png';
 import collapsLogo from '@/assets/icon.png';
 import { useAuthStore } from '@/store/authStore';
 import { useEffect, useState } from 'react';
-import { MenuItem } from '@/interface';
+import { ChildMenu, MenuItem } from '@/interface';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface DashboardSidebarProps {
   navigationItems: MenuItem[];
+  accountMenuItems?: ChildMenu[];
+
   isOpen: boolean;
   onClose: () => void;
   isMobile?: boolean;
@@ -31,29 +40,29 @@ export function DashboardSidebar({
   onClose,
   isMobile = false,
   isCollapsed = false,
+  accountMenuItems,
 }: DashboardSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [openItems, setOpenItems] = useState<string[]>([]);
   const { clearAuth } = useAuthStore();
 
-  // Check if any child is active to keep parent open
-  const isParentActive = (item: MenuItem) => {
-    if (!item.children) return false;
-    return item.children.some(
-      (child) =>
-        child.link &&
-        (pathname === child.link || pathname.startsWith(child.link + '/')),
-    );
-  };
-
   // Initialize open items based on active routes
   useEffect(() => {
+    // Check if any child is active to keep parent open
+    const isParentActive = (item: MenuItem) => {
+      if (!item.children) return false;
+      return item.children.some(
+        (child) =>
+          child.link &&
+          (pathname === child.link || pathname.startsWith(child.link + '/')),
+      );
+    };
+
     const activeParents = navigationItems
       .filter((item) => item.children && isParentActive(item))
       .map((item) => item.name);
     setOpenItems(activeParents);
-    console.log(navigationItems);
   }, [pathname, navigationItems]);
 
   const toggleItem = (title: string) => {
@@ -209,7 +218,7 @@ export function DashboardSidebar({
       </nav>
 
       {/* Account Menu Items */}
-      {/* <div className="p-3 pb-6">
+      <div className="p-3 pb-6 flex lg:hidden">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
@@ -219,10 +228,12 @@ export function DashboardSidebar({
               )}
               title={isCollapsed && !isMobile ? 'My Account' : undefined}
             >
-              <UserCircle className="text-icon h-5 w-5 shrink-0" />
+              <span className="lg:text-2xl text-lg rounded-full border-2 p-2">
+                AH
+              </span>{' '}
               {(!isCollapsed || isMobile) && (
                 <>
-                  <span className="flex-1 text-left">My Account</span>
+                  <span className="flex-1 text-left">Ahmed Hakimi</span>
                   <ChevronDown className="h-4 w-4 shrink-0" />
                 </>
               )}
@@ -233,27 +244,28 @@ export function DashboardSidebar({
             side={isCollapsed && !isMobile ? 'right' : 'top'}
             className="w-56 border-none shadow-lg"
           >
-            {accountMenuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.link;
-              return (
-                <DropdownMenuItem key={item.link} asChild>
-                  <Link
-                    link={item.link}
-                    onClick={isMobile ? onClose : undefined}
-                    className={cn(
-                      'flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                      isActive
-                        ? 'bg-accent text-accent-foreground'
-                        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-                    )}
-                  >
-                    <Icon className="h-4 w-4 shrink-0" />
-                    <span>{item.name}</span>
-                  </Link>
-                </DropdownMenuItem>
-              );
-            })}
+            {accountMenuItems &&
+              accountMenuItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = pathname === item.link;
+                return (
+                  <DropdownMenuItem key={item.link} asChild>
+                    <Link
+                      href={item.link!}
+                      onClick={isMobile ? onClose : undefined}
+                      className={cn(
+                        'flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                        isActive
+                          ? 'bg-accent text-accent-foreground'
+                          : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+                      )}
+                    >
+                      <Icon className="h-4 w-4 shrink-0" />
+                      <span>{item.name}</span>
+                    </Link>
+                  </DropdownMenuItem>
+                );
+              })}
 
             <DropdownMenuSeparator />
 
@@ -268,7 +280,7 @@ export function DashboardSidebar({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </div> */}
+      </div>
     </div>
   );
 
@@ -281,7 +293,7 @@ export function DashboardSidebar({
               className="fixed inset-0 z-40 bg-black/50 md:hidden"
               onClick={onClose}
             />
-            <aside className="fixed inset-y-0 left-0 z-50  transform transition-transform md:hidden">
+            <aside className="fixed inset-y-0 left-0 z-50  transform transition-transform md:hidden bg-white">
               <SidebarContent />
             </aside>
           </>

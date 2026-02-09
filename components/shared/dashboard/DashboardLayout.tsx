@@ -82,6 +82,7 @@ export function DashboardLayout({
       {/* Mobile Sidebar */}
       <DashboardSidebar
         navigationItems={menuOptions}
+        accountMenuItems={accountMenu}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         isMobile={true}
