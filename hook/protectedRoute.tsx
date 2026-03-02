@@ -13,7 +13,8 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const publicRoutes = [
     '/',
     '/login',
-    '/login/verify-two-fa',
+    '/login/set-up-2fa',
+    '/login/verify-2fa',
     '/create-password',
     '/forgot-password',
     '/forgot-password/reset-password',

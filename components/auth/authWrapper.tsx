@@ -13,12 +13,14 @@ interface AuthWrapperProps {
   pageTitle: string;
   pageSubTitle?: string;
   enableBackBtn?: boolean;
+  cardClassName?: string;
 }
 export default function AuthWrapper({
   children,
   pageTitle,
   pageSubTitle,
   enableBackBtn,
+  cardClassName,
 }: AuthWrapperProps) {
   const date = new Date().getFullYear();
   return (
@@ -53,7 +55,12 @@ export default function AuthWrapper({
         <div></div>
       </div>
       <div className="flex  items-center justify-center ">
-        <div className="text-muted-foreground relative z-10 w-full max-w-md rounded-xl shadow">
+        <div
+          className={cn(
+            'text-muted-foreground relative z-10 w-full max-w-md rounded-xl shadow',
+            cardClassName,
+          )}
+        >
           {/* Form Card */}
           <Card className="rounded-lg ">
             <CardContent

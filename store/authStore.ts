@@ -2,11 +2,12 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 // import { logout } from '@/service/authApi'
 
-import { setTokens } from '@/services/axios';
-import { Tokens, User } from '@/types';
+import { deleteTokens, setTokens } from '@/services/axios';
+import { Tokens } from '@/types';
+import { UserProfileRes } from '@/interface';
 
 interface AuthState {
-  user: User | null;
+  user: UserProfileRes | null;
   avatarUrl?: string | null;
   tokens: Tokens | null;
   isAuthenticated: boolean;
@@ -14,10 +15,9 @@ interface AuthState {
   hasHydrated: boolean;
   // Actions
 
-  setAuth: (user: User, tokens: Tokens) => Promise<void>;
-  updateUser: (userData: Partial<User>) => Promise<User>;
+  setAuth: (user: UserProfileRes, tokens: Tokens) => Promise<void>;
+  updateUser: (userData: Partial<UserProfileRes>) => Promise<UserProfileRes>;
   updateToken: (tokens: Partial<Tokens>) => Promise<Tokens>;
-  updateUserLoanStatus: (loanStatus: boolean) => Promise<User>;
   updateUserAvatar: (avatarUrl: string) => void;
   clearAuth: () => Promise<void>;
   loadAuth: () => Promise<void>;
@@ -73,19 +73,12 @@ export const useAuthStore = create<AuthState>()(
         set({ tokens: updatedTokens });
         return updatedTokens;
       },
-      updateUserLoanStatus: async (loanStatus) => {
-        const currentUser = get().user;
-        if (!currentUser) throw new Error('No user to update');
-
-        const updatedUser = { ...currentUser, hasBacsLoan: loanStatus };
-        set({ user: updatedUser });
-        return updatedUser;
-      },
 
       clearAuth: async () => {
         try {
           set({ isLoading: true });
           // await logout()
+          deleteTokens();
           set({
             user: null,
             tokens: null,
@@ -114,7 +107,7 @@ export const useAuthStore = create<AuthState>()(
             return;
           }
 
-          const user = JSON.parse(userData!) as User;
+          const user = JSON.parse(userData!) as UserProfileRes;
           const token = JSON.parse(tokens!) as Tokens;
           set({
             user,

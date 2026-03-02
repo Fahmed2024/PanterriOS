@@ -18,6 +18,7 @@ import { useState } from 'react';
 import Notification from './Notification';
 import { AppBreadcrumbs } from '../AppBreadcrumbs';
 import { Input } from '@/components/ui/input';
+import { useAuthStore } from '@/store/authStore';
 
 interface DashboardHeaderProps {
   user: DashboardUser;
@@ -43,9 +44,11 @@ export function DashboardHeader({
   const router = useRouter();
   const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState('');
+  const { clearAuth } = useAuthStore();
 
-  const handleLogout = () => {
-    router.push('/');
+  const handleLogout = async () => {
+    await clearAuth();
+    router.push('/login');
   };
 
   return (
@@ -119,11 +122,13 @@ export function DashboardHeader({
                 title={isCollapsed && !isMobile ? 'My Account' : undefined}
               >
                 <span className="lg:text-2xl text-lg rounded-full border-2 p-2">
-                  AH
+                  {user.initials}
                 </span>
                 {(!isCollapsed || isMobile) && (
                   <>
-                    <span className="flex-1 text-left">Ahmed Hakimi</span>
+                    <span className="flex-1 text-left">
+                      {`${user.firstName} ${user.lastName}`.trim()}
+                    </span>
                     <ChevronDown className="h-4 w-4 shrink-0" />
                   </>
                 )}

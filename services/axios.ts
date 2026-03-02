@@ -90,13 +90,12 @@ API.interceptors.response.use(
         if (!refreshToken || refreshToken === null)
           throw new Error('No refresh token found')
 
-        const { data } = await axios.post(`${baseUrl}/auth/refresh-token`, {
+        const { data } = await axios.post(`${baseUrl}/api/v1/auth/refresh-token`, {
           refreshToken,
         })
-        const newAccessToken = data.body.accessToken
-        const newRefreshToken = data.body.refreshToken
+        const newAccessToken = data.accessToken
+        const newRefreshToken = data.refreshToken || refreshToken
         setTokens(newAccessToken, newRefreshToken)
-        setTokens(newAccessToken, refreshToken)
 
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
         return API(originalRequest)

@@ -1,10 +1,10 @@
 'use client';
+
 import { PageHead, StatCard } from '@/components/shared';
 import { ReUseAbleTable } from '@/components/shared/reUseAbleTable';
 import { Button } from '@/components/ui/button';
 import { type ColumnDef } from '@tanstack/react-table';
 import {
-  CircleAlert,
   CircleCheckBig,
   CircleX,
   Eye,
@@ -27,7 +27,9 @@ import {
 import Link from 'next/link';
 import { UsersDetialsPage } from '@/components/dashboard/users/page';
 import EditCreateModal from '@/components/dashboard/users/modal/editCreateModal';
-interface usersProp {
+import { useRetrieveUsers } from '@/hook/user-management/useRetrieveUsers';
+
+interface UsersRow {
   id: number;
   name: string;
   email: string;
@@ -37,90 +39,49 @@ interface usersProp {
 }
 
 export default function UsersPage() {
-  const usersRes = {
-    users: [
-      {
-        id: 1,
-        name: 'John Doe',
-        email: 'admin@panterrium.com',
-        role: 'Super Admin',
-        status: 'active',
-        last_login: '2024-01-25T14:30:00',
-      },
-      {
-        id: 2,
-        name: 'Chidi Okonkwo',
-        email: 'chidi@panterrium.com',
-        role: 'Finance Admin',
-        status: 'active',
-        last_login: '2024-01-25T10:15:00',
-      },
-      {
-        id: 3,
-        name: 'Amara Ana',
-        email: 'amara@panterrium.com',
-        role: 'Real Estate Analyst',
-        status: 'active',
-        last_login: '2024-01-24T16:45:00',
-      },
-      {
-        id: 4,
-        name: 'Ngozi Edit',
-        email: 'ngozi@panterrium.com',
-        role: 'Content Editor',
-        status: 'active',
-        last_login: '2024-01-24T12:20:00',
-      },
-      {
-        id: 5,
-        name: 'Kunle Modera',
-        email: 'kunle@panterrium.com',
-        role: 'Event Moderator',
-        status: 'inactive',
-        last_login: '2024-01-20T09:30:00',
-      },
-    ],
-    admin_summary: [
-      {
-        label: 'Total Admin Users',
-        value: 5,
-        icon: Users,
-        bgColor: 'text-blue-500 bg-blue-100 rounded-md p-2',
-      },
-      {
-        label: 'Active Users',
-        value: 4,
-        icon: Shield,
-        bgColor: 'text-green-500 bg-green-100 rounded-md p-2',
-      },
-      {
-        label: 'Roles Defined',
-        value: 5,
-        icon: Shield,
-        bgColor: 'text-purple-500 bg-purple-100 rounded-md p-2',
-      },
-    ],
-  };
+  const { data: usersRes } = useRetrieveUsers({ search: '', page: 1, limit: 20 });
 
-  const columns: ColumnDef<usersProp>[] = [
+  const tableData: UsersRow[] =
+    usersRes?.data?.map((user, index) => ({
+      id: user.id || index + 1,
+      name: user.fullName,
+      email: user.email,
+      role: user.roles?.join(', ') || '-',
+      status: user.status,
+      last_login: '-',
+    })) || [];
+
+  const summary = [
+    {
+      label: 'Total Admin Users',
+      value: usersRes?.userStats?.totalUsers || 0,
+      icon: Users,
+      bgColor: 'text-blue-500 bg-blue-100 rounded-md p-2',
+    },
+    {
+      label: 'Active Users',
+      value: usersRes?.userStats?.activeUsers || 0,
+      icon: Shield,
+      bgColor: 'text-green-500 bg-green-100 rounded-md p-2',
+    },
+    {
+      label: 'Pending Users',
+      value: usersRes?.userStats?.pendingUsers || 0,
+      icon: Shield,
+      bgColor: 'text-orange-500 bg-orange-100 rounded-md p-2',
+    },
+  ];
+
+  const columns: ColumnDef<UsersRow>[] = [
     {
       accessorKey: 'name',
       header: 'name',
-      cell: ({ row }) => {
-        const id = row.original.id;
-        return (
-          <div className=" ">
-            <p>{row.original.name} </p>
-          </div>
-        );
-      },
+      cell: ({ row }) => <p>{row.original.name}</p>,
     },
     {
       accessorKey: 'email',
       header: 'Email',
-      cell: ({ row }) => (
-        <div className="text-gray-400">{row.original.email}</div>
-      ),
+      cell: ({ row }) => <div className="text-gray-400">{row.original.email}</div>,
     },
 
     {
@@ -128,20 +89,10 @@ export default function UsersPage() {
       header: 'role',
       cell: ({ row }) => {
         const role = row.original.role;
-        return role.toLowerCase() === 'approved' ? (
-          <div className="text-center capitalize bg-green-50 text-green-500 flex  items-center gap-1.5 border border-green-300 whitespace-nowrap p-1 rounded-sm w-fit ">
-            <CircleCheckBig className="w-3 h-3" />
-            <span> {role}</span>
-          </div>
-        ) : role === 'Pending' ? (
-          <div className="text-center capitalize bg-orange-50 text-orange-500 flex  items-center gap-1.5 border border-orange-300 whitespace-nowrap p-1 rounded-sm w-fit ">
-            <CircleAlert className="w-3 h-3" />
-            <span> {role}</span>
-          </div>
-        ) : (
-          <div className="text-center capitalize bg-gray-50 text-gray-500 flex  items-center gap-1.5 border border-gray-300 whitespace-nowrap p-1 rounded-sm w-fit ">
+        return (
+          <div className="text-center capitalize bg-gray-50 text-gray-500 flex items-center gap-1.5 border border-gray-300 whitespace-nowrap p-1 rounded-sm w-fit ">
             <User className="w-3 h-3" />
-            <span> {role}</span>
+            <span>{role}</span>
           </div>
         );
       },
@@ -151,7 +102,8 @@ export default function UsersPage() {
       header: ' status',
       cell: ({ row }) => {
         const status = row.original.status;
-        return status.toLowerCase() === 'active' ? (
+        return status.toLowerCase() === 'active' ||
+          status.toLowerCase() === 'activated' ? (
           <div className="text-center capitalize bg-green-50 text-green-500 flex  items-center gap-1.5 border border-green-300 whitespace-nowrap p-1 rounded-sm w-fit ">
             <CircleCheckBig className="w-3 h-3" />
             <span> {status}</span>
@@ -189,16 +141,12 @@ export default function UsersPage() {
                   </DrawerTrigger>
                   <DrawerContent
                     className=" lg:data-[vaul-drawer-direction=left]:sm:max-w-xl
-            lg:data-[vaul-drawer-direction=right]:sm:max-w-xl  overflow-hiddenoverflow-hidden overflow-y-auto
-            "
+            lg:data-[vaul-drawer-direction=right]:sm:max-w-xl overflow-y-auto"
                   >
                     <DrawerHeader>
                       <DrawerTitle className="flex justify-between">
                         <div>
                           <div className="text-xl font-bold">User Profile </div>
-                          {/* <p className="text-gray-500">
-                          Complete details and activity for John Doe
-                        </p> */}
                         </div>
                         <DrawerClose asChild>
                           <X />
@@ -229,6 +177,7 @@ export default function UsersPage() {
       },
     },
   ];
+
   return (
     <div>
       <PageHead
@@ -242,7 +191,7 @@ export default function UsersPage() {
         </EditCreateModal>
       </PageHead>
       <div className="grid lg:grid-cols-3 grid-cols-2 flex-wrap lg:gap-6 gap-3 my-8 ">
-        {usersRes.admin_summary.map((user, i) => (
+        {summary.map((user, i) => (
           <StatCard
             label={user.label}
             value={user.value}
@@ -253,7 +202,7 @@ export default function UsersPage() {
         ))}
       </div>
 
-      <ReUseAbleTable data={usersRes.users} columns={columns} />
+      <ReUseAbleTable data={tableData} columns={columns} />
     </div>
   );
 }

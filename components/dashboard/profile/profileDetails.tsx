@@ -1,17 +1,9 @@
 'use client';
+
 import Image from 'next/image';
 import Banner from '@/assets/svg/profile-header.svg';
 import ProfilePic from '@/assets/images/ahmed.png';
-import {
-  Calendar,
-  Camera,
-  Check,
-  Mail,
-  MapPin,
-  Pencil,
-  Phone,
-  User,
-} from 'lucide-react';
+import { Calendar, Camera, Mail, Phone, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -23,30 +15,55 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { useMemo, useState } from 'react';
+import { useMyProfileDetails } from '@/hook/user-management/useMyProfileDetails';
+import { useUploadMyProfilePicture } from '@/hook/user-management/useUploadMyProfilePicture';
 
 export function ProfileDetails() {
-  const userDetails = [
-    {
-      holder: 'Email Address',
-      details: 'Blessing.solomon@panterrare.com',
-      icon: Mail,
-    },
-    {
-      holder: 'Phone Number',
-      details: '+234 817 294 4795',
-      icon: Phone,
-    },
-    {
-      holder: 'Gender',
-      details: 'Male',
-      icon: User,
-    },
-    {
-      holder: 'Member Since',
-      details: 'October 2024',
-      icon: Calendar,
-    },
-  ];
+  const { data: profile } = useMyProfileDetails();
+  const { mutateAsync: uploadProfilePicture, isPending: isUploading } =
+    useUploadMyProfilePicture();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const fullName = useMemo(() => {
+    if (!profile) return 'Administrator';
+    return `${profile.firstName} ${profile.lastName}`.trim();
+  }, [profile]);
+
+  const userDetails = useMemo(
+    () => [
+      {
+        holder: 'Email Address',
+        details: profile?.email || '-',
+        icon: Mail,
+      },
+      {
+        holder: 'Phone Number',
+        details: profile?.phoneNumber || '-',
+        icon: Phone,
+      },
+      {
+        holder: 'Gender',
+        details: profile?.gender || '-',
+        icon: User,
+      },
+      {
+        holder: 'Member Since',
+        details: profile?.joinedAt
+          ? new Date(profile.joinedAt).toLocaleDateString()
+          : '-',
+        icon: Calendar,
+      },
+    ],
+    [profile],
+  );
+
+  const handleSavePhoto = async () => {
+    if (!selectedFile) return;
+    await uploadProfilePicture(selectedFile);
+    setSelectedFile(null);
+  };
+
   return (
     <div className=" lg:my-10 my-5 relative container mx-auto shadow h-fit ">
       <Image
@@ -60,23 +77,28 @@ export function ProfileDetails() {
         <div className="flex lg:flex-row flex-col gap-2 justify-between w-full lg:items-end items-center ">
           <div className=" flex items-end gap-6 ">
             <div className=" w-35 h-35  object-cover object-center items-center rounded-md overflow-hidden">
-              <Image
-                src={ProfilePic}
-                alt=""
-                width={100}
-                height={100}
-                className="    object-center w-full  "
-              />
+              {profile?.profileImage ? (
+                <img
+                  src={profile.profileImage}
+                  alt="Profile"
+                  className="object-center w-full"
+                />
+              ) : (
+                <Image
+                  src={ProfilePic}
+                  alt=""
+                  width={100}
+                  height={100}
+                  className="object-center w-full"
+                />
+              )}
             </div>
 
             <div className="space-y-2">
-              <h2 className="lg:text-3xl text-xl font-bold ">Ahmed Faruq</h2>
+              <h2 className="lg:text-3xl text-xl font-bold ">{fullName}</h2>
               <p className="bg-black text-white px-4 rounded-sm whitespace-nowrap w-fit">
-                Admin Officer
+                {profile?.roles?.[0] || 'Admin.Officer'}
               </p>
-              <div className="flex items-center lg:gap-2 gap-1">
-                <MapPin className="w-5 h-5" /> <span>Lagos Nigeria</span>
-              </div>
             </div>
           </div>
           <Dialog>
@@ -85,35 +107,39 @@ export function ProfileDetails() {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle className="flex items-center">
-                  {' '}
-                  <Pencil /> <span> Are you absolutely sure?</span>
-                </DialogTitle>
+                <DialogTitle>Update Profile Photo</DialogTitle>
                 <DialogDescription className=" space-y-4 items-center">
                   <div className=" flex gap-4 bg-gray-100 p-2">
-                    <Image
-                      src={ProfilePic}
-                      alt=""
-                      width={100}
-                      height={100}
-                      className=" w-24 h-24  object-cover object-center items-center rounded-md "
-                    />
+                    {profile?.profileImage ? (
+                      <img
+                        src={profile.profileImage}
+                        alt=""
+                        className=" w-24 h-24 object-cover object-center items-center rounded-md "
+                      />
+                    ) : (
+                      <Image
+                        src={ProfilePic}
+                        alt=""
+                        width={100}
+                        height={100}
+                        className=" w-24 h-24 object-cover object-center items-center rounded-md "
+                      />
+                    )}
                     <div className="space-y-1">
                       <div className="text-xl font-bold">Profile Picture</div>
-                      <p className="text-gray-500">JPG, PNG or GIF. Max 2MB.</p>
-                      <div className=" relative">
-                        {' '}
-                        <label
-                          // for="profileImage"
-                          className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition relative"
-                        >
+                      <p className="text-gray-500">JPG, JPEG or PNG. Max 12MB.</p>
+                      <div className="relative">
+                        <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition relative">
                           <Camera className=" w-4 h-4" />
-                          <span> Change Photo</span>
+                          <span>Change Photo</span>
                           <Input
                             type="file"
                             placeholder="Choose photo"
-                            accept="image/png, image/jpeg, image/gif"
-                            className=" opacity-0  absolute w-full h-10 top-0"
+                            accept="image/png, image/jpeg, image/jpg"
+                            className="opacity-0 absolute w-full h-10 top-0"
+                            onChange={(e) =>
+                              setSelectedFile(e.target.files?.[0] || null)
+                            }
                           />
                         </label>
                       </div>
@@ -125,9 +151,12 @@ export function ProfileDetails() {
                         Cancel
                       </Button>
                     </DialogClose>
-                    <Button className="flex bg-blue-500 text-white gap-1.5 items-center">
-                      {' '}
-                      <Check /> <span>Save Change</span>{' '}
+                    <Button
+                      className="flex bg-blue-500 text-white gap-1.5 items-center"
+                      onClick={handleSavePhoto}
+                      disabled={!selectedFile || isUploading}
+                    >
+                      Save Change
                     </Button>
                   </div>
                 </DialogDescription>

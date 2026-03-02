@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-// import { useLogin } from '@/hooks/auth/useLogin'
+import { useLogin } from '@/hook/auth/useLogin';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import {
@@ -15,7 +15,6 @@ import {
   FormLabel,
   FormMessage,
 } from '../ui/form';
-import { useState } from 'react';
 import { Checkbox } from '../ui/checkbox';
 import { Spinner } from '../ui/spinner';
 
@@ -30,15 +29,17 @@ const loginSchema = z.object({
 type LoginSchema = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
-  // const { loginFn, isLoading } = useLogin()
-  const [isLoading] = useState(false);
+  const { loginFn, isLoading } = useLogin();
   const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = async (data: LoginSchema) => {
-    // await loginFn({ ...data, email: data.email.toLowerCase() })
-    console.log({ ...data });
+    await loginFn({
+      ...data,
+      email: data.email.toLowerCase(),
+      userDevice: navigator.userAgent,
+    });
   };
 
   return (

@@ -16,21 +16,17 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from '@/components/ui/input-otp';
-// import { useVerify2faLogin } from '@/hooks/auth/useVerify2faLogin'
-import { useAuthStore } from '@/store/authStore';
-import { useState } from 'react';
+import { useVerify2faLogin } from '@/hook/auth/useVerify2faLogin';
 import { Spinner } from '../ui/spinner';
 
 const FormSchema = z.object({
   token: z.string().min(6, {
-    message: 'Your one-time password must be 4 characters.',
+    message: 'Your one-time password must be 6 characters.',
   }),
 });
 
 export function Verify2faOnLogin() {
-  // const { verify2faloginFn, isLoading } = useVerify2faLogin()
-  const [isLoading] = useState(false);
-  const { user } = useAuthStore();
+  const { verify2faLoginFn, isLoading } = useVerify2faLogin();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -39,13 +35,16 @@ export function Verify2faOnLogin() {
   });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    if (!user) return;
+    const temporaryToken = localStorage.getItem('twoFactorTemporaryToken');
+    if (!temporaryToken) return;
+
     const payload = {
-      email: user.email,
-      token: data.token,
+      temporaryToken,
+      code: data.token,
+      deviceToken: navigator.userAgent,
     };
-    // await verify2faloginFn(payload)
-    console.log(payload);
+
+    await verify2faLoginFn(payload);
   }
 
   return (

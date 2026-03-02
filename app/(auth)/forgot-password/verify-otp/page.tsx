@@ -5,7 +5,11 @@ import { useCountdown } from '@/lib/timeCounter';
 import { useState } from 'react';
 
 export default function VerifyOtpPage() {
-  const [email, setEmail] = useState<string | null>('');
+  const [email] = useState<string | null>(() =>
+    typeof window !== 'undefined'
+      ? localStorage.getItem('resetPasswordEmail')
+      : null,
+  );
   const counter = useCountdown(40);
 
   // Obscure email function
@@ -18,7 +22,7 @@ export default function VerifyOtpPage() {
   return (
     <AuthWrapper
       pageTitle="Check Your Email"
-      pageSubTitle={`We sent a verification code to ${obscureEmail('admin@panterrium.com')} `}
+      pageSubTitle={`We sent a verification code to ${obscureEmail(email || 'admin@panterrium.com')} `}
       enableBackBtn
     >
       <VerifyForgetPasswordOTPForm counter={counter} email={email} />

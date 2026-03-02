@@ -18,6 +18,7 @@ export default function ClientLayoutWrapper({
     '/',
     '/login',
     '/login/verify-2fa',
+    '/login/set-up-2fa',
     '/create-password',
     '/forgot-password',
     '/forgot-password/reset-password',
@@ -29,17 +30,11 @@ export default function ClientLayoutWrapper({
   const { user } = useAuthStore();
 
   const currentUser: DashboardUser = {
-    // firstName: user.firstName,
-    // lastName: user.lastName,
-    // email: user.email,
-    // role: user.role as UserRoles[],
-
-    email: 'Ahmed@email.com',
-    firstName: 'Ahmed',
-    lastName: 'Faruq',
-    role: ['Admin.Officer'],
-
-    initials: `${user?.firstName.charAt(0)}${user?.lastName.charAt(0)}`,
+    email: user?.email || '',
+    firstName: user?.firstName || 'Admin',
+    lastName: user?.lastName || 'User',
+    role: user?.roles || ['Admin.Officer'],
+    initials: `${user?.firstName?.charAt(0) || 'A'}${user?.lastName?.charAt(0) || 'U'}`,
   };
 
   if (isAuthRoute) {

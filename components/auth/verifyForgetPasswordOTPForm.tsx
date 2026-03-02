@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormMessage,
@@ -17,14 +16,13 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from '@/components/ui/input-otp';
-import { Info, RefreshCcw } from 'lucide-react';
-import { useState } from 'react';
-// import { useResendResetPasswordOtp } from '@/hooks/auth/useResendResetPasswordOtp';
-// import { useVerifyResetPasswordOtp } from '@/hooks/auth/useVerifyResetPasswordOtp';
+import { RefreshCcw } from 'lucide-react';
+import { useResendResetPasswordOtp } from '@/hook/auth/useResendResetPasswordOtp';
+import { useVerifyResetPasswordOtp } from '@/hook/auth/useVerifyResetPasswordOtp';
 
 const FormSchema = z.object({
-  otp: z.string().min(4, {
-    message: 'Your one-time password must be 4 characters.',
+  otp: z.string().min(6, {
+    message: 'Your one-time password must be 6 characters.',
   }),
 });
 interface VerifyForgetPasswordOTPFormProps {
@@ -43,19 +41,16 @@ export function VerifyForgetPasswordOTPForm({
     },
   });
 
-  // const { resendForgetPasswordOtpFn, isLoading: isResending } =
-  //   useResendResetPasswordOtp();
-
-  // const { verifyOtpFn, isLoading } = useVerifyResetPasswordOtp();
-  const [isLoading] = useState(false);
-  const [isResending] = useState(false);
+  const { resendResetPasswordOtpFn, isLoading: isResending } =
+    useResendResetPasswordOtp();
+  const { verifyResetPasswordOtpFn, isLoading } = useVerifyResetPasswordOtp();
 
   const handleResendOtP = async () => {
     if (!email) return;
     const payload = {
       email: email,
     };
-    // await resendForgetPasswordOtpFn(payload);
+    await resendResetPasswordOtpFn(payload);
   };
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
@@ -63,7 +58,7 @@ export function VerifyForgetPasswordOTPForm({
       email: email!,
       otp: data.otp,
     };
-    // await verifyOtpFn(payload);
+    await verifyResetPasswordOtpFn(payload);
   }
 
   return (
@@ -78,7 +73,7 @@ export function VerifyForgetPasswordOTPForm({
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <InputOTP maxLength={4} {...field}>
+                <InputOTP maxLength={6} {...field}>
                   <InputOTPGroup className="w-ull mx-auto space-x-4">
                     <InputOTPSlot
                       index={0}
