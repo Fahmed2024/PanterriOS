@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-// import { useSendResetPasswordOtp } from '@/hooks/auth/useSendResetPasswordOtp'
+import { useSendResetPasswordOtp } from '@/hook/auth/useSendResetPasswordOtp';
 import { Button } from '../ui/button';
 import {
   Form,
@@ -14,7 +14,6 @@ import {
   FormMessage,
 } from '../ui/form';
 import { Input } from '../ui/input';
-import { useState } from 'react';
 import { Spinner } from '../ui/spinner';
 import { BellRing } from 'lucide-react';
 
@@ -25,8 +24,7 @@ const createPasswordSchema = z.object({
 type CreatePasswordSchema = z.infer<typeof createPasswordSchema>;
 
 export default function ForgetPasswordForm() {
-  // const { sendForgetPasswordOtpFn, isLoading } = useSendResetPasswordOtp()
-  const [isLoading, setIsLoading] = useState(false);
+  const { sendResetPasswordOtpFn, isLoading } = useSendResetPasswordOtp();
   const form = useForm<CreatePasswordSchema>({
     resolver: zodResolver(createPasswordSchema),
     defaultValues: {
@@ -35,10 +33,7 @@ export default function ForgetPasswordForm() {
   });
 
   const onSubmit = async (data: CreatePasswordSchema) => {
-    // await sendForgetPasswordOtpFn({ email: data.email.toLowerCase() })
-    setIsLoading(true);
-    console.log(data);
-    setTimeout(() => setIsLoading(false), 200);
+    await sendResetPasswordOtpFn({ email: data.email.toLowerCase() });
   };
 
   return (
@@ -49,7 +44,7 @@ export default function ForgetPasswordForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>New Password</FormLabel>
+              <FormLabel>Email Address</FormLabel>
               <FormControl>
                 <Input
                   placeholder="email@example.com"
@@ -61,7 +56,7 @@ export default function ForgetPasswordForm() {
                 />
               </FormControl>
               <p className="text-sm">
-                We'll send a 6-digit verification code to this email
+                We&apos;ll send a 6-digit verification code to this email
               </p>
               <FormMessage />
             </FormItem>
@@ -86,7 +81,7 @@ export default function ForgetPasswordForm() {
         <div className="w-full ">
           <h2 className="font-semibold">NOTE</h2>
           <p className="lg:text-sm text-xs">
-            If you don't receive the email within 5 minutes, check your spam
+            If you don&apos;t receive the email within 5 minutes, check your spam
             folder or contact support.
           </p>
         </div>

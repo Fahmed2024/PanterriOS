@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Card } from '@/components/ui/card';
@@ -28,29 +29,32 @@ import {
 } from '@/components/shared/dashboard/data';
 import { Save } from 'lucide-react';
 import { MultiSelect } from '@/components/ui/multiSelect';
+import { useCreateUser } from '@/hook/user-management/useCreateUser';
+import { useRetrieveAdminUserProfile } from '@/hook/user-management/useRetrieveAdminUserProfile';
+import { useUpdateUser } from '@/hook/user-management/useUpdateUser';
 
 const createUserSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
   email: z.string().email('Invalid email address'),
-  phone: z.string().min(7, 'Phone number is required'),
+  phoneNumber: z.string().min(7, 'Phone number is required'),
+  password: z.string().optional(),
   gender: z.string().min(1, 'Select gender'),
-  role: z.array(z.string()).min(1, 'Select at least one role'),
+  roles: z.array(z.string()).min(1, 'Select at least one role'),
   department: z.string().min(1, 'Select department'),
-  status: z.string().min(1, 'Select status'),
+  userStatus: z.string().min(1, 'Select status'),
+  appAccess: z.string().optional(),
 });
 
 type CreateUserFormData = z.infer<typeof createUserSchema>;
 
 const genderOptions = [
-  { label: 'Female', value: 'female' },
-  { label: 'Male', value: 'male' },
+  { label: 'Female', value: 'Female' },
+  { label: 'Male', value: 'Male' },
 ];
 
 const roleOptions = USER_ROLES;
-
 const departmentOptions = DEPARTMENTS;
-
 const statusOptions = ACCOUNT_STATUS;
 
 interface Prop {
@@ -59,25 +63,89 @@ interface Prop {
 }
 
 export function CreateUserForm({ closeModal, id }: Prop) {
+  const userId = id ? Number(id) : undefined;
+  const isEditMode = Boolean(userId);
+
+  const { data: editProfile } = useRetrieveAdminUserProfile(userId || 0);
+  const { mutateAsync: createUserFn, isPending: isCreating } = useCreateUser();
+  const { mutateAsync: updateUserFn, isPending: isUpdating } = useUpdateUser();
+
   const form = useForm<CreateUserFormData>({
     resolver: zodResolver(createUserSchema),
     defaultValues: {
       firstName: '',
       lastName: '',
       email: '',
-      phone: '',
+      phoneNumber: '',
+      password: '',
       gender: '',
-      role: [],
+      roles: [],
       department: '',
-      status: '',
+      userStatus: '',
+      appAccess: 'Panterrios',
     },
   });
 
-  const onSubmit = async (values: CreateUserFormData) => {
-    console.log(values);
+  useEffect(() => {
+    if (!isEditMode || !editProfile) return;
 
-    // 🔥 Call your create user mutation here
-    // await createUserFn(values)
+    form.reset({
+      firstName: editProfile.firstName,
+      lastName: editProfile.lastName,
+      email: editProfile.email,
+      phoneNumber: editProfile.phoneNumber,
+      password: '',
+      gender: editProfile.gender,
+      roles: editProfile.roles,
+      department: editProfile.department,
+      userStatus: editProfile.userStatus,
+      appAccess: 'Panterrios',
+    });
+  }, [editProfile, form, isEditMode]);
+
+  const onSubmit = async (values: CreateUserFormData) => {
+    if (isEditMode && userId) {
+      await updateUserFn({
+        userId,
+        payload: {
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          phoneNumber: values.phoneNumber,
+          gender: values.gender,
+          roles: values.roles,
+          department: values.department,
+          userStatus: values.userStatus as
+            | 'activated'
+            | 'deactivated'
+            | 'pending'
+            | 'banned'
+            | 'suspended'
+            | 'archived',
+          appAccess: values.appAccess,
+        },
+      });
+    } else {
+      await createUserFn({
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        phoneNumber: values.phoneNumber,
+        password: values.password || 'StrongPass123!',
+        gender: values.gender,
+        roles: values.roles,
+        department: values.department,
+        userStatus: values.userStatus as
+          | 'activated'
+          | 'deactivated'
+          | 'pending'
+          | 'banned'
+          | 'suspended'
+          | 'archived',
+        appAccess: values.appAccess,
+      });
+    }
+
     closeModal();
     form.reset();
   };
@@ -86,7 +154,7 @@ export function CreateUserForm({ closeModal, id }: Prop) {
     <div className="space-y-6 pb-6 w-full">
       <div className="flex items-center gap-4">
         <h1 className="text-2xl font-semibold">
-          {id ? 'Edit User detials' : 'Create New User'}
+          {id ? 'Edit User details' : 'Create New User'}
         </h1>
       </div>
 
@@ -94,7 +162,6 @@ export function CreateUserForm({ closeModal, id }: Prop) {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2">
-              {/* First Name */}
               <FormField
                 control={form.control}
                 name="firstName"
@@ -113,7 +180,6 @@ export function CreateUserForm({ closeModal, id }: Prop) {
                 )}
               />
 
-              {/* Last Name */}
               <FormField
                 control={form.control}
                 name="lastName"
@@ -132,7 +198,6 @@ export function CreateUserForm({ closeModal, id }: Prop) {
                 )}
               />
 
-              {/* Email */}
               <FormField
                 control={form.control}
                 name="email"
@@ -152,10 +217,30 @@ export function CreateUserForm({ closeModal, id }: Prop) {
                 )}
               />
 
-              {/* Phone */}
+              {!isEditMode && (
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-2">
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <input
+                          type="password"
+                          {...field}
+                          placeholder="Enter temporary password"
+                          className="border-input bg-surface h-10 w-full rounded-md border px-3 text-sm"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
               <FormField
                 control={form.control}
-                name="phone"
+                name="phoneNumber"
                 render={({ field }) => (
                   <FormItem className="md:col-span-2">
                     <FormLabel>Phone</FormLabel>
@@ -171,7 +256,6 @@ export function CreateUserForm({ closeModal, id }: Prop) {
                 )}
               />
 
-              {/* Gender */}
               <FormField
                 control={form.control}
                 name="gender"
@@ -202,10 +286,9 @@ export function CreateUserForm({ closeModal, id }: Prop) {
                 )}
               />
 
-              {/* Role */}
               <FormField
                 control={form.control}
-                name="role"
+                name="roles"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Role</FormLabel>
@@ -222,7 +305,6 @@ export function CreateUserForm({ closeModal, id }: Prop) {
                 )}
               />
 
-              {/* Department */}
               <FormField
                 control={form.control}
                 name="department"
@@ -253,10 +335,9 @@ export function CreateUserForm({ closeModal, id }: Prop) {
                 )}
               />
 
-              {/* Status */}
               <FormField
                 control={form.control}
-                name="status"
+                name="userStatus"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Status</FormLabel>
@@ -285,7 +366,6 @@ export function CreateUserForm({ closeModal, id }: Prop) {
               />
             </div>
 
-            {/* Buttons */}
             <div className="space-y-3 flex gap-4 justify-center">
               <Button
                 type="button"
@@ -299,9 +379,10 @@ export function CreateUserForm({ closeModal, id }: Prop) {
               <Button
                 type="submit"
                 className=" font-medium flex items-center gap-2"
+                disabled={isCreating || isUpdating}
               >
                 <Save />
-                <span> Create User</span>
+                <span>{id ? 'Update User' : 'Create User'}</span>
               </Button>
             </div>
           </form>

@@ -1,7 +1,38 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import { Shield, Smartphone } from 'lucide-react';
+import { useMyProfileDetails } from '@/hook/user-management/useMyProfileDetails';
+import { useEnableTwoFactor } from '@/hook/auth/useEnableTwoFactor';
+import { useGenerateTwoFactorSecret } from '@/hook/auth/useGenerateTwoFactorSecret';
+import { useToggleUserTwoFactor } from '@/hook/auth/useToggleUserTwoFactor';
 
 export function TwoFaBar() {
+  const { data: profile } = useMyProfileDetails();
+  const { mutateAsync: generateSecret, isPending: isGenerating } =
+    useGenerateTwoFactorSecret();
+  const { mutateAsync: enableTwoFactor, isPending: isEnabling } =
+    useEnableTwoFactor();
+  const { mutateAsync: toggleTwoFactor, isPending: isToggling } =
+    useToggleUserTwoFactor();
+
+  const isTwoFactorEnabled = Boolean(profile?.isTwoEnabled);
+
+  const handleEnable = async () => {
+    const secretRes = await generateSecret();
+    const token = window.prompt(
+      `Enter the 6-digit code from your authenticator app. Manual key: ${secretRes.manualEntryKey}`,
+    );
+
+    if (!token) return;
+    await enableTwoFactor({ token });
+  };
+
+  const handleDisable = async () => {
+    if (!profile?.id) return;
+    await toggleTwoFactor({ userId: profile.id, isEnabled: false });
+  };
+
   return (
     <div className=" space-y-4 lg:space-y-12">
       <div className="rounded-xl shadow p-4">
@@ -11,10 +42,13 @@ export function TwoFaBar() {
             <span className="text-xl font-semibold">2FA Verification</span>
           </div>
           <small
-            className="text-xs text-green-500 bg-green-50 p-2
-        "
+            className={`text-xs p-2 ${
+              isTwoFactorEnabled
+                ? 'text-green-500 bg-green-50'
+                : 'text-gray-500 bg-gray-50'
+            }`}
           >
-            Active
+            {isTwoFactorEnabled ? 'Active' : 'Inactive'}
           </small>
         </div>
         <div className="p-2 space-y-4 mt-4">
@@ -31,12 +65,25 @@ export function TwoFaBar() {
                 </small>
               </div>
 
-              <Button
-                variant={'outline'}
-                className="text-red-500 border-red-400 w-fit"
-              >
-                Disable
-              </Button>
+              {isTwoFactorEnabled ? (
+                <Button
+                  variant={'outline'}
+                  className="text-red-500 border-red-400 w-fit"
+                  onClick={handleDisable}
+                  disabled={isToggling}
+                >
+                  Disable
+                </Button>
+              ) : (
+                <Button
+                  variant={'outline'}
+                  className="w-fit"
+                  onClick={handleEnable}
+                  disabled={isGenerating || isEnabling}
+                >
+                  Enable
+                </Button>
+              )}
             </div>
           </div>
 
@@ -68,7 +115,7 @@ export function TwoFaBar() {
           <div className="flex justify-between">
             <p>Account Status</p>
             <small className="text-xs text-green-500 bg-green-50 p-2">
-              Active
+              {profile?.userStatus || 'Active'}
             </small>
           </div>
         </div>

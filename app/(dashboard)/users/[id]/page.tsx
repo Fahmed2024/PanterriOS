@@ -1,7 +1,11 @@
-import React from 'react'
+import { UsersDetialsPage } from '@/components/dashboard/users/page';
 
-export default function UsersIdPage() {
-  return (
-    <div>page</div>
-  )
+export default async function UsersIdPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const { id } = params;
+
+  return <UsersDetialsPage id={id} />;
 }

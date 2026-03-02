@@ -1,3 +1,4 @@
+'use client';
 import {
   ActiveSessions,
   ChangePassword,
@@ -7,8 +8,11 @@ import {
 
 import { PageHead } from '@/components/shared/';
 import { Calendar } from 'lucide-react';
+import { useMyProfileDetails } from '@/hook/user-management/useMyProfileDetails';
 
 export default function ProfilePage() {
+  const { data: profile } = useMyProfileDetails();
+
   return (
     <div>
       <PageHead
@@ -16,7 +20,13 @@ export default function ProfilePage() {
         subTitle="Manage your personal information and security settings."
       >
         <div className="flex items-center gap-2">
-          <Calendar /> <span> Last Login: Today at 09:41 AM</span>
+          <Calendar />{' '}
+          <span>
+            Last Login:{' '}
+            {profile?.lastLogin
+              ? new Date(profile.lastLogin).toLocaleString()
+              : 'N/A'}
+          </span>
         </div>
       </PageHead>
       {/* profile head */}

@@ -39,25 +39,8 @@ export function DashboardLayout({
   }
 
   const getInitialMenuOptions = (): MenuItem[] => {
-    // const storedUser = localStorage.getItem('user');
-
-    // if (!storedUser) return [];
-
     try {
-      // TODO: pass retrival of user
-      // const user: any = JSON.parse(storedUser);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const user: any = {
-        email: 'Ahmed@email.com',
-        firstName: 'Ahmed',
-        lastName: 'Faruq',
-        role: ['Admin.Officer'],
-        profileImage: '',
-        isVerified: false,
-        isTwoFactorEnabled: false,
-        isPasswordChanged: false,
-      };
-      return getMenuByRoles(user.role);
+      return getMenuByRoles(currentUser.role);
     } catch (error) {
       console.error('Error parsing user data:', error);
       return [];

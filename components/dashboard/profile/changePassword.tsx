@@ -3,7 +3,6 @@ import { Shield } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-// import { useResetPassword } from '@/hooks/auth/useResetPassword';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -14,34 +13,34 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useState } from 'react';
-// import PasswordStrength from '../shared/password-strength';
+import { useChangeMyPassword } from '@/hook/user-management/useChangeMyPassword';
 
 const resetPasswordSchema = z
   .object({
-    currentNewPassword: z
+    currentPassword: z
       .string()
-      .min(6, 'Password must be at least 6 characters')
+      .min(8, 'Password must be at least 8 characters')
       .max(50, 'Password too long'),
     newPassword: z
       .string()
-      .min(6, 'Password must be at least 6 characters')
+      .min(8, 'Password must be at least 8 characters')
       .max(50, 'Password too long'),
-    confirmNewPassword: z
+    confirmPassword: z
       .string()
-      .min(6, 'Password must be at least 6 characters')
+      .min(8, 'Password must be at least 8 characters')
       .max(50, 'Password too long'),
   })
-  .refine((data) => data.newPassword === data.confirmNewPassword, {
+  .refine((data) => data.newPassword === data.confirmPassword, {
     message: 'Passwords do not match',
-    path: ['confirmNewPassword'],
+    path: ['confirmPassword'],
   });
 
 type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
 
 export function ChangePassword() {
-  //   const { resetPasswordFn, isLoading } = useResetPassword();
-  const [isLoading] = useState(false);
+  const { mutateAsync: changePasswordFn, isPending: isLoading } =
+    useChangeMyPassword();
+
   const validPasswordOption = [
     '• Minimum 8 characters long',
     '• At least one uppercase letter',
@@ -49,22 +48,20 @@ export function ChangePassword() {
     '• At least one number',
     '• At least one special character (!@#$%^&*)',
   ];
+
   const form = useForm<ResetPasswordSchema>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
       newPassword: '',
-      confirmNewPassword: '',
-      currentNewPassword: '',
+      confirmPassword: '',
+      currentPassword: '',
     },
     mode: 'onChange',
   });
 
   const onSubmit = async (data: ResetPasswordSchema) => {
-    const payload = {
-      ...data,
-    };
-    // await resetPasswordFn(payload);
-    console.log(payload);
+    await changePasswordFn(data);
+    form.reset();
   };
 
   return (
@@ -78,14 +75,14 @@ export function ChangePassword() {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
             control={form.control}
-            name="currentNewPassword"
+            name="currentPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
+                <FormLabel>Current Password</FormLabel>
                 <FormControl>
                   <Input
                     password
-                    placeholder="Enter new password"
+                    placeholder="Enter current password"
                     disabled={isLoading}
                     {...field}
                     className="bg-[#E6E8EB] text-gray-800 placeholder:text-gray-500"
@@ -117,7 +114,7 @@ export function ChangePassword() {
 
           <FormField
             control={form.control}
-            name="confirmNewPassword"
+            name="confirmPassword"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Confirm Password</FormLabel>
