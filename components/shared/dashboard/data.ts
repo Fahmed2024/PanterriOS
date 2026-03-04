@@ -48,19 +48,29 @@ export const ROLE_SPECIFIC_MENUS: Record<Role, MenuItem[]> = {
       name: "Wallet & Finance",
       icon: Wallet,
       link: "/finance",
-      children: [
-        { name: "Transactions", link: "/finance/transactions", icon: FileText },
-        {
-          name: "Withdrawal Request",
-          link: "/finance/withdrawal-request",
-          icon: FileText,
-        },
-        {
-          name: "Reconciliation",
-          link: "/finance/reconciliation",
-          icon: FileText,
-        },
-      ],
+      // children: [
+      //   { name: "Transactions", link: "/finance/transactions", icon: FileText },
+      //   {
+      //     name: "Withdrawal Request",
+      //     link: "/finance/withdrawal-request",
+      //     icon: FileText,
+      //   },
+      //   {
+      //     name: "Reconciliation",
+      //     link: "/finance/reconciliation",
+      //     icon: FileText,
+      //   },
+      //   {
+      //     name: "Yield Events",
+      //     link: "/finance/yield-events",
+      //     icon: FileText,
+      //   },
+      //   {
+      //     name: "Investor Wallet",
+      //     link: "/finance/investor-wallet",
+      //     icon: FileText,
+      //   },
+      // ],
     },
     { name: "Market Data", icon: MapPin, link: "/market-data" },
     { name: "Analytics", icon: ChartColumn, link: "/analytics" },

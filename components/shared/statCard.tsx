@@ -26,7 +26,7 @@ export function StatCard({
 }: CardProp) {
   return (
     <div className="rounded-lg border border-[#E5E7EB] bg-white p-6 w-full">
-      <div className="flex items-start justify-between mb-6">
+      <div className="flex items-start justify-between mb-8">
         <span className="text-[#45556C] text-base font-normal">{label}</span>
         {typeof Icon === "string" ? (
           <div className="font-bold text-2xl text-[#9CA3AF]">{Icon}</div>
@@ -37,12 +37,12 @@ export function StatCard({
               bgColor,
             )}
           >
-            <Icon className={cn("h-7 w-7", iconColor)} />
+            <Icon className={cn("h-5 w-5", iconColor)} />
           </span>
         ) : null}
       </div>
 
-      <div className={cn("text-3xl font-bold text-[#000000] mb-3", color)}>
+      <div className={cn("text-3xl font-bold text-[#000000] mb-2", color)}>
         {value}
       </div>
 

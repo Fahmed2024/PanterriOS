@@ -69,12 +69,12 @@ export function ReUseAbleTable({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  className="border-b border-[#E2E2E2] hover:bg-[#F9FAFB]/50"
+                  className="border-b min-h-20 border-[#E2E2E2] hover:bg-[#F9FAFB]/50"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className="px-6 py- text-sm font-normal"
+                      className="px-6 text-sm font-normal"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,

@@ -1,28 +1,28 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { X, ChevronDown, ChevronRight, LogOut } from 'lucide-react';
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { X, ChevronDown, ChevronRight, LogOut } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import { cn } from '@/lib/utils';
-import Image from 'next/image';
-import dashboardLogo from '@/assets/logo.png';
-import collapsLogo from '@/assets/icon.png';
-import { useAuthStore } from '@/store/authStore';
-import { useEffect, useState } from 'react';
-import { ChildMenu, MenuItem } from '@/interface';
+} from "@/components/ui/collapsible";
+import { cn } from "@/lib/utils";
+import Image from "next/image";
+import dashboardLogo from "@/assets/logo.png";
+import collapsLogo from "@/assets/icon.png";
+import { useAuthStore } from "@/store/authStore";
+import { useEffect, useState } from "react";
+import { ChildMenu, MenuItem } from "@/interface";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 
 interface DashboardSidebarProps {
   navigationItems: MenuItem[];
@@ -55,7 +55,7 @@ export function DashboardSidebar({
       return item.children.some(
         (child) =>
           child.link &&
-          (pathname === child.link || pathname.startsWith(child.link + '/')),
+          (pathname === child.link || pathname.startsWith(child.link + "/")),
       );
     };
 
@@ -76,7 +76,7 @@ export function DashboardSidebar({
 
   const handleLogout = async () => {
     await clearAuth();
-    router.push('/login');
+    router.push("/login");
   };
 
   const NavItem = ({ item, level = 0 }: { item: MenuItem; level?: number }) => {
@@ -84,15 +84,17 @@ export function DashboardSidebar({
     const hasChildren = item.children && item.children.length > 0;
     const isOpen = openItems.includes(item.name);
     const isActive = item.link
-      ? pathname === item.link || pathname.startsWith(item.link + '/')
+      ? pathname === item.link || pathname.startsWith(item.link + "/")
       : false;
 
     // Check if this parent has any active children
-    const hasActiveChild = hasChildren && item.children?.some(
-      (child) =>
-        child.link &&
-        (pathname === child.link || pathname.startsWith(child.link + '/')),
-    );
+    const hasActiveChild =
+      hasChildren &&
+      item.children?.some(
+        (child) =>
+          child.link &&
+          (pathname === child.link || pathname.startsWith(child.link + "/")),
+      );
 
     if (hasChildren) {
       return (
@@ -100,11 +102,11 @@ export function DashboardSidebar({
           <CollapsibleTrigger asChild>
             <button
               className={cn(
-                'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors',
+                "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
                 hasActiveChild
-                  ? 'text-primary-blue font-medium'
-                  : 'text-[#6B7280] hover:bg-accent',
-                isCollapsed && !isMobile && 'justify-center px-2',
+                  ? "text-primary-blue font-medium"
+                  : "text-[#6B7280] hover:bg-accent",
+                isCollapsed && !isMobile && "justify-center px-2",
               )}
               title={isCollapsed && !isMobile ? item.name : undefined}
             >
@@ -136,13 +138,13 @@ export function DashboardSidebar({
     if (level > 0) {
       return (
         <Link
-          href={item.link || '#'}
+          href={item.link || "#"}
           onClick={isMobile ? onClose : undefined}
           className={cn(
-            'flex items-center gap-3 rounded-lg p-3 pl-9 transition-colors text-sm',
+            "flex items-center gap-3 rounded-lg p-3 pl-9 transition-colors text-sm",
             isActive
-              ? 'text-primary-blue font-medium'
-              : 'text-[#6B7280] hover:text-foreground'
+              ? "text-primary-blue font-medium"
+              : "text-[#6B7280] hover:text-foreground",
           )}
         >
           <span>{item.name}</span>
@@ -153,27 +155,32 @@ export function DashboardSidebar({
     // Single item (no children, level 0)
     return (
       <Link
-        href={item.link || '#'}
+        href={item.link || "#"}
         onClick={isMobile ? onClose : undefined}
         className={cn(
-          'flex items-center gap-3 rounded-lg p-3 transition-colors text-sm',
+          "flex items-center gap-3 rounded-md p-3 transition-colors relative overflow-hidden",
+          level > 0 && "pl-9",
           isActive
-            ? 'text-primary-blue font-medium'
-            : 'text-[#6B7280] hover:bg-accent',
-          isCollapsed && !isMobile && 'justify-center px-2',
+            ? "bg-blue-100   py-4 text-[#155DFC] font-bold"
+            : "text-gray-500 hover:bg-blue-50",
+          isCollapsed && !isMobile && level === 0 && "justify-center px-2",
         )}
-        title={isCollapsed && !isMobile ? item.name : undefined}
+        title={isCollapsed && !isMobile && level === 0 ? item.name : undefined}
       >
+        {isActive && (
+          <span
+            className={cn(
+              "h-[80%] rounded-2xl w-4 -left-2 absolute bg-[#155DFC] py-4",
+            )}
+          ></span>
+        )}
         {Icon && (
           <Icon
-            className={cn(
-              'h-5 w-5 shrink-0',
-              isActive ? 'text-primary-blue' : ''
-            )}
+            className={`h-5 w-5 shrink-0 ${isActive ? "text-[#155DFC] font-bold" : "text-icon"} `}
           />
         )}
-        {(!isCollapsed || isMobile) && (
-          <span>{item.name}</span>
+        {(!isCollapsed || isMobile || level > 0) && (
+          <span className="font-sans text-sm font-normal">{item.name}</span>
         )}
       </Link>
     );
@@ -184,8 +191,8 @@ export function DashboardSidebar({
       {/* Logo/Brand */}
       <div
         className={cn(
-          'mx-4 flex h-16 items-center px-4 py-8 pt-12 border-b',
-          isCollapsed && !isMobile ? 'justify-center' : 'justify-between',
+          "mx-4 flex h-16 items-center px-4 py-8 pt-12 border-b",
+          isCollapsed && !isMobile ? "justify-center" : "justify-between",
         )}
       >
         {!isCollapsed || isMobile ? (
@@ -236,14 +243,12 @@ export function DashboardSidebar({
           <DropdownMenuTrigger asChild>
             <button
               className={cn(
-                'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors text-[#6B7280] hover:bg-accent',
-                isCollapsed && !isMobile && 'justify-center px-2',
+                "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors text-[#6B7280] hover:bg-accent",
+                isCollapsed && !isMobile && "justify-center px-2",
               )}
-              title={isCollapsed && !isMobile ? 'My Account' : undefined}
+              title={isCollapsed && !isMobile ? "My Account" : undefined}
             >
-              <span className="text-lg rounded-full border-2 p-2">
-                AH
-              </span>
+              <span className="text-lg rounded-full border-2 p-2">AH</span>
               {(!isCollapsed || isMobile) && (
                 <>
                   <span className="flex-1 text-left">Ahmed Hakimi</span>
@@ -253,8 +258,8 @@ export function DashboardSidebar({
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            align={isCollapsed && !isMobile ? 'end' : 'start'}
-            side={isCollapsed && !isMobile ? 'right' : 'top'}
+            align={isCollapsed && !isMobile ? "end" : "start"}
+            side={isCollapsed && !isMobile ? "right" : "top"}
             className="w-56 border-none shadow-lg"
           >
             {accountMenuItems &&
@@ -267,10 +272,10 @@ export function DashboardSidebar({
                       href={item.link!}
                       onClick={isMobile ? onClose : undefined}
                       className={cn(
-                        'flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                        "flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                         isActive
-                          ? 'text-primary-blue font-medium'
-                          : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+                          ? "text-primary-blue font-medium"
+                          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
                       )}
                     >
                       <Icon className="h-4 w-4 shrink-0" />
@@ -319,8 +324,8 @@ export function DashboardSidebar({
     <aside className="hidden md:flex md:shrink-0">
       <div
         className={cn(
-          'flex flex-col border rounded-lg bg-white transition-all duration-300',
-          isCollapsed ? 'w-20' : 'w-64',
+          "flex flex-col border rounded-lg bg-white transition-all duration-300",
+          isCollapsed ? "w-20" : "w-64",
         )}
       >
         <SidebarContent />

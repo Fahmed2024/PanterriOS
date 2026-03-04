@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { getStatusColor, formatStatus } from "@/utils/statusColors";
-import { CircleAlert, CircleCheckBig, CircleX, TriangleAlert } from "lucide-react";
+import { CircleAlert, CircleCheckBig, CircleX } from "lucide-react";
 
 interface StatusBadgeProps {
   status: string;

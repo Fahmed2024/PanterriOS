@@ -11,6 +11,7 @@ export function getStatusColor(status: string): {
     case "completed":
     case "approved":
     case "active":
+    case "activated":
       return {
         textColor: "text-[#008236]",
         bgColor: "bg-[#F0FDF4]",
@@ -20,19 +21,32 @@ export function getStatusColor(status: string): {
 
     case "pending":
     case "in progress":
-    case "processing":
       return {
         textColor: "text-[#BB4D00]",
         bgColor: "bg-[#FFFBEB]",
         dotColor: "bg-[#BB4D00]",
         borderColor: "border-[#FEE685]",
       };
-
+    case "processing":
+      return {
+        textColor: "text-[#BB4D00]",
+        bgColor: "bg-[#EFF6FF]",
+        dotColor: "bg-[#1447E6]",
+        borderColor: "border-[#BEDBFF]",
+      };
+    case "disbursed":
+      return {
+        textColor: "text-[#0369A1]",
+        bgColor: "bg-[#F0F9FF]",
+        dotColor: "bg-[#0369A1]",
+        borderColor: "border-[#BAE6FD]",
+      };
     case "rejected":
     case "failed":
     case "cancelled":
     case "error":
     case "suspended":
+    case "deactivated":
       return {
         textColor: "text-[#C10007]",
         bgColor: "bg-[#FEF2F2]",

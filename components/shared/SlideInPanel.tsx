@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X } from "lucide-react";
+import { FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -49,25 +49,31 @@ export function SlideInPanelDrawer({
           "w-full overflow-hidden overflow-y-auto ",
           drawerWidthClasses[width],
           contentClassName,
-          
         )}
       >
-        <DrawerHeader className="flex items-start justify-between border-b border-[#E5E7EB] flex-shrink-0">
-          <div className="flex-1">
-            <DrawerTitle className="text-lg font-semibold text-[#111827]">
-              {title}
-            </DrawerTitle>
-            {subtitle && (
-              <p className="text-sm text-[#6B7280] mt-1">{subtitle}</p>
-            )}
+        <DrawerHeader className="relative flex justify-between border-b border-[#E5E7EB] ">
+          <div className="flex-1 items-center flex gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#DBEAFE]">
+              <FileText className="w-5 h-5 text-[#155DFC]" />
+            </div>
+
+            <div>
+              <DrawerTitle className="text-lg font-semibold text-[#111827]">
+                {title}
+              </DrawerTitle>
+              {subtitle && <p className="text-sm text-[#6B7280]">{subtitle}</p>}
+            </div>
           </div>
-          <DrawerClose asChild>
+          <DrawerClose
+            asChild
+            className="absolute top-[25%] right-5 bg-gray-100 p-2 "
+          >
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 rounded-full"
+              onClick={() => setIsOpen(false)}
             >
-              <X className="h-5 w-5 text-[#6B7280]" />
+              <X className="h-4 w-4" />
             </Button>
           </DrawerClose>
         </DrawerHeader>
