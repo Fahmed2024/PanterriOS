@@ -29,8 +29,8 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
     header: "Type",
     cell: ({ row }) => {
       const type = row.getValue("type") as string;
-      const config = getTransactionTypeConfig(type as any);
-      const IconComponent = config.icon as any;
+      const config = getTransactionTypeConfig(type as unknown as Parameters<typeof getTransactionTypeConfig>[0]);
+      const IconComponent = config.icon as React.ComponentType<{ className: string }>;
       return (
         <div className="flex items-center gap-2">
           <IconComponent className={cn("h-4 w-4", config.color)} />

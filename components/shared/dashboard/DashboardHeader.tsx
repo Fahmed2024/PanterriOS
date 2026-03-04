@@ -36,8 +36,6 @@ export function DashboardHeader({
   accountMenuItems,
   onMenuClick,
   showMobileMenu = true,
-  isMobile = false,
-  onClose,
   onCollapseClick,
   isCollapsed = false,
 }: DashboardHeaderProps) {

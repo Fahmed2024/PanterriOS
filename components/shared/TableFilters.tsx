@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/select";
 import { debounce } from "@/utils/helpers";
 import { Search, X } from "lucide-react";
-import { Button } from "../ui/button";
 
 export interface FilterOption {
   label: string;

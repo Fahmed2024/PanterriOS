@@ -6,7 +6,6 @@ import { AllTransactions } from "./tabs/all-transactions/AllTransactions";
 import { WithdrawalRequests } from "./tabs/withdrawal-requests/WithdrawalRequests";
 import { Reconciliation } from "./tabs/reconciliation/Reconciliation";
 import { YieldEvents } from "./tabs/yield-events/YieldEvents";
-import { InvestorsWallet } from "./tabs/investors-wallet/InvestorsWallet";
 import { StatCard } from "@/components/shared";
 import { FINANCE_STATS } from "./data";
 import { Wallet, Users2, TrendingUp, Clock } from "lucide-react";

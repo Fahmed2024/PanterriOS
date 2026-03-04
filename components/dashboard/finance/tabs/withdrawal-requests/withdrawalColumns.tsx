@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { WithdrawalRequest } from "./withdrawalData";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, CircleCheckBig, CircleX, X } from "lucide-react";
+import { CircleCheckBig, CircleX } from "lucide-react";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 
 const getRiskColor = (risk: string) => {
@@ -73,7 +73,6 @@ export const withdrawalColumns: ColumnDef<WithdrawalRequest>[] = [
     accessorKey: "actions",
     header: "ACTIONS",
     cell: ({ row }) => {
-      const status = row.original.status;
       const handleApprove = () => {
         console.log("Approve:", row.original.requestId);
         // TODO: Implement approval logic

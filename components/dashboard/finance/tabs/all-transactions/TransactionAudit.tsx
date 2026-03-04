@@ -42,9 +42,9 @@ export function TransactionAudit({ transaction }: TransactionAuditProps) {
   return (
     <div className="flex flex-col h-full">
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto space-y-6">
+      <div className="flex-1 overflow-y-auto  p-6 space-y-6">
         {/* Amount and Status Section */}
-        <div className="border rounded-lg p-6">
+        <div className="border bg-gray-100  border-border rounded-lg p-6">
           <div className="flex justify-between items-end gap-4">
             <div className="flex-1">
               <p className="text-gray-600 text-sm mb-2">Transaction Amount</p>
@@ -67,7 +67,7 @@ export function TransactionAudit({ transaction }: TransactionAuditProps) {
 
           <div className="grid grid-cols-1 gap-4">
             {detailItems.map((item) => (
-              <div key={item.label} className="border rounded-lg p-4">
+              <div key={item.label} className="border border-border bg-gray-100 rounded-lg p-4">
                 <label className="text-sm text-gray-600 block mb-1">
                   {item.label}
                 </label>
@@ -80,7 +80,7 @@ export function TransactionAudit({ transaction }: TransactionAuditProps) {
             {/* Date and Time Grid */}
             <div className="grid grid-cols-2 gap-4">
               {dateTimeItems.map((item) => (
-                <div key={item.label} className="border rounded-lg p-4">
+                <div key={item.label} className="border bg-gray-100 rounded-lg p-4">
                   <label className="text-sm text-gray-600 block mb-1">
                     {item.label}
                   </label>

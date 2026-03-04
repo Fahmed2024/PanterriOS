@@ -13,9 +13,10 @@ import { KycDetail } from "./kyc-detailTab";
 import { StatCard } from "@/components/shared";
 
 interface DetailsViewProp {
-  id: string | number;
+  id?: string | number;
 }
 export function DetailsView({ id }: DetailsViewProp) {
+  // id is available if needed for future implementation
   const [tab, setTab] = useState("overview");
   const profile = {
     name: "Ahmed Faruq",

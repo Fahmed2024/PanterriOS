@@ -15,8 +15,8 @@ import {
   TriangleAlert,
   Users,
   Wallet,
-  EllipsisVertical,
   Eye,
+  // EllipsisVertical removed - unused
 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
