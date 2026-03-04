@@ -11,6 +11,8 @@ import { DUMMY_TRANSACTIONS, FINANCE_STATS } from "./data";
 import { Wallet, Users2, TrendingUp, Clock, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { DUMMY_WITHDRAWAL_REQUESTS } from "./tabs/withdrawal-requests/withdrawalData";
+import { DUMMY_RECONCILIATION_DATA } from "./tabs/reconciliation/data";
 
 const iconMap = {
   Wallet,
@@ -41,13 +43,13 @@ export function FinanceContainer() {
     {
       title: "Withdrawal Requests",
       value: "withdrawal-requests",
-      count: 5,
+      count: DUMMY_WITHDRAWAL_REQUESTS.length,
       content: <WithdrawalRequests />,
     },
     {
       title: "Reconciliation",
       value: "reconciliation",
-      count: 0,
+      count: DUMMY_RECONCILIATION_DATA.length,
       content: <Reconciliation />,
     },
     {
