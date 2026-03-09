@@ -20,26 +20,36 @@ import {
 } from "@tanstack/react-table";
 import { ChevronLeft, ChevronRight, Inbox } from "lucide-react";
 
+interface PaginationConfig {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  limit: number;
+  onPageChange: (page: number) => void;
+}
+
 interface TableProp<TData extends object> {
   data: TData[];
   columns: ColumnDef<TData, unknown>[];
   entityName?: string;
+  pagination?: PaginationConfig;
 }
 export function ReUseAbleTable<TData extends object>({
   data,
   columns,
   entityName = "results",
+  pagination,
 }: TableProp<TData>) {
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    getPaginationRowModel: pagination ? undefined : getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
   });
 
-  const hasData = table.getRowModel().rows?.length > 0;
+  const hasData = data?.length > 0;
 
   return (
     <div className="w-full">
@@ -66,7 +76,7 @@ export function ReUseAbleTable<TData extends object>({
           </TableHeader>
           <TableBody>
             {hasData ? (
-              table.getRowModel().rows.map((row) => (
+              (pagination ? table.getRowModel().rows : table.getRowModel().rows).map((row) => (
                 <TableRow
                   key={row.id}
                   className="border-b min-h-20 border-[#E2E2E2] hover:bg-[#F9FAFB]/50"
@@ -107,68 +117,147 @@ export function ReUseAbleTable<TData extends object>({
         {/* Pagination */}
         {hasData && (
           <div className="flex items-center justify-between px-6 py-4 border-t border-[#E5E7EB]">
-            <div className="text-sm text-[#6B7280]">
-              Showing{" "}
-              <span className="font-medium text-[#111827]">
-                {table.getState().pagination.pageIndex *
-                  table.getState().pagination.pageSize +
-                  1}
-                -
-                {Math.min(
-                  (table.getState().pagination.pageIndex + 1) *
-                    table.getState().pagination.pageSize,
-                  table.getFilteredRowModel().rows.length,
-                )}
-              </span>{" "}
-              of{" "}
-              <span className="font-medium text-[#111827]">
-                {table.getFilteredRowModel().rows.length}
-              </span>{" "}
-              {entityName}
-            </div>
-            <div className="flex items-center gap-1">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-                className="h-9 w-9 p-0"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-
-              {Array.from({ length: table.getPageCount() }, (_, i) => i).map(
-                (pageIndex) => (
+            {pagination ? (
+              <>
+                <div className="text-sm text-[#6B7280]">
+                  Showing{" "}
+                  <span className="font-medium text-[#111827]">
+                    {(pagination.currentPage - 1) * pagination.limit + 1}
+                    -
+                    {Math.min(
+                      pagination.currentPage * pagination.limit,
+                      pagination.totalItems,
+                    )}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-medium text-[#111827]">
+                    {pagination.totalItems}
+                  </span>{" "}
+                  {entityName}
+                </div>
+                <div className="flex items-center gap-1">
                   <Button
-                    key={pageIndex}
-                    variant={
-                      table.getState().pagination.pageIndex === pageIndex
-                        ? "default"
-                        : "outline"
-                    }
+                    variant="outline"
                     size="sm"
-                    onClick={() => table.setPageIndex(pageIndex)}
-                    className={`h-9 w-9 p-0 ${
-                      table.getState().pagination.pageIndex === pageIndex
-                        ? "bg-primary-blue text-white hover:bg-primary-blue/90"
-                        : "hover:bg-gray-50"
-                    }`}
+                    onClick={() => pagination.onPageChange(Math.max(1, pagination.currentPage - 1))}
+                    disabled={pagination.currentPage === 1}
+                    className="h-9 w-9 p-0"
                   >
-                    {pageIndex + 1}
+                    <ChevronLeft className="h-4 w-4" />
                   </Button>
-                ),
-              )}
 
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-                className="h-9 w-9 p-0"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
+                  {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
+                    .filter((page) => {
+                      const distance = Math.abs(page - pagination.currentPage);
+                      return (
+                        distance === 0 ||
+                        distance === 1 ||
+                        page === 1 ||
+                        page === pagination.totalPages
+                      );
+                    })
+                    .map((page, index, array) => {
+                      const showEllipsisBefore =
+                        index > 0 && array[index - 1] !== page - 1;
+
+                      return (
+                        <div key={page} className="flex items-center gap-1">
+                          {showEllipsisBefore && (
+                            <span className="px-2 text-gray-500">...</span>
+                          )}
+                          <Button
+                            variant={pagination.currentPage === page ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => pagination.onPageChange(page)}
+                            className="min-w-[40px]"
+                          >
+                            {page}
+                          </Button>
+                        </div>
+                      );
+                    })}
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      pagination.onPageChange(
+                        Math.min(pagination.totalPages, pagination.currentPage + 1),
+                      )
+                    }
+                    disabled={pagination.currentPage === pagination.totalPages}
+                    className="h-9 w-9 p-0"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-sm text-[#6B7280]">
+                  Showing{" "}
+                  <span className="font-medium text-[#111827]">
+                    {table.getState().pagination.pageIndex *
+                      table.getState().pagination.pageSize +
+                      1}
+                    -
+                    {Math.min(
+                      (table.getState().pagination.pageIndex + 1) *
+                        table.getState().pagination.pageSize,
+                      table.getFilteredRowModel().rows.length,
+                    )}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-medium text-[#111827]">
+                    {table.getFilteredRowModel().rows.length}
+                  </span>{" "}
+                  {entityName}
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                    className="h-9 w-9 p-0"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+
+                  {Array.from({ length: table.getPageCount() }, (_, i) => i).map(
+                    (pageIndex) => (
+                      <Button
+                        key={pageIndex}
+                        variant={
+                          table.getState().pagination.pageIndex === pageIndex
+                            ? "default"
+                            : "outline"
+                        }
+                        size="sm"
+                        onClick={() => table.setPageIndex(pageIndex)}
+                        className={`h-9 w-9 p-0 ${
+                          table.getState().pagination.pageIndex === pageIndex
+                            ? "bg-primary-blue text-white hover:bg-primary-blue/90"
+                            : "hover:bg-gray-50"
+                        }`}
+                      >
+                        {pageIndex + 1}
+                      </Button>
+                    ),
+                  )}
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                    className="h-9 w-9 p-0"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>

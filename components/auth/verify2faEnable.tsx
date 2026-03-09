@@ -16,7 +16,6 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from '@/components/ui/input-otp';
-import { useVerify2faLogin } from '@/hook/auth/useVerify2faLogin';
 import { Spinner } from '../ui/spinner';
 import { getTwoFactorTemporaryToken } from '@/services/axios';
 import { useEnableTwoFactor } from '@/hook/auth/useEnableTwoFactor';

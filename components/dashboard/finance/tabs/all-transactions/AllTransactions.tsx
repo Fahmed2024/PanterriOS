@@ -75,7 +75,7 @@ export function AllTransactions({ data }: { data: Transaction[] }) {
         filterStatus,
         filterTime,
       ),
-    [searchValue, filterType, filterStatus, filterTime],
+    [data, searchValue, filterType, filterStatus, filterTime],
   );
 
   return (

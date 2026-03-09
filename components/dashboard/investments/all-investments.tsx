@@ -2,207 +2,64 @@
 import { ReUseAbleTable } from "@/components/shared/reusableTable";
 import { Button } from "@/components/ui/button";
 import { type ColumnDef } from "@tanstack/react-table";
-import { Eye, MapPin } from "lucide-react";
+import { Eye } from "lucide-react";
 import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { InvestmentDetailsView } from "./details/investmentDetailsView";
 import { StatusBadge } from "@/components/shared";
-interface PropertiesTableData {
-  id: string;
-  property: string;
-  type: string;
-  status: string;
-  funding_progress: {
-    value: number;
-    formatted: string;
+import { InvestmentListItem } from "@/interface";
+
+interface AllInvestmentsProps {
+  data: InvestmentListItem[];
+  pagination?: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    limit: number;
   };
-  target_amount: {
-    currency: string;
-    value: number;
-    formatted: string;
-  };
-  raised_amount: {
-    currency: string;
-    value: number;
-    formatted: string;
-  };
-  returns: {
-    value: number;
-    unit: string;
-    formatted: string;
-  };
-  investors: number;
-  location: string;
+  currentPage: number;
+  onPageChange: (page: number) => void;
 }
 
-export function AllInvestments() {
-  const properties = [
-    {
-      id: "200",
-      property: "Victoria Island Office Complex",
-      type: "Commercial",
-      status: "Active",
-      funding_progress: {
-        value: 85,
-        formatted: "85%",
-      },
-      target_amount: {
-        currency: "NGN",
-        value: 50000000,
-        formatted: "₦50.0M",
-      },
-      raised_amount: {
-        currency: "NGN",
-        value: 42500000,
-        formatted: "₦42.5M",
-      },
-      returns: {
-        value: 18,
-        unit: "percent",
-        formatted: "18%",
-      },
-      investors: 127,
-      location: "Lagos",
-    },
-    {
-      id: "2003",
-      property: "Lekki Phase 1 Apartments",
-      type: "Residential",
-      status: "Funded",
-      funding_progress: {
-        value: 85,
-        formatted: "85%",
-      },
-      target_amount: {
-        currency: "NGN",
-        value: 50000000,
-        formatted: "₦50.0M",
-      },
-      raised_amount: {
-        currency: "NGN",
-        value: 42500000,
-        formatted: "₦42.5M",
-      },
-      returns: {
-        value: 15,
-        unit: "percent",
-        formatted: "15%",
-      },
-      investors: 127,
-      location: "Lagos",
-    },
-    {
-      id: "20034",
-      property: "Abuja Mixed-Use Development",
-      type: "Mixed-Use",
-      status: "Active",
-      funding_progress: {
-        value: 85,
-        formatted: "85%",
-      },
-      target_amount: {
-        currency: "NGN",
-        value: 50000000,
-        formatted: "₦50.0M",
-      },
-      raised_amount: {
-        currency: "NGN",
-        value: 42500000,
-        formatted: "₦42.5M",
-      },
-      returns: {
-        value: 20,
-        unit: "percent",
-        formatted: "20%",
-      },
-      investors: 127,
-      location: "Lagos",
-    },
-    {
-      id: "200342",
-      property: "Ikoyi Luxury Residences",
-      type: "Residential",
-      status: "Active",
-      funding_progress: {
-        value: 85,
-        formatted: "85%",
-      },
-      target_amount: {
-        currency: "NGN",
-        value: 50000000,
-        formatted: "₦50.0M",
-      },
-      raised_amount: {
-        currency: "NGN",
-        value: 42500000,
-        formatted: "₦42.5M",
-      },
-      returns: {
-        value: 17,
-        unit: "percent",
-        formatted: "17%",
-      },
-      investors: 127,
-      location: "Lagos",
-    },
-    {
-      id: "2003423",
-      property: "Port Harcourt Shopping Mall",
-      type: "Commercial",
-      status: "Active",
-      funding_progress: {
-        value: 85,
-        formatted: "85%",
-      },
-      target_amount: {
-        currency: "NGN",
-        value: 50000000,
-        formatted: "₦50.0M",
-      },
-      raised_amount: {
-        currency: "NGN",
-        value: 42500000,
-        formatted: "₦42.5M",
-      },
-      returns: {
-        value: 18,
-        unit: "percent",
-        formatted: "18%",
-      },
-      investors: 127,
-      location: "Lagos",
-    },
-  ];
+export function AllInvestments({
+  data,
+  pagination,
+  currentPage,
+  onPageChange,
+}: AllInvestmentsProps) {
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency: "NGN",
+      maximumFractionDigits: 0,
+    }).format(value);
 
-  const columns: ColumnDef<PropertiesTableData>[] = [
+  const columns: ColumnDef<InvestmentListItem>[] = [
     {
-      accessorKey: "property",
+      accessorKey: "propertyName",
       header: "property",
-      cell: ({ row }) => {
-        const location = row.original.location;
-        return (
-          <div className="">
-            <p>{row.original.property} </p>
-            <small className="text-gray-500 flex items-center gap-1">
-              {" "}
-              <MapPin className="w-3 h-3" /> <span> {location}</span>
-            </small>
-          </div>
-        );
-      },
+      cell: ({ row }) => (
+        <div className="">
+          <p>{row.original.propertyName} </p>
+          <small className="text-gray-500 flex items-center gap-1">
+            {" "}
+            {/* <MapPin className="w-3 h-3" /> <span> {row.original.location}</span> */}
+          </small>
+        </div>
+      ),
     },
     {
-      accessorKey: "type",
+      accessorKey: "propertyType",
       header: "type",
-      cell: ({ row }) => <div className="">{row.original.type}</div>,
+      cell: ({ row }) => <div>{row.original.propertyType}</div>,
     },
 
     {
-      accessorKey: "status",
+      accessorKey: "investmentStatus",
       header: " status",
       cell: ({ row }) => {
-        const status = row.original.status;
+        const status = row.original.investmentStatus;
         return <StatusBadge status={status} />;
       },
     },
@@ -210,7 +67,7 @@ export function AllInvestments() {
       accessorKey: "funding",
       header: "funding",
       cell: ({ row }) => {
-        const value = row.original.funding_progress.value;
+        const value = row.original.funding;
         return (
           <div className=" flex items-center gap-2">
             <Progress
@@ -223,41 +80,33 @@ export function AllInvestments() {
                 "[&>div]:transition-colors duration-300",
               )}
             />
-            {row.original.funding_progress.formatted}
+            {value}%
           </div>
         );
       },
     },
     {
-      accessorKey: "target",
+      accessorKey: "targetAmount",
       header: "target",
-      cell: ({ row }) => (
-        <div className="">{row.original.target_amount.formatted}</div>
-      ),
+      cell: ({ row }) => <div>{formatCurrency(row.original.targetAmount)}</div>,
     },
     {
-      accessorKey: "raised",
+      accessorKey: "amountRaised",
       header: "raised",
-      cell: ({ row }) => (
-        <div className="">{row.original.raised_amount.formatted}</div>
-      ),
+      cell: ({ row }) => <div>{formatCurrency(row.original.amountRaised)}</div>,
     },
 
     {
       accessorKey: "returns",
       header: "returns",
-      cell: ({ row }) => {
-        return (
-          <div className=" text-blue-600">{row.original.returns.formatted}</div>
-        );
-      },
+      cell: ({ row }) => (
+        <div className=" text-blue-600">{row.original.returns}%</div>
+      ),
     },
     {
-      accessorKey: "investors",
-      header: "invostors",
-      cell: ({ row }) => {
-        return <div className=" ">{row.original.investors}</div>;
-      },
+      accessorKey: "totalNumberOfInvestors",
+      header: "investors",
+      cell: ({ row }) => <div>{row.original.totalNumberOfInvestors}</div>,
     },
     {
       accessorKey: "action",
@@ -281,9 +130,21 @@ export function AllInvestments() {
       },
     },
   ];
+
   return (
-    <div>
-      <ReUseAbleTable data={properties} columns={columns} />
+    <div className="space-y-4">
+      <ReUseAbleTable
+        data={data}
+        columns={columns}
+        entityName="All Investments"
+        pagination={{
+          currentPage,
+          totalPages: pagination?.totalPages || 1,
+          totalItems: pagination?.totalItems || data.length,
+          limit: pagination?.limit || 20,
+          onPageChange,
+        }}
+      />
     </div>
   );
 }
