@@ -1,90 +1,170 @@
-'use client';
-import { PageHead, StatCard } from '@/components/shared';
-import { Button } from '@/components/ui/button';
-import { Plus, Search } from 'lucide-react';
-import Link from 'next/link';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useState } from 'react';
-import { AllInvestments } from '@/components/dashboard/investments';
-import { Badge } from '@/components/ui/badge';
+"use client";
+import { PageHead, StatCard } from "@/components/shared";
+import { Button } from "@/components/ui/button";
+import { Plus, Search } from "lucide-react";
+import Link from "next/link";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState, useMemo } from "react";
+import {
+  AllInvestments,
+  DraftInvestments,
+} from "@/components/dashboard/investments";
+import { Badge } from "@/components/ui/badge";
+import { useRetrieveInvestments } from "@/hook/investment-management";
+import { debounce } from "@/utils/helpers";
+import { StatCardSkeleton, TableSkeleton } from "@/components/shared/loader";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 export default function InvestmentPage() {
-  const [tab, setTab] = useState('all');
+  const [tab, setTab] = useState("all");
+  const [searchValue, setSearchValue] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [stateFilter, setStateFilter] = useState<string | undefined>(undefined);
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(
+    undefined,
+  );
+  const [typeFilter, setTypeFilter] = useState<string | undefined>(undefined);
+
+  // Debounce search input
+  const debouncedSetSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        setDebouncedSearch(value);
+        setPage(1);
+      }, 500),
+    [],
+  );
+
+  const handleSearchChange = (value: string) => {
+    setSearchValue(value);
+    debouncedSetSearch(value);
+  };
+
+  const { data, isLoading, isError } = useRetrieveInvestments({
+    search: debouncedSearch || undefined,
+    page,
+    limit: 20,
+    state: stateFilter,
+    investmentStatus: statusFilter,
+    propertyType: typeFilter,
+  });
+
+  const allInvestmentsContent = (() => {
+    if (isLoading) {
+      return <TableSkeleton />;
+    }
+
+    if (isError) {
+      return (
+        <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          Unable to load investments right now. Please try again.
+        </div>
+      );
+    }
+
+    return (
+      <AllInvestments
+        data={data?.data || []}
+        pagination={data?.pagination}
+        currentPage={page}
+        onPageChange={setPage}
+      />
+    );
+  })();
 
   const tabs = [
     {
       title: `All investments`,
-      value: 'all',
-      count: 3,
-      content: <AllInvestments />,
+      value: "all",
+      count: data?.data?.length || 0,
+      content: allInvestmentsContent,
     },
     {
       title: `Draft `,
-      value: 'draft',
-      count: 3,
-
-      content: '',
+      value: "draft",
+      count: 0,
+      content: <DraftInvestments />,
     },
   ];
   const metrics = [
     {
-      label: 'Total Investments',
-      value: 12,
-      scope: '8 active, 4 completed',
+      label: "Total Investments",
+      value: data?.stats?.totalInvestments ?? "N/A",
+      scope: data?.stats?.statusBreakdown
+        ? `${data.stats.statusBreakdown.active} active, ${data.stats.statusBreakdown.pending} pending`
+        : "N/A",
     },
     {
-      label: 'Total Raised',
-      currency: 'NGN',
-
-      value: '₦670M',
-      scope: 'Across all properties',
+      label: "Total Raised",
+      currency: "NGN",
+      value: data?.stats?.totalRaised
+        ? `₦${(data.stats.totalRaised / 1000000).toFixed(1)}M`
+        : "N/A",
+      scope: "Across all properties",
     },
     {
-      label: 'Avg Returns',
-
-      unit: 'percent',
-      value: '62.5%',
-      scope: 'Across all properties',
+      label: "Avg Returns",
+      unit: "percent",
+      value: data?.stats?.averageReturn
+        ? `${data.stats.averageReturn}%`
+        : "N/A",
+      scope: "Across all properties",
     },
     {
-      label: 'Total Investors',
-      value: 123,
-
-      scope: 'Unique participants',
+      label: "Total Investors",
+      value: data?.stats?.totalInvestors ?? "N/A",
+      scope: "Unique participants",
     },
   ];
   const filterSelection = [
     {
-      value: 'types',
-      label: 'All Types',
+      value: "propertyType",
+      label: "All Types",
+      filterState: typeFilter,
+      setFilter: setTypeFilter,
       options: [
-        { value: 'commercial', label: 'commercial' },
-        { value: 'residential', label: 'Residential' },
+        { value: "all", label: "All Types" },
+        { value: "commercial", label: "Commercial" },
+        { value: "industrial_space", label: "Industrial Space" },
+        { value: "land", label: "Land" },
+        { value: "office_block", label: "Office Block" },
+        { value: "retail_mall", label: "Retail Mall" },
+        { value: "residential", label: "Residential" },
+        { value: "student_housing", label: "Student Housing" },
       ],
     },
     {
-      value: 'status',
-      label: 'All Status',
+      value: "status",
+      label: "All Status",
+      filterState: statusFilter,
+      setFilter: setStatusFilter,
       options: [
-        { value: 'active', label: 'Active' },
-        { value: 'funded', label: 'AFundeda' },
+        { value: "all", label: "All Status" },
+        { value: "pending", label: "Pending" },
+        { value: "upcoming", label: "Upcoming" },
+        { value: "active", label: "Active" },
+        { value: "funded", label: "Funded" },
+        { value: "closed", label: "Closed" },
       ],
     },
     {
-      value: 'location',
-      label: 'Location',
+      value: "location",
+      label: "Location",
+      filterState: stateFilter,
+      setFilter: setStateFilter,
       options: [
-        { value: 'lagos', label: 'Lagos' },
-        { value: 'abuja', label: 'Abuja' },
-        { value: 'portHarcourt', label: 'Port Harcourt' },
+        { value: "all", label: "All Locations" },
+        { value: "lagos", label: "Lagos" },
+        { value: "abuja", label: "Abuja" },
+        { value: "port Harcourt", label: "Port Harcourt" },
       ],
     },
   ];
@@ -94,38 +174,42 @@ export default function InvestmentPage() {
       <PageHead
         pageTitle="Investment Management"
         subTitle="Create and manage investment opportunities"
-        // className=" [&_h2]:text-green-700"
       >
-        <Link href={'/investments/create-investment'}>
+        <Link href={"/investments/create-investment"}>
           <Button className="flex items-center gap-2 rounded-sm">
             <Plus /> <span className="hidden lg:block"> Create Investment</span>
           </Button>
         </Link>
       </PageHead>
       <div className="grid lg:grid-cols-4 grid-cols-2 flex-wrap lg:gap-6 gap-3 my-8 ">
-        {metrics.map((stat, i) => (
-          <StatCard
-            label={stat.label}
-            description={stat.scope}
-            value={stat.value}
-            color={'text-green-700'}
-            key={i}
-          />
-        ))}
+        {isLoading ? (
+          <>
+            <StatCardSkeleton />
+          </>
+        ) : (
+          metrics.map((stat, i) => (
+            <StatCard
+              label={stat.label}
+              description={stat.scope}
+              value={stat.value}
+              color={"text-green-700"}
+              key={i}
+            />
+          ))
+        )}
       </div>
-      <Tabs defaultValue={tab} className="space-y-5">
+      <Tabs value={tab} onValueChange={setTab} className="space-y-5">
         <div className="flex justify-between">
           <TabsList className="flex flex-wrap">
             {tabs.map((tab, i) => (
               <TabsTrigger
                 value={tab.value}
                 key={i}
-                onClick={() => setTab(tab.value)}
                 className="flex items-center"
               >
-                {tab.title}{' '}
+                {tab.title}{" "}
                 <Badge
-                  className={`rounded-sm ${tab.value === 'all' ? 'text-blue-500 bg-blue-100' : 'text-orange-500 bg-orange-100'}`}
+                  className={`rounded-sm ${tab.value === "all" ? "text-blue-500 bg-blue-100" : "text-orange-500 bg-orange-100"}`}
                 >
                   {tab.count}
                 </Badge>
@@ -135,17 +219,29 @@ export default function InvestmentPage() {
           <div className="flex items-center gap-4">
             <div className="border bg-gray-100 flex gap-1 items-center rounded-sm">
               <Button
-                variant={'outline'}
+                variant={"outline"}
                 className="border-0 bg-transparent rounded-none"
               >
                 <Search />
               </Button>
-              <Input className=" text-black " placeholder="search..." />
+              <Input
+                className=" text-black "
+                placeholder="search..."
+                value={searchValue}
+                onChange={(e) => handleSearchChange(e.target.value)}
+              />
             </div>
             <div className="flex lg:flex-row flex-col gap-2">
               {filterSelection.map((filter, i) => {
                 return (
-                  <Select key={i}>
+                  <Select
+                    key={i}
+                    value={filter.filterState || "all"}
+                    onValueChange={(value) => {
+                      filter.setFilter(value === "all" ? undefined : value);
+                      setPage(1);
+                    }}
+                  >
                     <SelectTrigger className="">
                       <SelectValue placeholder={filter.label} />
                     </SelectTrigger>

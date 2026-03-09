@@ -1,4 +1,9 @@
-import { CreateInvestmentReq, CreateInvestmentRes } from '@/interface';
+import {
+  CreateInvestmentReq,
+  CreateInvestmentRes,
+  InvestmentListRes,
+  RetrieveInvestmentsQuery,
+} from '@/interface';
 import API from '@/services/axios';
 
 export const createInvestment = async (
@@ -87,6 +92,16 @@ export const createInvestment = async (
       },
     },
   );
+
+  return data;
+};
+
+export const retrieveInvestments = async (
+  query: RetrieveInvestmentsQuery,
+): Promise<InvestmentListRes> => {
+  const { data } = await API.get('/investments/admin/published', {
+    params: query,
+  });
 
   return data;
 };
