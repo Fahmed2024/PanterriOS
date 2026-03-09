@@ -22,6 +22,7 @@ import {
   Bot,
   Calendar,
   LayoutDashboard,
+  LucideIcon,
 } from "lucide-react";
 
 import {
@@ -34,7 +35,7 @@ interface Feature {
   id: number;
   title: string;
   description: string;
-  icon: any;
+  icon: LucideIcon;
   color: string;
   border: string;
   accentHex: string;
@@ -196,7 +197,7 @@ export default function HomeHero() {
 
       {/* RIGHT SECTION (circular layout) */}
 
-      <div 
+      <div
         className={`relative hidden md:flex   ${poppins.className} mr-10 md:mr-30 items-center`}
       >
         <div
@@ -219,7 +220,10 @@ export default function HomeHero() {
 
           <div className="absolute left-1/2 top-[41%] transform -translate-x-1/2 -translate-y-1/2">
             <div className="h-21 w-26 rounded-2xl bg-black flex items-center justify-center shadow-lg">
-              <LayoutDashboard className="text-white h-16 w-16" strokeWidth='1' />
+              <LayoutDashboard
+                className="text-white h-16 w-16"
+                strokeWidth="1"
+              />
             </div>
           </div>
 
@@ -232,23 +236,19 @@ export default function HomeHero() {
             const pos = designPositions[index] ?? { left: 0, top: 0 };
             const x = pos.left * scale;
             const y = pos.top * scale;
-            const shadowColor = active
-              ? `${feature.accentHex}33`
-              : "#00000033";
+            const shadowColor = active ? `${feature.accentHex}33` : "#00000033";
 
             return (
               <Tooltip key={feature.id}>
                 <TooltipTrigger asChild>
                   <div
-                    style={
-                      {
-                        left: `${x}px`,
-                        top: `${y}px`,
-                        position: "absolute",
-                        transform: "translate(-50%, -50%)",
-                        boxShadow: `0px 2px 12px 0px ${shadowColor}`,
-                      } as any
-                    }
+                    style={{
+                      left: `${x}px`,
+                      top: `${y}px`,
+                      position: "absolute",
+                      transform: "translate(-50%, -50%)",
+                      boxShadow: `0px 2px 12px 0px ${shadowColor}`,
+                    }}
                     className={
                       `flex items-center justify-center h-24 w-40 rounded-2xl bg-[#FAFAFA] border transition-all duration-500 cursor-pointer p-2 ` +
                       (active

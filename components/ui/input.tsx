@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Eye, EyeOff, Check, LetterText, Lock, Mail } from 'lucide-react';
+import { Eye, EyeOff, Check, Lock, Mail } from 'lucide-react';
 
 import { cn } from '../../lib/utils';
 import { Spinner } from './spinner';

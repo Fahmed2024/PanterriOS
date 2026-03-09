@@ -2,7 +2,7 @@
 import { ReUseAbleTable } from "@/components/shared/reusableTable";
 import { Button } from "@/components/ui/button";
 import { type ColumnDef } from "@tanstack/react-table";
-import { Eye, MapPin } from "lucide-react";
+import { Eye } from "lucide-react";
 import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
