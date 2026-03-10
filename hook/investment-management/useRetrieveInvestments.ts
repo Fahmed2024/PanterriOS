@@ -40,5 +40,6 @@ export function useRetrieveInvestments({
         investmentStatus,
         propertyType,
       }),
+    
   });
 }

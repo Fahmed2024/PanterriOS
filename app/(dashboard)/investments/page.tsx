@@ -72,8 +72,8 @@ export default function InvestmentPage() {
 
     return (
       <AllInvestments
-        data={data?.data || []}
-        pagination={data?.pagination}
+        data={data?.data?.data || []}
+        pagination={data?.data?.pagination}
         currentPage={page}
         onPageChange={setPage}
       />
@@ -84,7 +84,7 @@ export default function InvestmentPage() {
     {
       title: `All investments`,
       value: "all",
-      count: data?.data?.length || 0,
+      count: data?.data?.data.length || 0,
       content: allInvestmentsContent,
     },
     {
@@ -94,33 +94,30 @@ export default function InvestmentPage() {
       content: <DraftInvestments />,
     },
   ];
+  console.log(data?.data?.pagination)
   const metrics = [
     {
       label: "Total Investments",
-      value: data?.stats?.totalInvestments ?? "N/A",
-      scope: data?.stats?.statusBreakdown
-        ? `${data.stats.statusBreakdown.active} active, ${data.stats.statusBreakdown.pending} pending`
+      value: data?.data?.stats?.totalInvestments ?? 0,
+      scope: data?.data?.stats?.statusBreakdown
+        ? `${data?.data?.stats.statusBreakdown.active} active, ${data.data?.stats.statusBreakdown.pending} pending`
         : "N/A",
-    },
+    }, 
     {
       label: "Total Raised",
       currency: "NGN",
-      value: data?.stats?.totalRaised
-        ? `₦${(data.stats.totalRaised / 1000000).toFixed(1)}M`
-        : "N/A",
+      value: `₦${((data?.data?.stats?.totalRaised ?? 0) / 1000000).toFixed(1)}M`,
       scope: "Across all properties",
     },
     {
       label: "Avg Returns",
       unit: "percent",
-      value: data?.stats?.averageReturn
-        ? `${data.stats.averageReturn}%`
-        : "N/A",
+      value: `${data?.data?.stats?.averageReturn ?? 0}%`,
       scope: "Across all properties",
     },
     {
       label: "Total Investors",
-      value: data?.stats?.totalInvestors ?? "N/A",
+      value: data?.data?.stats?.totalInvestors ?? 0,
       scope: "Unique participants",
     },
   ];

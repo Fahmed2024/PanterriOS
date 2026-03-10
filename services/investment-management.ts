@@ -1,8 +1,12 @@
 import {
+  CommonRes,
   CreateInvestmentReq,
   CreateInvestmentRes,
   InvestmentListRes,
+  RetrieveInvestmentDetailsRes,
   RetrieveInvestmentsQuery,
+  UpdateInvestmentReq,
+  UpdateInvestmentRes,
 } from '@/interface';
 import API from '@/services/axios';
 
@@ -103,5 +107,76 @@ export const retrieveInvestments = async (
     params: query,
   });
 
+  return data;
+};
+
+export const retrieveInvestmentDetails = async (
+  id: number,
+): Promise<RetrieveInvestmentDetailsRes> => {
+  const { data } = await API.get(`/investments/admin/${id}`);
+  return data;
+};
+
+export const updateInvestmentDetails = async (
+  id: number,
+  payload: UpdateInvestmentReq,
+): Promise<UpdateInvestmentRes> => {
+  const formData = new FormData();
+
+  const appendIfDefined = (key: string, value: unknown) => {
+    if (value === undefined || value === null) return;
+
+    if (Array.isArray(value)) {
+      formData.append(key, JSON.stringify(value));
+      return;
+    }
+
+    formData.append(key, String(value));
+  };
+
+  appendIfDefined('propertyName', payload.propertyName);
+  appendIfDefined('propertyType', payload.propertyType);
+  appendIfDefined('state', payload.state);
+  appendIfDefined('city', payload.city);
+  appendIfDefined('fullAddress', payload.fullAddress);
+  appendIfDefined('propertyDescription', payload.propertyDescription);
+  appendIfDefined('targetAmount', payload.targetAmount);
+  appendIfDefined('minimumInvestmentAmount', payload.minimumInvestmentAmount);
+  appendIfDefined(
+    'returnDistributionSchedule',
+    payload.returnDistributionSchedule,
+  );
+  appendIfDefined('duration', payload.duration);
+  appendIfDefined(
+    'expectedReturnPercentage',
+    payload.expectedReturnPercentage,
+  );
+  appendIfDefined('riskRating', payload.riskRating);
+  appendIfDefined(
+    'investmentPublicationStatus',
+    payload.investmentPublicationStatus,
+  );
+  appendIfDefined('propertyValue', payload.propertyValue);
+  appendIfDefined('expectedRoi', payload.expectedRoi);
+  appendIfDefined('propertySizeSqm', payload.propertySizeSqm);
+  appendIfDefined('propertyUnit', payload.propertyUnit);
+  appendIfDefined('keyHighlights', payload.keyHighlights);
+  appendIfDefined('projectMilestones', payload.projectMilestones);
+  appendIfDefined('documentVisibility', payload.documentVisibility);
+  appendIfDefined('coverImageIndex', payload.coverImageIndex);
+  appendIfDefined('documentUpdates', payload.documentUpdates);
+  appendIfDefined('imageUpdates', payload.imageUpdates);
+
+  const { data } = await API.put(`/investments/admin/${id}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  return data;
+};
+
+export const deleteInvestment = async (id: number): Promise<CommonRes> => {
+  const { data } = await API.delete(`/investments/admin/${id}`);
   return data;
 };

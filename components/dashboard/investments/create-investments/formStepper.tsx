@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 import {
   Banknote,
   Check,
@@ -6,7 +6,7 @@ import {
   CircleCheck,
   FileText,
   Flag,
-} from 'lucide-react';
+} from "lucide-react";
 
 export function FormStepper({
   activeStep,
@@ -17,61 +17,76 @@ export function FormStepper({
 }) {
   const steppers = [
     {
-      title: 'Basic Information',
+      title: "Basic Information",
       icon: CircleAlert,
     },
     {
-      title: 'Financial Details',
+      title: "Financial Details",
       icon: Banknote,
     },
     {
-      title: 'Media & Documents',
+      title: "Media & Documents",
       icon: FileText,
     },
     {
-      title: 'Project Milestones',
+      title: "Project Milestones",
       icon: Flag,
     },
     {
-      title: 'Review & Publish',
+      title: "Review & Publish",
       icon: Check,
     },
   ];
   return (
-    <div className={cn(` space-y-4 p-4 last:[&_div:hidden ${className}`)}>
-      {steppers.map((step, i) => {
-        const Icon = step.icon;
-        const isLast = i === steppers.length - 1;
-        const stepCount = i + 1;
-        const isCompleted = activeStep > stepCount;
+    <div>
+      <div className="px-4 mt-6 mb-6">
+        <h2 className="text-lg font-bold">Create new investment</h2>
+        <small className="text-gray-500">
+          Step {activeStep < 5 ? activeStep : 5} of 5
+        </small>
+      </div>
 
-        return (
-          <div key={i} className="space-y-3">
-            <div
-              className={cn(
-                ` text-gray-400 flex items-center gap-4 p-4 rounded-md ${activeStep === stepCount && 'bg-green-900 text-white'} ${isCompleted && 'bg-green-100 text-green-950'}`,
-              )}
-            >
+      <div className={cn("space-y-4 px-4", className)}>
+        {steppers.map((step, i) => {
+          const Icon = step.icon;
+          const isLast = i === steppers.length - 1;
+          const stepCount = i + 1;
+          const isCompleted = activeStep > stepCount;
+
+          return (
+            <div key={i} className="space-y-3">
               <div
                 className={cn(
-                  `bg-gray-50/20 p-4 rounded-md ${isCompleted && 'bg-white'}`,
+                  "text-gray-400 flex items-center gap-4 p-4 rounded-md transition-colors",
+                  activeStep === stepCount && "bg-green-900 text-white",
+                  isCompleted && "bg-green-100 text-green-950"
                 )}
               >
-                {isCompleted ? <CircleCheck /> : <Icon className="" />}
+                <div
+                  className={cn(
+                    "bg-gray-50/20 p-4 rounded-md transition-colors",
+                    isCompleted && "bg-white"
+                  )}
+                >
+                  {isCompleted ? <CircleCheck /> : <Icon className="" />}
+                </div>
+                <div className="">
+                  <span className="text-sm">Step {i + 1}</span>
+                  <p className="font-bold">{step.title}</p>
+                </div>
               </div>
-              <div className="">
-                <span>Step {i + 1}</span>
-                <p className=" font-bold">{step.title}</p>
-              </div>
-            </div>
-            <div
-              className={cn(
-                ` w-1.5 rounded-md h-10 bg-gray-100 mx-auto ${isLast && 'hidden'} ${isCompleted && 'bg-green-700'}`,
+              {!isLast && (
+                <div
+                  className={cn(
+                    "w-1.5 rounded-md h-10 bg-gray-100 mx-auto transition-colors",
+                    isCompleted && "bg-green-700"
+                  )}
+                />
               )}
-            />
-          </div>
-        );
-      })}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

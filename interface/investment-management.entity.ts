@@ -71,6 +71,7 @@ export interface InvestmentStats {
 
 export interface InvestmentListRes {
   message: string;
+  data: {
   data: InvestmentListItem[];
   stats: InvestmentStats;
   pagination: {
@@ -78,5 +79,70 @@ export interface InvestmentListRes {
     totalPages: number;
     totalItems: number;
     limit: number;
+  };
+}
+}
+
+export interface InvestmentDetails {
+  id: number;
+  propertyName: string;
+  propertyType: string;
+  investmentPublicationStatus: string;
+  investmentStatus: string;
+  targetAmount: number;
+  expectedReturnPercentage: number;
+  images: string[];
+  legalDocuments: string[];
+}
+
+export interface RetrieveInvestmentDetailsRes {
+  message: string;
+  data: InvestmentDetails;
+}
+
+export interface DocumentUpdate {
+  action: 'add' | 'remove' | 'replace';
+  index?: number;
+  url?: string;
+  fileName?: string;
+}
+
+export interface ImageUpdate {
+  action: 'add' | 'remove' | 'replace';
+  index?: number;
+  url?: string;
+}
+
+export interface UpdateInvestmentReq {
+  propertyName?: string;
+  propertyType?: string;
+  state?: string;
+  city?: string;
+  fullAddress?: string;
+  propertyDescription?: string;
+  targetAmount?: number;
+  minimumInvestmentAmount?: number;
+  returnDistributionSchedule?: string;
+  duration?: number;
+  expectedReturnPercentage?: number;
+  riskRating?: string;
+  investmentPublicationStatus?: string;
+  propertyValue?: number;
+  expectedRoi?: number;
+  propertySizeSqm?: number;
+  propertyUnit?: string;
+  keyHighlights?: string[];
+  projectMilestones?: ProjectMilestone[];
+  documentVisibility?: boolean[];
+  coverImageIndex?: number;
+  documentUpdates?: DocumentUpdate[];
+  imageUpdates?: ImageUpdate[];
+}
+
+export interface UpdateInvestmentRes {
+  message: string;
+  data: {
+    id: number;
+    investmentPublicationStatus: string;
   };
 }

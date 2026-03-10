@@ -76,7 +76,7 @@ export function ReUseAbleTable<TData extends object>({
           </TableHeader>
           <TableBody>
             {hasData ? (
-              (pagination ? table.getRowModel().rows : table.getRowModel().rows).map((row) => (
+              table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
                   className="border-b min-h-20 border-[#E2E2E2] hover:bg-[#F9FAFB]/50"
