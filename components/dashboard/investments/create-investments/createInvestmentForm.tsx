@@ -116,8 +116,8 @@ const schedulOption = [
   { label: "Monthly", value: "monthly" },
   { label: "Quarterly", value: "quarterly" },
   { label: "Annual", value: "annual" },
-  { label: "Bi annual", value: "bi annual" },
-  { label: "At Maturity", value: "at maturity" },
+  { label: "Bi annual", value: "bi_annual" },
+  { label: "At Maturity", value: "at_maturity" },
 ];
 const riskOption = [
   { label: "Low", value: "low" },
@@ -127,7 +127,7 @@ const riskOption = [
 const milestoneStatusOption = [
   { label: "Completed", value: "completed" },
   { label: "In Progress", value: "in_progress" },
-  { label: "Up Coming", value: "up_coming" },
+  { label: "Up Coming", value: "upcoming" },
 ];
 const requiredDoc = [
   "• Investment Prospectus",
@@ -264,14 +264,12 @@ export function CreateInvestmentForm({ step, setStep }: Prop) {
     publicationStatus: "draft" | "published" = "published",
   ) => {
     try {
-      // Combine cover image with property images
       const allPropertyImages = [
-        ...values.coverimage,
         ...values.propertyImages,
       ];
-      const coverImageIndex = 0; // First image is the cover
+      // first image as cover
+      const coverImageIndex = 0;
 
-      // Transform the data to match API requirements
       const payload = {
         propertyName: values.propertyName,
         propertyType: values.propertyType,
@@ -292,11 +290,10 @@ export function CreateInvestmentForm({ step, setStep }: Prop) {
         propertyUnit: values.units.toString(),
         keyHighlights: values.features,
         projectMilestones: values.projectMilestones,
-        coverImageIndex,
+        coverImage: values.coverimage[0],
         propertyImages: allPropertyImages,
         propertyDocuments: values.legalDocuments,
       };
-      console.log("create invetsment form payload:", payload);
       await createInvestmentFn(payload);
       form.reset();
       setStep(1);

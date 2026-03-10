@@ -10,7 +10,10 @@ import {
   DraftInvestments,
 } from "@/components/dashboard/investments";
 import { Badge } from "@/components/ui/badge";
-import { useRetrieveInvestments } from "@/hook/investment-management";
+import {
+  useRetrieveDraftInvestments,
+  useRetrieveInvestments,
+} from "@/hook/investment-management";
 import { debounce } from "@/utils/helpers";
 import { StatCardSkeleton, TableSkeleton } from "@/components/shared/loader";
 import {
@@ -26,7 +29,7 @@ export default function InvestmentPage() {
   const [tab, setTab] = useState("all");
   const [searchValue, setSearchValue] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [page, setPage] = useState(1);
+  const [allPage, setAllPage] = useState(1);
   const [stateFilter, setStateFilter] = useState<string | undefined>(undefined);
   const [statusFilter, setStatusFilter] = useState<string | undefined>(
     undefined,
@@ -38,7 +41,7 @@ export default function InvestmentPage() {
     () =>
       debounce((value: string) => {
         setDebouncedSearch(value);
-        setPage(1);
+        setAllPage(1);
       }, 500),
     [],
   );
@@ -50,7 +53,20 @@ export default function InvestmentPage() {
 
   const { data, isLoading, isError } = useRetrieveInvestments({
     search: debouncedSearch || undefined,
-    page,
+    page: allPage,
+    limit: 20,
+    state: stateFilter,
+    investmentStatus: statusFilter,
+    propertyType: typeFilter,
+  });
+
+  const {
+    data: draftData,
+    isLoading: isDraftLoading,
+    isError: isDraftError,
+  } = useRetrieveDraftInvestments({
+    search: debouncedSearch || undefined,
+    page: 1,
     limit: 20,
     state: stateFilter,
     investmentStatus: statusFilter,
@@ -74,10 +90,26 @@ export default function InvestmentPage() {
       <AllInvestments
         data={data?.data?.data || []}
         pagination={data?.data?.pagination}
-        currentPage={page}
-        onPageChange={setPage}
+          currentPage={allPage}
+          onPageChange={setAllPage}
       />
     );
+  })();
+
+  const draftInvestmentsContent = (() => {
+    if (isDraftLoading) {
+      return <TableSkeleton />;
+    }
+
+    if (isDraftError) {
+      return (
+        <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          Unable to load draft investments right now. Please try again.
+        </div>
+      );
+    }
+
+    return <DraftInvestments data={draftData?.data || []} />;
   })();
 
   const tabs = [
@@ -90,11 +122,10 @@ export default function InvestmentPage() {
     {
       title: `Draft `,
       value: "draft",
-      count: 0,
-      content: <DraftInvestments />,
+      count: draftData?.data?.length || 0,
+      content: draftInvestmentsContent,
     },
   ];
-  console.log(data?.data?.pagination)
   const metrics = [
     {
       label: "Total Investments",
@@ -236,7 +267,7 @@ export default function InvestmentPage() {
                     value={filter.filterState || "all"}
                     onValueChange={(value) => {
                       filter.setFilter(value === "all" ? undefined : value);
-                      setPage(1);
+                      setAllPage(1);
                     }}
                   >
                     <SelectTrigger className="">

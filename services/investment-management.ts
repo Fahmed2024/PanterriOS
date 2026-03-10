@@ -2,6 +2,7 @@ import {
   CommonRes,
   CreateInvestmentReq,
   CreateInvestmentRes,
+  DraftInvestmentListRes,
   InvestmentListRes,
   RetrieveInvestmentDetailsRes,
   RetrieveInvestmentsQuery,
@@ -72,10 +73,8 @@ export const createInvestment = async (
     );
   }
 
-  // Append cover image index if provided
-  if (payload.coverImageIndex !== undefined) {
-    formData.append('coverImageIndex', payload.coverImageIndex.toString());
-  }
+  // Append cover image as a single file
+  formData.append('coverImage', payload.coverImage);
 
   // Append property images
   payload.propertyImages.forEach((file) => {
@@ -104,6 +103,16 @@ export const retrieveInvestments = async (
   query: RetrieveInvestmentsQuery,
 ): Promise<InvestmentListRes> => {
   const { data } = await API.get('/investments/admin/published', {
+    params: query,
+  });
+
+  return data;
+};
+
+export const retrieveDraftInvestments = async (
+  query: RetrieveInvestmentsQuery,
+): Promise<DraftInvestmentListRes> => {
+  const { data } = await API.get('/investments/admin/drafts', {
     params: query,
   });
 

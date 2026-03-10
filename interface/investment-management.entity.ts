@@ -19,14 +19,14 @@ export interface CreateInvestmentReq {
   keyHighlights?: string[];
   projectMilestones: ProjectMilestone[];
   documentVisibility?: boolean[];
-  coverImageIndex?: number;
+  coverImage: File;
   propertyImages: File[];
   propertyDocuments: File[];
 }
 
 export interface ProjectMilestone {
   title: string;
-  status: string;
+  status: "completed" | "in_progress" | "upcoming";
   date: string;
   description: string;
 }
@@ -57,6 +57,19 @@ export interface InvestmentListItem {
   totalNumberOfInvestors: number;
 }
 
+export interface DraftInvestmentItem {
+  id: number;
+  name: string;
+  propertyType: string;
+  location: {
+    state: string;
+    city: string;
+  };
+  targetedAmount: number;
+  lastEdited: string;
+  completionPercentage: number;
+}
+
 export interface InvestmentStats {
   totalInvestments: number;
   totalRaised: number;
@@ -81,6 +94,11 @@ export interface InvestmentListRes {
       limit: number;
     };
   };
+}
+
+export interface DraftInvestmentListRes {
+  message: string;
+  data: DraftInvestmentItem[];
 }
 
 export interface InvestmentDetails {

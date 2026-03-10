@@ -33,29 +33,30 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
   }, [id]);
 
   const investmentDetails = data;
-console.log("Investment Details:", investmentDetails); // Debug log to check the structure of the data
+
   const tabs = [
     {
       title: "Overview",
       value: "overview",
-      content:
-        investmentDetails?.overview && <Overview overview={investmentDetails.overview} />,
+      content: investmentDetails?.overview && (
+        <Overview overview={investmentDetails.overview} />
+      ),
     },
     {
       title: "Financial Details",
       value: "financial-details",
-      content:
-        investmentDetails?.financialDetails && (
-          <FinancialDetails financialDetails={investmentDetails.financialDetails} />
-        ),
+      content: investmentDetails?.financialDetails && (
+        <FinancialDetails
+          financialDetails={investmentDetails.financialDetails}
+        />
+      ),
     },
     {
       title: "Property Details",
       value: "property-info",
-      content:
-        investmentDetails?.propertyDetails && (
-          <PropertyInfo propertyDetails={investmentDetails.propertyDetails} />
-        ),
+      content: investmentDetails?.propertyDetails && (
+        <PropertyInfo propertyDetails={investmentDetails.propertyDetails} />
+      ),
     },
     {
       title: "Documents",
@@ -91,14 +92,19 @@ console.log("Investment Details:", investmentDetails); // Debug log to check the
             <DrawerTitle className="flex justify-between">
               <div className="w-full">
                 <div className="flex gap-14 items-center">
-                  <div className="text-xl font-bold">{investmentDetails?.header.propertyName ?? "-"}</div>
+                  <div className="text-xl font-bold">
+                    {investmentDetails?.header.propertyName ?? "-"}
+                  </div>
 
                   <StatusBadge
-                    status={investmentDetails?.header?.investmentPublicationStatus ?? "pending"}
+                    status={
+                      investmentDetails?.header?.investmentPublicationStatus ??
+                      "pending"
+                    }
                     showDot
                   />
                 </div>
-                <p className="text-gray-500 flex items-center">
+                <p className="text-gray-500 pt-1 flex items-center">
                   <MapPin className="w-4 h-4" />
                   <span>{investmentDetails?.header.location ?? "-"}</span>
                 </p>
@@ -109,8 +115,15 @@ console.log("Investment Details:", investmentDetails); // Debug log to check the
                 </button>
               </DrawerClose>
             </DrawerTitle>
-            <Button className="w-fit">Edit investment</Button>
-            <DrawerDescription />
+
+            <DrawerDescription>
+              <div className="flex my-2 justify-between">
+                <Button className="w-fit rounded-sm">Edit investment</Button>
+                <Button className="w-fit " variant="destructive">
+                  Delete Investment
+                </Button>
+              </div>
+            </DrawerDescription>
 
             {isLoading ? (
               <InvestmentDetailsSkeleton />
@@ -119,7 +132,7 @@ console.log("Investment Details:", investmentDetails); // Debug log to check the
                 Unable to load investment details right now.
               </div>
             ) : (
-              <Tabs value={tab} className="space-y-5 w-full">
+              <Tabs value={tab} className="space-y-2 w-full">
                 <TabsList className="flex flex-wrap w-full">
                   {tabs.map((currentTab) => (
                     <TabsTrigger
