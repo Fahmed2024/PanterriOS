@@ -18,6 +18,7 @@ import PropertyInfo from "./propertyInfo";
 import { Documents } from "./documents";
 import PropertyInvestors from "./propertyInvestors";
 import { useRetrieveInvestmentDetails } from "@/hook/investment-management/useRetrieveInvestmentDetails";
+import { useDeleteInvestment } from "@/hook/investment-management";
 import { InvestmentDetailsSkeleton, StatusBadge } from "@/components/shared";
 
 interface DetailsPageViewProp {
@@ -27,6 +28,8 @@ interface DetailsPageViewProp {
 export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
   const [isOpen, setIsOpen] = useState(false);
   const { data, isLoading, error } = useRetrieveInvestmentDetails(id, isOpen);
+  const { mutate: deleteInvestment, isPending: isDeleting } =
+    useDeleteInvestment();
   const [tab, setTab] = useState("overview");
 
   useEffect(() => {
@@ -34,6 +37,11 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
   }, [id]);
 
   const investmentDetails = data;
+
+  const handleDelete = () => {
+    if (!id) return;
+    deleteInvestment(id);
+  };
 
   const tabs = [
     {
@@ -120,8 +128,13 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
             <DrawerDescription>
               <div className="flex my-2 justify-between">
                 <Button className="w-fit rounded-sm">Edit investment</Button>
-                <Button className="w-fit " variant="destructive">
-                  Delete Investment
+                <Button
+                  className="w-fit cursor-pointer"
+                  variant="destructive"
+                  onClick={handleDelete}
+                  disabled={isDeleting || !id}
+                >
+                  {isDeleting ? "Deleting..." : "Delete Investment"}
                 </Button>
               </div>
             </DrawerDescription>
