@@ -23,6 +23,7 @@ export function getStatusColor(status: string): {
       };
 
     case "pending":
+      case "draft":
     case "in progress":
       return {
         textColor: "text-[#BB4D00]",

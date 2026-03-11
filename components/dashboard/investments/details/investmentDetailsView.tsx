@@ -18,7 +18,10 @@ import PropertyInfo from "./propertyInfo";
 import { Documents } from "./documents";
 import PropertyInvestors from "./propertyInvestors";
 import { useRetrieveInvestmentDetails } from "@/hook/investment-management/useRetrieveInvestmentDetails";
-import { useDeleteInvestment } from "@/hook/investment-management";
+import {
+  useToggleInvestmentDocumentVisibility,
+  useUpdateInvestmentPublicationStatus,
+} from "@/hook/investment-management";
 import { InvestmentDetailsSkeleton, StatusBadge } from "@/components/shared";
 
 interface DetailsPageViewProp {
@@ -28,19 +31,60 @@ interface DetailsPageViewProp {
 export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
   const [isOpen, setIsOpen] = useState(false);
   const { data, isLoading, error } = useRetrieveInvestmentDetails(id, isOpen);
-  const { mutate: deleteInvestment, isPending: isDeleting } =
-    useDeleteInvestment();
+  const { mutate: toggleDocumentVisibility, isPending: isTogglingDocument } =
+    useToggleInvestmentDocumentVisibility();
+  const {
+    mutate: updatePublicationStatus,
+    isPending: isUpdatingPublicationStatus,
+  } = useUpdateInvestmentPublicationStatus();
   const [tab, setTab] = useState("overview");
+  const [togglingDocumentId, setTogglingDocumentId] = useState<number | null>(
+    null,
+  );
 
   useEffect(() => {
     setTab("overview");
   }, [id]);
 
-  const investmentDetails = data;
+  useEffect(() => {
+    const handleInvestmentDeleted = (event: Event) => {
+      const deletedInvestmentId = (
+        event as CustomEvent<{ id: number }>
+      ).detail?.id;
 
-  const handleDelete = () => {
+      if (deletedInvestmentId === id) {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener("investment-deleted", handleInvestmentDeleted);
+
+    return () => {
+      window.removeEventListener(
+        "investment-deleted",
+        handleInvestmentDeleted,
+      );
+    };
+  }, [id]);
+
+  const investmentDetails = data;
+  const publicationStatus =
+    investmentDetails?.header?.investmentPublicationStatus?.toLowerCase() ??
+    "pending";
+  const isPublished = publicationStatus === "published";
+
+
+
+  const handlePublicationStatus = () => {
     if (!id) return;
-    deleteInvestment(id);
+    updatePublicationStatus(id);
+  };
+
+  const handleToggleDocumentVisibility = (documentId: number) => {
+    setTogglingDocumentId(documentId);
+    toggleDocumentVisibility(documentId, {
+      onSettled: () => setTogglingDocumentId(null),
+    });
   };
 
   const tabs = [
@@ -70,7 +114,14 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
     {
       title: "Documents",
       value: "documents",
-      content: <Documents documents={investmentDetails?.documents ?? []} />,
+      content: (
+        <Documents
+          documents={investmentDetails?.documents ?? []}
+          onToggleVisibility={handleToggleDocumentVisibility}
+          isToggling={isTogglingDocument}
+          togglingDocumentId={togglingDocumentId}
+        />
+      ),
     },
     {
       title: "Investors",
@@ -92,60 +143,64 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
     <div>
       <Drawer direction="right" open={isOpen} onOpenChange={setIsOpen}>
         <DrawerTrigger asChild>{children}</DrawerTrigger>
-        <DrawerContent
-          className=" lg:data-[vaul-drawer-direction=left]:sm:max-w-xl
+        {isLoading ? (
+          <InvestmentDetailsSkeleton />
+        ) : error ? (
+          <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            Unable to load investment details right now.
+          </div>
+        ) : (
+          <DrawerContent
+            className=" py-4 lg:data-[vaul-drawer-direction=left]:sm:max-w-xl
             lg:data-[vaul-drawer-direction=right]:sm:max-w-xl  overflow-hidden overflow-y-auto
             "
-        >
-          <DrawerHeader>
-            <DrawerTitle className="flex justify-between">
-              <div className="w-full">
-                <div className="flex gap-14 items-center">
-                  <div className="text-xl font-bold">
-                    {investmentDetails?.header.propertyName ?? "-"}
+          >
+            <DrawerHeader>
+              <DrawerTitle className="flex justify-between">
+                <div className="w-full">
+                  <div className="flex gap-14 items-center">
+                    <div className="text-xl font-bold">
+                      {investmentDetails?.header.propertyName ?? "-"}
+                    </div>
+
+                    <StatusBadge
+                      status={
+                        investmentDetails?.header
+                          ?.investmentPublicationStatus ?? "pending"
+                      }
+                      showDot
+                    />
                   </div>
-
-                  <StatusBadge
-                    status={
-                      investmentDetails?.header?.investmentPublicationStatus ??
-                      "pending"
-                    }
-                    showDot
-                  />
+                  <p className="text-gray-500 pt-1 flex items-center">
+                    <MapPin className="w-4 h-4" />
+                    <span>{investmentDetails?.header.location ?? "-"}</span>
+                  </p>
                 </div>
-                <p className="text-gray-500 pt-1 flex items-center">
-                  <MapPin className="w-4 h-4" />
-                  <span>{investmentDetails?.header.location ?? "-"}</span>
-                </p>
-              </div>
-              <DrawerClose asChild>
-                <button type="button" aria-label="Close investment details">
-                  <X />
-                </button>
-              </DrawerClose>
-            </DrawerTitle>
+                <DrawerClose asChild>
+                  <button type="button" aria-label="Close investment details">
+                    <X />
+                  </button>
+                </DrawerClose>
+              </DrawerTitle>
 
-            <DrawerDescription>
-              <div className="flex my-2 justify-between">
-                <Button className="w-fit rounded-sm">Edit investment</Button>
-                <Button
-                  className="w-fit cursor-pointer"
-                  variant="destructive"
-                  onClick={handleDelete}
-                  disabled={isDeleting || !id}
-                >
-                  {isDeleting ? "Deleting..." : "Delete Investment"}
-                </Button>
-              </div>
-            </DrawerDescription>
+              <DrawerDescription>
+                <div className="flex my-2 justify-between">
+                  <Button
+                    variant="outline"
+                    className="w-fit cursor-pointer"
+                    onClick={handlePublicationStatus}
+                    disabled={isUpdatingPublicationStatus || !id}
+                  >
+                    {isUpdatingPublicationStatus
+                      ? "Updating..."
+                      : isPublished
+                        ? "Unpublish"
+                        : "Publish"}
+                  </Button>
+                  <div className="w-24" aria-hidden="true" />
+                </div>
+              </DrawerDescription>
 
-            {isLoading ? (
-              <InvestmentDetailsSkeleton />
-            ) : error ? (
-              <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                Unable to load investment details right now.
-              </div>
-            ) : (
               <Tabs value={tab} className="space-y-2 w-full">
                 <TabsList className="flex flex-wrap w-full">
                   {tabs.map((currentTab) => (
@@ -164,9 +219,9 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
                   </TabsContent>
                 ))}
               </Tabs>
-            )}
-          </DrawerHeader>
-        </DrawerContent>
+            </DrawerHeader>
+          </DrawerContent>
+        )}
       </Drawer>
     </div>
   );
