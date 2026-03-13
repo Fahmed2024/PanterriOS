@@ -10,7 +10,10 @@ import {
   DraftInvestments,
 } from "@/components/dashboard/investments";
 import { Badge } from "@/components/ui/badge";
-import { useRetrieveInvestments } from "@/hook/investment-management";
+import {
+  useRetrieveDraftInvestments,
+  useRetrieveInvestments,
+} from "@/hook/investment-management";
 import { debounce } from "@/utils/helpers";
 import { StatCardSkeleton, TableSkeleton } from "@/components/shared/loader";
 import {
@@ -26,7 +29,8 @@ export default function InvestmentPage() {
   const [tab, setTab] = useState("all");
   const [searchValue, setSearchValue] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [page, setPage] = useState(1);
+  const [allPage, setAllPage] = useState(1);
+  const [draftPage, setDraftPage] = useState(1);
   const [stateFilter, setStateFilter] = useState<string | undefined>(undefined);
   const [statusFilter, setStatusFilter] = useState<string | undefined>(
     undefined,
@@ -38,7 +42,8 @@ export default function InvestmentPage() {
     () =>
       debounce((value: string) => {
         setDebouncedSearch(value);
-        setPage(1);
+        setAllPage(1);
+        setDraftPage(1);
       }, 500),
     [],
   );
@@ -50,7 +55,20 @@ export default function InvestmentPage() {
 
   const { data, isLoading, isError } = useRetrieveInvestments({
     search: debouncedSearch || undefined,
-    page,
+    page: allPage,
+    limit: 20,
+    state: stateFilter,
+    investmentStatus: statusFilter,
+    propertyType: typeFilter,
+  });
+
+  const {
+    data: draftData,
+    isLoading: isDraftLoading,
+    isError: isDraftError,
+  } = useRetrieveDraftInvestments({
+    search: debouncedSearch || undefined,
+    page: draftPage,
     limit: 20,
     state: stateFilter,
     investmentStatus: statusFilter,
@@ -72,10 +90,33 @@ export default function InvestmentPage() {
 
     return (
       <AllInvestments
-        data={data?.data || []}
-        pagination={data?.pagination}
-        currentPage={page}
-        onPageChange={setPage}
+        data={data?.data?.data || []}
+        pagination={data?.data?.pagination}
+        currentPage={allPage}
+        onPageChange={setAllPage}
+      />
+    );
+  })();
+
+  const draftInvestmentsContent = (() => {
+    if (isDraftLoading) {
+      return <TableSkeleton />;
+    }
+
+    if (isDraftError) {
+      return (
+        <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          Unable to load draft investments right now. Please try again.
+        </div>
+      );
+    }
+
+    return (
+      <DraftInvestments
+        data={draftData?.data?.data || []}
+        pagination={draftData?.data?.pagination}
+        currentPage={draftPage}
+        onPageChange={setDraftPage}
       />
     );
   })();
@@ -84,43 +125,39 @@ export default function InvestmentPage() {
     {
       title: `All investments`,
       value: "all",
-      count: data?.data?.length || 0,
+      count: data?.data?.pagination?.totalItems || 0,
       content: allInvestmentsContent,
     },
     {
       title: `Draft `,
       value: "draft",
-      count: 0,
-      content: <DraftInvestments />,
+      count: draftData?.data?.pagination?.totalItems || 0,
+      content: draftInvestmentsContent,
     },
   ];
   const metrics = [
     {
       label: "Total Investments",
-      value: data?.stats?.totalInvestments ?? "N/A",
-      scope: data?.stats?.statusBreakdown
-        ? `${data.stats.statusBreakdown.active} active, ${data.stats.statusBreakdown.pending} pending`
+      value: data?.data?.stats?.totalInvestments ?? 0,
+      scope: data?.data?.stats?.statusBreakdown
+        ? `${data?.data?.stats.statusBreakdown.active} active, ${data.data?.stats.statusBreakdown.pending} pending`
         : "N/A",
-    },
+    }, 
     {
       label: "Total Raised",
       currency: "NGN",
-      value: data?.stats?.totalRaised
-        ? `₦${(data.stats.totalRaised / 1000000).toFixed(1)}M`
-        : "N/A",
+      value: `₦${((data?.data?.stats?.totalRaised ?? 0) / 1000000).toFixed(1)}M`,
       scope: "Across all properties",
     },
     {
       label: "Avg Returns",
       unit: "percent",
-      value: data?.stats?.averageReturn
-        ? `${data.stats.averageReturn}%`
-        : "N/A",
+      value: `${data?.data?.stats?.averageReturn ?? 0}%`,
       scope: "Across all properties",
     },
     {
       label: "Total Investors",
-      value: data?.stats?.totalInvestors ?? "N/A",
+      value: data?.data?.stats?.totalInvestors ?? 0,
       scope: "Unique participants",
     },
   ];
@@ -239,7 +276,8 @@ export default function InvestmentPage() {
                     value={filter.filterState || "all"}
                     onValueChange={(value) => {
                       filter.setFilter(value === "all" ? undefined : value);
-                      setPage(1);
+                      setAllPage(1);
+                      setDraftPage(1);
                     }}
                   >
                     <SelectTrigger className="">

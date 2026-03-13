@@ -19,14 +19,14 @@ export interface CreateInvestmentReq {
   keyHighlights?: string[];
   projectMilestones: ProjectMilestone[];
   documentVisibility?: boolean[];
-  coverImage: File;
+  coverImageIndex?: number;
   propertyImages: File[];
   propertyDocuments: File[];
 }
 
 export interface ProjectMilestone {
   title: string;
-  status: "completed" | "in_progress" | "upcoming";
+  status: string;
   date: string;
   description: string;
 }
@@ -57,19 +57,6 @@ export interface InvestmentListItem {
   totalNumberOfInvestors: number;
 }
 
-export interface DraftInvestmentItem {
-  id: number;
-  name: string;
-  propertyType: string;
-  location: {
-    state: string;
-    city: string;
-  };
-  targetedAmount: number;
-  lastEdited: string;
-  completionPercentage: number;
-}
-
 export interface InvestmentStats {
   totalInvestments: number;
   totalRaised: number;
@@ -87,19 +74,6 @@ export interface InvestmentListRes {
   data: {
     data: InvestmentListItem[];
     stats: InvestmentStats;
-    pagination: {
-      currentPage: number;
-      totalPages: number;
-      totalItems: number;
-      limit: number;
-    };
-  };
-}
-
-export interface DraftInvestmentListRes {
-  message: string;
-  data: {
-    data: DraftInvestmentItem[];
     pagination: {
       currentPage: number;
       totalPages: number;
@@ -215,9 +189,7 @@ export interface InvestmentInvestors {
 
 export interface RetrieveInvestmentDetailsRes {
   message: string;
-  data: {
-    data: InvestmentDetails;
-  };
+  data: InvestmentDetails;
 }
 
 export interface DocumentUpdate {
@@ -257,9 +229,6 @@ export interface UpdateInvestmentReq {
   coverImageIndex?: number;
   documentUpdates?: DocumentUpdate[];
   imageUpdates?: ImageUpdate[];
-  coverImage?: File;
-  propertyImages?: File[];
-  propertyDocuments?: File[];
 }
 
 export interface UpdateInvestmentRes {
@@ -268,17 +237,4 @@ export interface UpdateInvestmentRes {
     id: number;
     investmentPublicationStatus: string;
   };
-}
-
-export interface ToggleInvestmentDocumentVisibilityRes {
-  message: string;
-  data: {
-    id: number;
-    isPublic: boolean;
-    fileUrl: string;
-  };
-}
-
-export interface UpdateInvestmentPublicationStatusRes {
-  message: string;
 }

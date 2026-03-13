@@ -2,13 +2,15 @@
 import { ReUseAbleTable } from "@/components/shared/reusableTable";
 import { Button } from "@/components/ui/button";
 import { type ColumnDef } from "@tanstack/react-table";
-import { Eye } from "lucide-react";
-import Link from "next/link";
+import { Edit, Eye, Trash2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { InvestmentDetailsView } from "./details/investmentDetailsView";
-import { StatusBadge } from "@/components/shared";
+import { ConfirmationDialog, StatusBadge } from "@/components/shared";
 import { InvestmentListItem } from "@/interface";
+import { useDeleteInvestment } from "@/hook/investment-management";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface AllInvestmentsProps {
   data: InvestmentListItem[];
@@ -28,12 +30,37 @@ export function AllInvestments({
   currentPage,
   onPageChange,
 }: AllInvestmentsProps) {
+  const router = useRouter();
+  const { mutate: deleteInvestment, isPending: isDeleting } =
+    useDeleteInvestment();
+  const [selectedInvestment, setSelectedInvestment] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("en-NG", {
       style: "currency",
       currency: "NGN",
       maximumFractionDigits: 0,
     }).format(value);
+
+  const handleDeleteConfirm = () => {
+    if (!selectedInvestment) return;
+
+    deleteInvestment(selectedInvestment.id, {
+      onSuccess: () => {
+        setIsDialogOpen(false);
+        window.dispatchEvent(
+          new CustomEvent("investment-deleted", {
+            detail: { id: selectedInvestment.id },
+          }),
+        );
+        setSelectedInvestment(null);
+      },
+    });
+  };
 
   const columns: ColumnDef<InvestmentListItem>[] = [
     {
@@ -54,7 +81,6 @@ export function AllInvestments({
       header: "type",
       cell: ({ row }) => <div>{row.original.propertyType}</div>,
     },
-
     {
       accessorKey: "investmentStatus",
       header: " status",
@@ -95,7 +121,6 @@ export function AllInvestments({
       header: "raised",
       cell: ({ row }) => <div>{formatCurrency(row.original.amountRaised)}</div>,
     },
-
     {
       accessorKey: "returns",
       header: "returns",
@@ -112,20 +137,46 @@ export function AllInvestments({
       accessorKey: "action",
       header: "action",
       cell: ({ row }) => {
-        const id = row.original.id;
+        const rowId = row.original.id;
+
         return (
-          <>
-            <InvestmentDetailsView>
-              <Button variant={"outline"}>
+          <div className="flex items-center justify-center gap-2">
+            <InvestmentDetailsView id={rowId}>
+              <Button variant="outline">
                 <Eye className="w-5 h-5" />
               </Button>
             </InvestmentDetailsView>
-            <Link href={"/investments/" + id} className="flex lg:hidden">
-              <Button variant={"outline"}>
-                <Eye className="w-5 h-5" />
-              </Button>
-            </Link>
-          </>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="cursor-pointer"
+              onClick={() =>
+                router.push(
+                  `/investments/${rowId}?edit&propertyName=${encodeURIComponent(
+                    row.original.propertyName,
+                  )}`,
+                )
+              }
+            >
+              <Edit className="w-5 h-5 inline" />
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="cursor-pointer"
+              onClick={() => {
+                setSelectedInvestment({
+                  id: rowId,
+                  name: row.original.propertyName,
+                });
+                setIsDialogOpen(true);
+              }}
+            >
+              <Trash2 className="w-5 h-5 text-red-500 inline" />
+            </Button>
+          </div>
         );
       },
     },
@@ -144,6 +195,22 @@ export function AllInvestments({
           limit: pagination?.limit || 20,
           onPageChange,
         }}
+      />
+
+      <ConfirmationDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        title="Delete investment"
+        description={
+          selectedInvestment
+            ? `Are you sure you want to delete "${selectedInvestment.name}"?. This action cannot be undone.`
+            : "Are you sure you want to delete this investment?"
+        }
+        confirmText="Delete"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setSelectedInvestment(null)}
+        isLoading={isDeleting}
+        variant="delete"
       />
     </div>
   );

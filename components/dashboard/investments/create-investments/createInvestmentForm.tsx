@@ -1,10 +1,15 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useCreateInvestment } from "@/hook/investment-management";
+import {
+  useCreateInvestment,
+  useRetrieveInvestmentDetails,
+  useUpdateInvestment,
+} from "@/hook/investment-management";
 import {
   Form,
   FormControl,
@@ -31,8 +36,14 @@ import {
 import { FileUpload } from "@/components/ui/file-upload";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
-import { CalendarIcon, CircleCheck, FileText, Plus, Share } from "lucide-react";
+import {
+  CalendarIcon,
+  CircleCheck,
+  FileText,
+  Plus,
+  Share,
+  Trash2,
+} from "lucide-react";
 import { formatPrice } from "@/utils/formatPrice";
 import FormPreview from "./formPreview";
 import { format } from "date-fns";
@@ -41,6 +52,8 @@ interface Prop {
   step: number;
   setStep: (step: number) => void;
 }
+
+const milestoneStatusValues = ["completed", "in_progress", "upcoming"] as const;
 
 const createInvestmentSchema = z.object({
   propertyName: z.string().min(1, "Property Name is required"),
@@ -62,25 +75,25 @@ const createInvestmentSchema = z.object({
   riskRating: z.string().min(1, "Select Risk Rating"),
   propertyValue: z.number().optional(),
   expectedROI: z.number().optional(),
-  coverimage: z
-    .array(z.instanceof(File))
-    .min(1, "Upload cover image")
+  coverImage: z
+    .instanceof(File)
+    .optional()
     .refine(
-      (files) => files.every((file) => file.size <= 5 * 1024 * 1024),
-      "Each file must be less than 5MB",
+      (file) => !file || file.size <= 5 * 1024 * 1024,
+      "Cover image must be less than 5MB",
     ),
   propertyImages: z
     .array(z.instanceof(File))
-    .min(1, "Upload at least one property image")
+    .optional()
     .refine(
-      (files) => files.every((file) => file.size <= 5 * 1024 * 1024),
+      (files) => !files || files.every((file) => file.size <= 5 * 1024 * 1024),
       "Each file must be less than 5MB",
     ),
   legalDocuments: z
     .array(z.instanceof(File))
-    .min(1, "Upload at least one Legal Documents")
+    .optional()
     .refine(
-      (files) => files.every((file) => file.size <= 5 * 1024 * 1024),
+      (files) => !files || files.every((file) => file.size <= 5 * 1024 * 1024),
       "Each file must be less than 5MB",
     ),
   projectMilestones: z
@@ -88,7 +101,10 @@ const createInvestmentSchema = z.object({
       z.object({
         title: z.string().min(1, "Milestone title is required"),
         date: z.string().min(1, "Milestone date is required"),
-        status: z.string().min(1, "Milestone status is required"),
+        status: z.enum(milestoneStatusValues, {
+          message:
+            "Milestone status must be completed, in_progress, or upcoming",
+        }),
         description: z.string().min(1, "Milestone description is required"),
       }),
     )
@@ -97,27 +113,30 @@ const createInvestmentSchema = z.object({
 
 type CreateInvestmentFormData = z.infer<typeof createInvestmentSchema>;
 type MilestoneItem = CreateInvestmentFormData["projectMilestones"][number];
+type MilestoneInput = Omit<MilestoneItem, "status"> & {
+  status: MilestoneItem["status"] | "";
+};
 
 const typeOptions = [
   { label: "Commercial", value: "commercial" },
-  { label: "Industrial Space", value: "industrial space" },
-  { label: " Land", value: " land" },
-  { label: "Office Block", value: "office block" },
-  { label: "Retail Mall", value: "retail mall" },
+  { label: "Industrial Space", value: "industrial_space" },
+  { label: "Land", value: "land" },
+  { label: "Office Block", value: "office_block" },
+  { label: "Retail Mall", value: "retail_mall" },
   { label: "Residential", value: "residential" },
-  { label: "Student Housing", value: "student housing" },
+  { label: "Student Housing", value: "student_housing" },
 ];
 const statesOption = [
   { label: "Lagos", value: "lagos" },
   { label: "Abuja", value: "abuja" },
-  { label: "Port Harcourt", value: "port harcourt" },
+  { label: "Port Harcourt", value: "port_harcourt" },
 ];
 const schedulOption = [
   { label: "Monthly", value: "monthly" },
   { label: "Quarterly", value: "quarterly" },
   { label: "Annual", value: "annual" },
-  { label: "Bi annual", value: "bi annual" },
-  { label: "At Maturity", value: "at maturity" },
+  { label: "Bi annual", value: "bi_annual" },
+  { label: "At Maturity", value: "at_maturity" },
 ];
 const riskOption = [
   { label: "Low", value: "low" },
@@ -127,7 +146,7 @@ const riskOption = [
 const milestoneStatusOption = [
   { label: "Completed", value: "completed" },
   { label: "In Progress", value: "in_progress" },
-  { label: "Up Coming", value: "up_coming" },
+  { label: "Up Coming", value: "upcoming" },
 ];
 const requiredDoc = [
   "• Investment Prospectus",
@@ -137,17 +156,48 @@ const requiredDoc = [
   "• Financial Projections",
 ];
 
-export function CreateInvestmentForm({ step, setStep }: Prop) {
+const normalizeValue = (value: string) =>
+  value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+
+const mapToOptionValue = (
+  rawValue: string,
+  options: { value: string; label?: string }[],
+  fallback = "",
+) => {
+  const normalized = normalizeValue(rawValue);
+  const matched = options.find(
+    (option) =>
+      normalizeValue(option.value) === normalized ||
+      normalizeValue(option.label ?? "") === normalized,
+  );
+
+  return matched?.value ?? fallback;
+};
+
+export function CreateInvestmentForm({ step, setStep, id }: Prop) {
+  const investmentId = id ? Number(id) : undefined;
+  const isEditMode = Boolean(investmentId);
   const [featureInput, setFeatureInput] = useState("");
   const [milestoneDate, setMilestoneDate] = useState<Date>();
-  const [milestoneInput, setMilestoneInput] = useState<MilestoneItem>({
+  const [milestoneInput, setMilestoneInput] = useState<MilestoneInput>({
     title: "",
     date: "",
     status: "",
     description: "",
   });
+  const [submitAction, setSubmitAction] = useState<
+    "draft" | "published" | null
+  >(null);
   const isLastStep = step === 5;
+  const { data: editDetails, isLoading: isEditLoading } =
+    useRetrieveInvestmentDetails(investmentId, isEditMode);
   const { mutateAsync: createInvestmentFn, isPending } = useCreateInvestment();
+  const { mutateAsync: updateInvestmentFn, isPending: isUpdating } =
+    useUpdateInvestment();
 
   const form = useForm<CreateInvestmentFormData>({
     resolver: zodResolver(createInvestmentSchema),
@@ -169,7 +219,7 @@ export function CreateInvestmentForm({ step, setStep }: Prop) {
       riskRating: "",
       propertyValue: 0,
       expectedROI: 0,
-      coverimage: [],
+      coverImage: undefined,
       propertyImages: [],
       legalDocuments: [],
       projectMilestones: [],
@@ -179,6 +229,65 @@ export function CreateInvestmentForm({ step, setStep }: Prop) {
     control: form.control,
     name: "projectMilestones",
   });
+
+  useEffect(() => {
+    if (!isEditMode || !editDetails) return;
+
+    const mappedPropertyType = mapToOptionValue(
+      editDetails.propertyDetails.propertyType,
+      typeOptions,
+    );
+    const mappedState = mapToOptionValue(
+      editDetails.propertyDetails.state,
+      statesOption,
+    );
+
+    form.reset({
+      propertyName: editDetails.propertyDetails.propertyName,
+      propertyType: mappedPropertyType,
+      state: mappedState,
+      city: editDetails.propertyDetails.city,
+      address: editDetails.propertyDetails.fullAddress,
+      propertySize: editDetails.propertyDetails.propertySizeSqm,
+      units:
+        Number(editDetails.propertyDetails.propertyUnit) ||
+        editDetails.propertyDetails.totalUnits ||
+        0,
+      description: editDetails.propertyDetails.description,
+      features: editDetails.propertyDetails.keyHighlights ?? [],
+      targetAmount: editDetails.financialDetails.targetAmount,
+      minimumInvestment: editDetails.financialDetails.minimumInvestmentAmount,
+      returnDistributionSchedule: mapToOptionValue(
+        editDetails.financialDetails.returnDistributionSchedule,
+        schedulOption,
+        "monthly",
+      ),
+      duration: String(editDetails.financialDetails.durationMonths),
+      expectedReturns: String(
+        editDetails.financialDetails.expectedReturnsPercentage,
+      ),
+      riskRating: mapToOptionValue(
+        editDetails.financialDetails.riskRating,
+        riskOption,
+      ),
+      propertyValue: editDetails.financialDetails.propertyValue,
+      expectedROI: editDetails.overview.expectedRoi,
+      coverImage: undefined,
+      propertyImages: [],
+      legalDocuments: [],
+      projectMilestones:
+        editDetails.propertyDetails.milestones?.map((milestone) => ({
+          title: milestone.title,
+          date: milestone.date,
+          status: normalizeValue(milestone.status) as MilestoneItem["status"],
+          description: milestone.description,
+        })) ?? [],
+    });
+
+    // Force these controlled select values after reset to avoid stale UI in Radix Select.
+    form.setValue("propertyType", mappedPropertyType, { shouldValidate: true });
+    form.setValue("state", mappedState, { shouldValidate: true });
+  }, [editDetails, form, isEditMode]);
 
   const isSection1Valid = async () => {
     const result = await form.trigger([
@@ -209,13 +318,46 @@ export function CreateInvestmentForm({ step, setStep }: Prop) {
   };
   const isSection3Valid = async () => {
     const result = await form.trigger([
-      "coverimage",
+      "coverImage",
       "propertyImages",
       "legalDocuments",
     ]);
 
+    if (isEditMode) {
+      return result;
+    }
+
+    const coverImage = form.getValues("coverImage");
+    const propertyImages = form.getValues("propertyImages") || [];
+    const legalDocuments = form.getValues("legalDocuments") || [];
+
+    if (!coverImage) {
+      form.setError("coverImage", {
+        type: "manual",
+        message: "Upload cover image",
+      });
+      return false;
+    }
+
+    if (!propertyImages.length) {
+      form.setError("propertyImages", {
+        type: "manual",
+        message: "Upload at least one property image",
+      });
+      return false;
+    }
+
+    if (!legalDocuments.length) {
+      form.setError("legalDocuments", {
+        type: "manual",
+        message: "Upload at least one Legal Documents",
+      });
+      return false;
+    }
+
     return result;
   };
+
   const isSection4Valid = async () => {
     const milestones = form.getValues("projectMilestones");
     if (milestones.length === 0) {
@@ -244,10 +386,20 @@ export function CreateInvestmentForm({ step, setStep }: Prop) {
     }
 
     const currentMilestones = form.getValues("projectMilestones");
-    form.setValue("projectMilestones", [...currentMilestones, milestoneInput], {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
+    form.setValue(
+      "projectMilestones",
+      [
+        ...currentMilestones,
+        {
+          ...milestoneInput,
+          status: milestoneInput.status as MilestoneItem["status"],
+        },
+      ],
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      },
+    );
     form.clearErrors("projectMilestones");
 
     setMilestoneInput({
@@ -259,19 +411,33 @@ export function CreateInvestmentForm({ step, setStep }: Prop) {
     setMilestoneDate(undefined);
   };
 
+  const handleDeleteMilestone = (indexToDelete: number) => {
+    const currentMilestones = form.getValues("projectMilestones");
+    const updatedMilestones = currentMilestones.filter(
+      (_, index) => index !== indexToDelete,
+    );
+
+    form.setValue("projectMilestones", updatedMilestones, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+
+    if (updatedMilestones.length === 0) {
+      form.setError("projectMilestones", {
+        type: "manual",
+        message: "Add at least one milestone before continuing.",
+      });
+    }
+  };
+
   const onSubmit = async (
     values: CreateInvestmentFormData,
     publicationStatus: "draft" | "published" = "published",
   ) => {
     try {
-      // Combine cover image with property images
-      const allPropertyImages = [
-        ...values.coverimage,
-        ...values.propertyImages,
-      ];
-      const coverImageIndex = 0; // First image is the cover
+      setSubmitAction(publicationStatus);
+      const allPropertyImages = [...(values.propertyImages || [])];
 
-      // Transform the data to match API requirements
       const payload = {
         propertyName: values.propertyName,
         propertyType: values.propertyType,
@@ -292,16 +458,35 @@ export function CreateInvestmentForm({ step, setStep }: Prop) {
         propertyUnit: values.units.toString(),
         keyHighlights: values.features,
         projectMilestones: values.projectMilestones,
-        coverImageIndex,
+        coverImage: values.coverImage,
         propertyImages: allPropertyImages,
         propertyDocuments: values.legalDocuments,
       };
-      console.log("create invetsment form payload:", payload);
-      await createInvestmentFn(payload);
+
+      if (isEditMode && investmentId) {
+        await updateInvestmentFn({ id: investmentId, payload });
+      } else {
+        const createPayload = {
+          ...payload,
+          coverImage: values.coverImage as File,
+          propertyImages: allPropertyImages,
+          propertyDocuments: values.legalDocuments || [],
+        };
+
+        await createInvestmentFn(createPayload);
+      }
+
       form.reset();
       setStep(1);
     } catch (error) {
-      console.error("Failed to create investment:", error);
+      console.error(
+        isEditMode
+          ? "Failed to update investment:"
+          : "Failed to create investment:",
+        error,
+      );
+    } finally {
+      setSubmitAction(null);
     }
   };
 
@@ -331,6 +516,10 @@ export function CreateInvestmentForm({ step, setStep }: Prop) {
     setStep(step - 1);
   };
 
+  if (isEditMode && isEditLoading) {
+    return <div className="p-6">Loading investment details...</div>;
+  }
+
   return (
     <div className="space-y-6 pb-6 w-full">
       <Card className=" p-6">
@@ -350,7 +539,11 @@ export function CreateInvestmentForm({ step, setStep }: Prop) {
               <>
                 <div className=" items-center gap-4">
                   <h1 className="text-2xl font-semibold"> Basic Information</h1>
-                  <p>Enter the fundamental details about the property</p>
+                  <p>
+                    {isEditMode
+                      ? "Update the fundamental details about the property"
+                      : "Enter the fundamental details about the property"}
+                  </p>
                 </div>
                 <div className="grid lg:grid-cols-2 gap-4">
                   {/* Property Name */}
@@ -387,8 +580,9 @@ export function CreateInvestmentForm({ step, setStep }: Prop) {
                         </FormLabel>
                         <FormControl>
                           <Select
+                            key={`propertyType-${field.value}`}
                             onValueChange={field.onChange}
-                            defaultValue={field.value}
+                            value={field.value ?? ""}
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Select property type" />
@@ -423,8 +617,9 @@ export function CreateInvestmentForm({ step, setStep }: Prop) {
                         </FormLabel>
                         <FormControl>
                           <Select
+                            key={`state-${field.value}`}
                             onValueChange={field.onChange}
-                            defaultValue={field.value}
+                            value={field.value ?? ""}
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Select state" />
@@ -676,7 +871,7 @@ export function CreateInvestmentForm({ step, setStep }: Prop) {
                         <FormControl>
                           <Select
                             onValueChange={field.onChange}
-                            defaultValue={field.value}
+                            value={field.value}
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Select return schedule" />
@@ -752,8 +947,9 @@ export function CreateInvestmentForm({ step, setStep }: Prop) {
                         </FormLabel>
                         <FormControl>
                           <Select
+                            key={`risk-${field.value}`}
                             onValueChange={field.onChange}
-                            defaultValue={field.value}
+                            value={field.value}
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Select risk" />
@@ -870,7 +1066,7 @@ export function CreateInvestmentForm({ step, setStep }: Prop) {
                 <div className=" grid lg:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="coverimage"
+                    name="coverImage"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="flex items-center gap-2 ">
@@ -878,9 +1074,10 @@ export function CreateInvestmentForm({ step, setStep }: Prop) {
                         </FormLabel>
                         <FormControl>
                           <FileUpload
-                            value={field.value || []}
-                            onChange={field.onChange}
+                            value={field.value ? [field.value] : []}
+                            onChange={(files) => field.onChange(files[0])}
                             placeholder="Upload the cover image"
+                            single
                           />
                         </FormControl>
 
@@ -1024,7 +1221,7 @@ export function CreateInvestmentForm({ step, setStep }: Prop) {
                         onValueChange={(value) =>
                           setMilestoneInput((prev) => ({
                             ...prev,
-                            status: value,
+                            status: value as MilestoneItem["status"],
                           }))
                         }
                       >
@@ -1103,9 +1300,21 @@ export function CreateInvestmentForm({ step, setStep }: Prop) {
                             <h4 className="font-semibold text-black">
                               {milestone.title}
                             </h4>
-                            <span className="text-xs uppercase">
-                              {milestone.status.replace("_", " ")}
-                            </span>
+                            <div className="flex items-center gap-3">
+                              <span className="text-xs uppercase">
+                                {milestone.status.replace("_", " ")}
+                              </span>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 text-red-500"
+                                onClick={() => handleDeleteMilestone(index)}
+                                aria-label={`Delete milestone ${milestone.title}`}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
                           </div>
                           <p className="text-sm mt-2 text-gray-600">
                             {milestone.description}
@@ -1143,18 +1352,28 @@ export function CreateInvestmentForm({ step, setStep }: Prop) {
                     onClick={() =>
                       form.handleSubmit((values) => onSubmit(values, "draft"))()
                     }
-                    disabled={isPending}
+                    disabled={isPending || isUpdating}
                     className="flex items-center gap-2"
                   >
                     <FileText className="w-4 h-4" />
-                    Save as Draft
+                    {submitAction === "draft" && (isPending || isUpdating)
+                      ? "Saving Draft..."
+                      : isEditMode
+                        ? "Save Changes"
+                        : "Save as Draft"}
                   </Button>
                   <Button
                     type="submit"
-                    disabled={isPending}
+                    disabled={isPending || isUpdating}
                     className="flex items-center gap-2"
                   >
-                    {isPending ? "Publishing..." : "Publish Investment"}
+                    {submitAction === "published" && (isPending || isUpdating)
+                      ? isEditMode
+                        ? "Updating..."
+                        : "Publishing..."
+                      : isEditMode
+                        ? "Update Investment"
+                        : "Publish Investment"}
                     <Share className="w-4 h-4" />
                   </Button>
                 </div>
@@ -1162,7 +1381,7 @@ export function CreateInvestmentForm({ step, setStep }: Prop) {
                 <Button
                   type={"button"}
                   onClick={isLastStep ? undefined : handleNext}
-                  disabled={isPending}
+                  disabled={isPending || isUpdating}
                 >
                   {isLastStep ? "Submit" : "Continue"}
                 </Button>

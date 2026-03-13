@@ -6,3 +6,4 @@ export * from './SlideInPanel';
 export * from './TableFilters';
 export * from './reusableTable';
 export * from './loader';
+export * from './ConfirmationDialog';
