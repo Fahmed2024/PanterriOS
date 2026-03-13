@@ -4,7 +4,7 @@ import { ReUseAbleTable } from "@/components/shared/reusableTable";
 import { DUMMY_RECONCILIATION_DATA } from "./data";
 import { reconciliationColumns } from "./reconciliationColumns";
 import { Clock, Download } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   Select,
   SelectTrigger,
@@ -18,15 +18,13 @@ export function Reconciliation() {
   const reconciliationData = DUMMY_RECONCILIATION_DATA;
   const [filterTime, setFilterTime] = useState("all");
 
-  const filteredData = useMemo(() => {
-    if (filterTime === "all") {
-      return reconciliationData;
-    }
+  let filteredData = reconciliationData;
 
+  if (filterTime !== "all") {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    return reconciliationData.filter((item) => {
+    filteredData = reconciliationData.filter((item) => {
       const itemDate = new Date(item.createdDate);
       itemDate.setHours(0, 0, 0, 0);
 
@@ -48,7 +46,7 @@ export function Reconciliation() {
 
       return true;
     });
-  }, [filterTime,reconciliationData]);
+  }
 
   const handleDownloadCSV = () => {
     // Convert data to CSV format

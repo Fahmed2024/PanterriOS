@@ -43,10 +43,6 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
   );
 
   useEffect(() => {
-    setTab("overview");
-  }, [id]);
-
-  useEffect(() => {
     const handleInvestmentDeleted = (event: Event) => {
       const deletedInvestmentId = (event as CustomEvent<{ id: number }>).detail
         ?.id;
@@ -135,7 +131,16 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
 
   return (
     <div>
-      <Drawer direction="right" open={isOpen} onOpenChange={setIsOpen}>
+      <Drawer
+        direction="right"
+        open={isOpen}
+        onOpenChange={(open) => {
+          setIsOpen(open);
+          if (open) {
+            setTab("overview");
+          }
+        }}
+      >
         <DrawerTrigger asChild>{children}</DrawerTrigger>
 
         <DrawerContent
@@ -157,14 +162,14 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
                     <StatusBadge
                       status={
                         investmentDetails?.header
-                          ?.investmentPublicationStatus ?? "pending"
+                          ?.investmentPublicationStatus ?? ""
                       }
                       showDot
                     />
                   </div>
                   <p className="text-gray-500 pt-1 flex items-center">
                     <MapPin className="w-4 h-4" />
-                    <span>{investmentDetails?.header.location ?? "-"}</span>
+                    <span className="capitalize">{investmentDetails?.header.location ?? "-"}</span>
                   </p>
                 </div>
               )}
@@ -187,8 +192,8 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
               <>
                 <div className="flex my-2 justify-between">
                   <Button
-                    variant="outline"
-                    className="w-fit cursor-pointer"
+                    // variant="secondary"
+                    className="w-fit bg-primary-blue cursor-pointer"
                     onClick={handlePublicationStatus}
                     disabled={isUpdatingPublicationStatus || !id}
                   >
@@ -201,13 +206,16 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
                   <div className="w-24" aria-hidden="true" />
                 </div>
 
-                <Tabs value={tab} className="space-y-2 w-full">
+                <Tabs
+                  value={tab}
+                  onValueChange={setTab}
+                  className="space-y-2 w-full"
+                >
                   <TabsList className="flex flex-wrap w-full">
                     {tabs.map((currentTab) => (
                       <TabsTrigger
                         value={currentTab.value}
                         key={currentTab.value}
-                        onClick={() => setTab(currentTab.value)}
                       >
                         {currentTab.title}
                       </TabsTrigger>

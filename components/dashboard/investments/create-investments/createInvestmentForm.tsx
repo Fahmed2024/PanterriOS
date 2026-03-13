@@ -127,9 +127,9 @@ const typeOptions = [
   { label: "Student Housing", value: "student_housing" },
 ];
 const statesOption = [
-  { label: "Lagos", value: "lagos" },
-  { label: "Abuja", value: "abuja" },
-  { label: "Port Harcourt", value: "port_harcourt" },
+  { label: "Lagos", value: "Lagos" },
+  { label: "Abuja", value: "Abuja" },
+  { label: "Port Harcourt", value: "Port Harcourt" },
 ];
 const schedulOption = [
   { label: "Monthly", value: "monthly" },

@@ -142,7 +142,7 @@ export default function InvestmentPage() {
       scope: data?.data?.stats?.statusBreakdown
         ? `${data?.data?.stats.statusBreakdown.active} active, ${data.data?.stats.statusBreakdown.pending} pending`
         : "N/A",
-    }, 
+    },
     {
       label: "Total Raised",
       currency: "NGN",
@@ -254,18 +254,16 @@ export default function InvestmentPage() {
             ))}
           </TabsList>
           <div className="flex items-center gap-4">
-            <div className="border bg-gray-100 flex gap-1 items-center rounded-sm">
-              <Button
-                variant={"outline"}
-                className="border-0 bg-transparent rounded-none"
-              >
-                <Search />
-              </Button>
+            <div className="border bg-gray-100 flex gap-2 px-3 items-center rounded-sm">
+            
+                <Search className="w-4  h-9 py-2" />
+              
               <Input
-                className=" text-black "
-                placeholder="search..."
+                placeholder="Search..."
                 value={searchValue}
                 onChange={(e) => handleSearchChange(e.target.value)}
+                className="border-border w-40 bg-[#F3F4F6] placeholder:text-[#636363] h-9   text-sm"
+                aria-label="Search tasks"
               />
             </div>
             <div className="flex lg:flex-row flex-col gap-2">
