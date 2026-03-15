@@ -15,9 +15,13 @@ export default function InvestmentByIdPage() {
   const [step, setStep] = useState(1);
 
   const investmentId = Number(params.id);
-  const isEditMode = searchParams.get("edit") === "true" || searchParams.has("edit");
+  const isEditMode =
+    searchParams.get("edit") === "true" || searchParams.has("edit");
 
-  const isValidId = useMemo(() => Number.isFinite(investmentId), [investmentId]);
+  const isValidId = useMemo(
+    () => Number.isFinite(investmentId),
+    [investmentId],
+  );
 
   if (!isValidId || !isEditMode) {
     return (
@@ -40,8 +44,9 @@ export default function InvestmentByIdPage() {
           onClick={() => router.back()}
           className="flex items-center gap-1 text-blue-700 cursor-pointer mb-4"
         >
-          <p>Back</p>
+          {" "}
           <ChevronLeft className="w-4 h-4" />
+          <p>Return Back</p>
         </div>
         <CreateInvestmentForm
           id={investmentId}
