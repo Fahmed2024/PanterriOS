@@ -18,23 +18,6 @@ function formatCurrency(amount: number) {
   }).format(amount);
 }
 
-function formatDateTime(value: string) {
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "-";
-  }
-
-  return `${date.toLocaleDateString("en-GB", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-  })} ${date.toLocaleTimeString("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-  })}`;
-}
-
 export const transactionColumns: ColumnDef<WalletFinanceTransaction>[] = [
   {
     accessorKey: "reference",

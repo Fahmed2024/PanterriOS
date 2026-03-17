@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ReUseAbleTable } from "@/components/shared/reusableTable";
 import { TableSkeleton } from "@/components/shared/loader";
 import { withdrawalColumns } from "./withdrawalColumns";
@@ -25,8 +25,8 @@ export function WithdrawalRequests({
   const [filterRisk, setFilterRisk] = useState("all");
   const [page, setPage] = useState(1);
 
-  const debouncedSetSearch = useCallback(
-    debounce((value: string) => setDebouncedSearchValue(value), 600),
+  const debouncedSetSearch = useMemo(
+    () => debounce((val: string) => setDebouncedSearchValue(val), 600),
     [],
   );
 

@@ -1,7 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { type InvestorWalletItem } from "@/interface";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { formatDate } from "@/utils/helpers";
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("en-NG", {

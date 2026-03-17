@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ReUseAbleTable } from "@/components/shared/reusableTable";
 import { TableFilters } from "@/components/shared/TableFilters";
 import { TableSkeleton } from "@/components/shared/loader";
@@ -22,8 +22,8 @@ export function InvestorsWallet({ onCountChange }: InvestorsWalletProps) {
   const [filterStatus, setFilterStatus] = useState("all");
   const [page, setPage] = useState(1);
 
-  const debouncedSetSearch = useCallback(
-    debounce((value: string) => setDebouncedSearchValue(value), 600),
+  const debouncedSetSearch = useMemo(
+    () => debounce((val: string) => setDebouncedSearchValue(val), 600),
     [],
   );
 
@@ -41,8 +41,15 @@ export function InvestorsWallet({ onCountChange }: InvestorsWalletProps) {
   const walletsData = data?.data?.data;
 
   useEffect(() => {
-    onCountChange?.(walletsData?.pagination?.totalItems ?? 0, walletsData?.summary);
-  }, [walletsData?.pagination?.totalItems, walletsData?.summary, onCountChange]);
+    onCountChange?.(
+      walletsData?.pagination?.totalItems ?? 0,
+      walletsData?.summary,
+    );
+  }, [
+    walletsData?.pagination?.totalItems,
+    walletsData?.summary,
+    onCountChange,
+  ]);
 
   return (
     <div className="w-full space-y-6">

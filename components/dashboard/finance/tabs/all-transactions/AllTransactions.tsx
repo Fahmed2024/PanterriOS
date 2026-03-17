@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ReUseAbleTable } from "@/components/shared/reusableTable";
 import { transactionColumns } from "./transactionColumns";
 import { TableFilters } from "@/components/shared/TableFilters";
@@ -31,8 +31,8 @@ export function AllTransactions({
     useState<WalletFinanceTimeRangeFilter>("all_time");
   const [page, setPage] = useState(1);
 
-  const debouncedSetSearch = useCallback(
-    debounce((val: string) => setDebouncedSearch(val), 600),
+  const debouncedSetSearch = useMemo(
+    () => debounce((val: string) => setDebouncedSearch(val), 600),
     [],
   );
   const { data, isLoading } = useRetrieveWalletFinance({

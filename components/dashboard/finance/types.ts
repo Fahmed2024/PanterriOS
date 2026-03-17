@@ -1,10 +1,4 @@
-import { TransactionType } from '@/utils/transactionTypeColors';
-import {
-  type WalletFinanceSummary,
-  type WalletFinanceTransaction,
-  type YieldDisbursementItem,
-} from '@/interface';
-
+import { TransactionType } from "@/utils/transactionTypeColors";
 export interface Transaction {
   id: number;
   reference: string;
@@ -40,11 +34,10 @@ export interface YieldEventRow {
   status: string;
 }
 
-
 export const FINANCE_TAB_SECTIONS = [
-  { id: 'all-transactions', label: 'All Transactions', count: 10 },
-  { id: 'withdrawal-requests', label: 'Withdrawal Requests', count: 5 },
-  { id: 'reconciliation', label: 'Reconciliation', count: 0 },
-  { id: 'yield-events', label: 'Yield Events', count: 1 },
-  { id: 'investors-wallet', label: 'Investors Wallet', count: 10 },
+  { id: "all-transactions", label: "All Transactions", count: 10 },
+  { id: "withdrawal-requests", label: "Withdrawal Requests", count: 5 },
+  { id: "reconciliation", label: "Reconciliation", count: 0 },
+  { id: "yield-events", label: "Yield Events", count: 1 },
+  { id: "investors-wallet", label: "Investors Wallet", count: 10 },
 ];
