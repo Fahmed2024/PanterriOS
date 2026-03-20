@@ -49,7 +49,10 @@ export function InvestorAudit({ investorId }: { investorId: number }) {
               </div>
             </div>
 
-            <StatusBadge status={walletDetails?.statusLabel || "Active"} showDot />
+            <StatusBadge
+              status={walletDetails?.statusLabel || "Active"}
+              showDot
+            />
           </div>
         </div>
 
@@ -58,29 +61,27 @@ export function InvestorAudit({ investorId }: { investorId: number }) {
           <h4 className="text-base font-semibold text-[#0F172A]">Overview</h4>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <div className="rounded-lg border border-[#BFDBFE] bg-[#F8FAFC] p-5">
-              <p className="text-sm text-[#475569]">Total Balance</p>
-              <p className="mt-3 text-2xl font-semibold text-[#0F172A]">
-                {formatCompactNaira(walletDetails?.overview?.totalBalance || 0)}
-              </p>
-            </div>
-
-            <div className="rounded-lg border border-[#E9D5FF] bg-[#FAF5FF] p-5">
-              <p className="text-sm text-[#475569]">Active Exposure</p>
-              <p className="mt-3 text-2xl font-semibold text-[#0F172A]">
-                {formatCompactNaira(
-                  walletDetails?.overview?.activeExposure || 0,
-                )}
-              </p>
-            </div>
-
-            <div className="rounded-lg border border-[#BBF7D0] bg-[#F0FDF4] p-5">
-              <p className="text-sm text-[#475569]">Accrued Yield</p>
-              <p className="mt-3 text-2xl font-semibold text-[#15803D]">
-                +
-                {formatCompactNaira(walletDetails?.overview?.accruedYield || 0)}
-              </p>
-            </div>
+            {[
+              {
+                title: "Total Balance",
+                value: walletDetails?.overview?.totalBalance,
+              },
+              {
+                title: "Active Exposure",
+                value: walletDetails?.overview?.activeExposure,
+              },
+              {
+                title: "Accrued Yield",
+                value: walletDetails?.overview?.accruedYield,
+              },
+            ].map((item) => (
+              <div key={item.title} className="rounded-lg border border-[#BFDBFE] bg-[#F8FAFC] p-5">
+                <p className="text-sm min-h-10 text-[#475569]">{item.title}</p>
+                <p className="mt-3 text-2xl font-semibold text-[#0F172A]">
+                  {formatCompactNaira(item.value || 0)}
+                </p>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -144,8 +145,8 @@ export function InvestorAudit({ investorId }: { investorId: number }) {
                   <p className="text-xs text-[#475569]">{event.occurredAt}</p>
                 </div>
 
-                <span >
-                 <StatusBadge status={event.badge} showDot={false} />
+                <span>
+                  <StatusBadge status={event.badge} showDot={false} />
                 </span>
               </div>
             ))}
