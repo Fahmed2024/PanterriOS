@@ -6,6 +6,7 @@ import {
   type RetrieveYieldDisbursementsRes,
   type RetrieveInvestorWalletsQuery,
   type RetrieveInvestorWalletsRes,
+  type InvestorWalletDetails,
   type RetrieveWithdrawalApprovalsQuery,
   type RetrieveWithdrawalApprovalsRes,
 } from "@/interface";
@@ -65,4 +66,14 @@ export const retrieveInvestorWallets = async (
   });
 
   return data;
+};
+
+export const retrieveInvestorWalletDetails = async (
+  investorId: number,
+): Promise<InvestorWalletDetails> => {
+  const { data } = await API.get(
+    `/investor-wallet/admin/investor-wallets/${investorId}`,
+  );
+
+  return data?.data;
 };

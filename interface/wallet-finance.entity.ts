@@ -222,3 +222,36 @@ export interface RetrieveInvestorWalletsRes {
     };
   };
 }
+
+export interface InvestorWalletOverview {
+  totalBalance: number;
+  availableBalance: number;
+  lockedBalance: number;
+  activeExposure: number;
+  accruedYield: number;
+}
+
+export interface InvestorWalletRecentActivityItem {
+  id: number;
+  title: string;
+  description: string;
+  occurredAt: string;
+  activityType: string;
+  badge: string;
+  amount: number;
+  amountDirection: 'credit' | 'debit';
+  reference: string;
+}
+
+export interface InvestorWalletDetails {
+  data:{  walletId: number;
+  investorId: number;
+  investorCode: string;
+  investorName: string;
+  investorEmail: string;
+  initials: string;
+  status: Exclude<InvestorWalletStatusFilter, 'all'>;
+  statusLabel: string;
+  overview: InvestorWalletOverview;
+  recentActivity: InvestorWalletRecentActivityItem[];}
+}
