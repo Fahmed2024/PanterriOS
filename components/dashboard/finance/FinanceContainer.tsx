@@ -15,6 +15,7 @@ import { DUMMY_RECONCILIATION_DATA } from "./tabs/reconciliation/data";
 import { type WalletFinanceSummary } from "@/interface";
 import { FinanceStats } from "./types";
 import { InvestorsWallet } from "./tabs/investors-wallet/InvestorsWallet";
+import { formatCurrency } from "@/utils/helpers";
 
 const iconMap = {
   Wallet,
@@ -105,7 +106,7 @@ export function FinanceContainer() {
   const FINANCE_STATS: FinanceStats[] = [
     {
       label: "Total Balance",
-      value: summary?.totalBalance || 0,
+      value: formatCurrency(summary?.totalBalance || 0,),
       description: "As of today",
       icon: "Wallet",
       color: "text-gray-900",

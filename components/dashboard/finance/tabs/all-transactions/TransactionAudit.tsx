@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Download, CheckCircle2, Section } from "lucide-react";
 import { StatusBadge, TransactionAuditSkeleton } from "@/components/shared";
 import { useRetrieveTransactionDetails } from "@/hook/wallet-finance";
-import { formatDate } from "@/utils/helpers";
 import { DrawerClose } from "@/components/ui/drawer";
+import { formatCurrency } from "@/utils/helpers";
 
 export function TransactionAudit({ transactionId }: { transactionId: number }) {
   const { data, isLoading, error } =
@@ -23,7 +23,7 @@ export function TransactionAudit({ transactionId }: { transactionId: number }) {
 
   return (
     <div className="flex flex-col h-full max-w-2xl mx-auto">
-      {/* SCROLLABLE CONTENT */}
+      
       <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
         {/* AMOUNT CARD */}
         <div className="border rounded-lg p-4 bg-gray-50">
@@ -31,7 +31,7 @@ export function TransactionAudit({ transactionId }: { transactionId: number }) {
             <div>
               <p className="text-xs text-gray-500">Transaction Amount</p>
               <p className="text-2xl font-semibold text-gray-900 mt-1">
-                {data?.amount}
+                {formatCurrency(data?.amount || 0)}
               </p>
             </div>
 
@@ -48,14 +48,12 @@ export function TransactionAudit({ transactionId }: { transactionId: number }) {
             Transaction Details
           </h3>
 
-                <div className="grid grid-cols-1 gap-4">
-                  <p className="text-sm text-gray-600 block mb-1">
-                    Reference Number
-                  </p>
-                  <p className="text-base font-semibold text-gray-900">
-                    {data?.reference}
-                  </p>
-                </div>
+          <div className="grid grid-cols-1 gap-4">
+            <p className="text-sm text-gray-600 block mb-1">Reference Number</p>
+            <p className="text-base font-semibold text-gray-900">
+              {data?.reference}
+            </p>
+          </div>
 
           {/* Date and Time Grid */}
           <div className="grid grid-cols-2 gap-4">
@@ -101,9 +99,7 @@ export function TransactionAudit({ transactionId }: { transactionId: number }) {
                 </div>
                 <div className="flex-1">
                   <p className="font-semibold text-gray-900">{event.title}</p>
-                  <p className="text-sm text-gray-600">
-                    {formatDate(event?.dateTime)}
-                  </p>
+                  <p className="text-sm text-gray-600">{event?.dateTime}</p>
                 </div>
               </div>
             ))}
