@@ -15,7 +15,7 @@ export interface Transaction {
 
 export interface FinanceStats {
   label: string;
-  value: number;
+  value: number | string;
   description: string;
   icon: string;
   color: string;

@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Input } from "@/components/ui/input";
+// import { useEffect, useState } from "react";
+// import { Input } from "@/components/ui/input";
 import { ReusableSelect } from "@/components/ui/ReusableSelect";
-import { Search, X } from "lucide-react";
+// import { Search, X } from "lucide-react";
 
 export interface FilterOption {
   label: string;
@@ -28,17 +28,17 @@ export interface TableFiltersProps {
 
 export function TableFilters({
   searchValue,
-  onSearchChange,
+  // onSearchChange,
   title,
   subtitle,
-  searchPlaceholder = "Search by user, action, or reference...",
+  // searchPlaceholder = "Search by user, action, or reference...",
   filters = [],
 }: TableFiltersProps) {
-  const [localSearch, setLocalSearch] = useState(searchValue);
+  // const [localSearch, setLocalSearch] = useState(searchValue);
 
-  useEffect(() => {
-    setLocalSearch(searchValue);
-  }, [searchValue]);
+  // useEffect(() => {
+  //   setLocalSearch(searchValue);
+  // }, [searchValue]);
 
   return (
     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -51,7 +51,8 @@ export function TableFilters({
       {/* Search Bar & Filters Together */}
       <div className="flex w-full flex-col gap-3 lg:w-auto lg:min-w-[420px] lg:items-end">
         <div className="flex w-full flex-col gap-3 lg:justify-end">
-          <div className="relative w-full rounded-sm border shadow-xs lg:max-w-xs">
+          {/* <div className="relative flex w-full bg-[#F3F4F6] rounded-sm border shadow-xs lg:max-w-xs">
+
           <Search className="text-gray-600 pointer-events-none absolute top-1/2 left-3 z-10 h-4 w-4 -translate-y-1/2 transform" />
 
           <Input
@@ -62,7 +63,7 @@ export function TableFilters({
               setLocalSearch(value);
               onSearchChange(value);
             }}
-            className="h-9 w-full border-border bg-[#F3F4F6] pl-10 pr-8 text-sm placeholder:text-[#636363] sm:min-w-[220px]"
+            className="h-9 w-full border-border  pl-10 pr-8 text-sm placeholder:text-[#636363] sm:min-w-[220px]"
             aria-label="Search tasks"
           />
 
@@ -79,7 +80,7 @@ export function TableFilters({
               <X className="text-white h-3.5 w-3.5" />
             </div>
           )}
-          </div>
+          </div> */}
 
           {/* Filter Dropdowns */}
           <div className="grid w-full grid-cols-2 gap-2 lg:flex lg:w-auto lg:flex-wrap lg:justify-end">

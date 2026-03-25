@@ -9,24 +9,26 @@ import { SlideInPanelDrawer } from "@/components/shared";
 import { Eye } from "lucide-react";
 import { TransactionAudit } from "./TransactionAudit";
 import { WalletFinanceTransaction } from "@/interface";
+import { formatCurrency } from "@/utils/helpers";
 
-function formatCurrency(amount: number) {
-  return new Intl.NumberFormat("en-NG", {
-    style: "currency",
-    currency: "NGN",
-    maximumFractionDigits: 2,
-  }).format(amount);
-}
+
 
 export const transactionColumns: ColumnDef<WalletFinanceTransaction>[] = [
   {
     accessorKey: "reference",
     header: "Reference",
-    cell: ({ row }) => (
-      <span className="font-medium text-base text-gray-900">
-        {row.original.reference}
-      </span>
-    ),
+    cell: ({ row }) => {
+      const ref = row.original.reference;
+      const displayRef = ref.length > 25 ? ref.substring(0, 25) + "..." : ref;
+      return (
+        <span
+          className="font-medium text-base text-gray-900 cursor-pointer"
+          title={ref}
+        >
+          {displayRef}
+        </span>
+      );
+    },
   },
   {
     accessorKey: "investorName",

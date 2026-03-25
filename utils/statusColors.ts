@@ -15,6 +15,7 @@ export function getStatusColor(status: string): {
     case "balanced":
     case "funded":
     case "published":
+    case "investment":
       return {
         textColor: "text-[#008236]",
         bgColor: "bg-[#F0FDF4]",
@@ -23,7 +24,8 @@ export function getStatusColor(status: string): {
       };
 
     case "pending":
-      case "draft":
+    case "draft":
+    case "deposit":
     case "in progress":
       return {
         textColor: "text-[#BB4D00]",

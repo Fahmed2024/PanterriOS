@@ -3,3 +3,4 @@ export * from "./useRetrieveWalletFinanceTransactionDetails";
 export * from "./useRetrieveYieldDisbursements";
 export * from "./useRetrieveWithdrawalApprovals";
 export * from "./useRetrieveInvestorWallets";
+export * from "./useRetrieveInvestorWalletDetails";
