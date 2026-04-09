@@ -1,13 +1,9 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { type ReactElement } from "react";
-import {
-  SlideInPanelDrawer,
-  StatusBadge,
-  TransactionAuditSkeleton,
-} from "@/components/shared";
+import { StatusBadge } from "@/components/shared";
+import Link from "next/link";
 import { YieldDisbursementItem } from "@/interface";
 import { formatCurrency } from "@/utils/helpers";
-import { Button } from "@/components/ui/button";
 
 export const yieldColumns: ColumnDef<YieldDisbursementItem>[] = [
   {
@@ -135,28 +131,20 @@ export const yieldColumns: ColumnDef<YieldDisbursementItem>[] = [
       );
     },
   },
+
   {
     accessorKey: "action",
     header: "Action",
     cell: ({ row }) => {
-      const transaction = row.original;
+      const eventId = row.original.eventId;
 
       return (
-        <SlideInPanelDrawer
-          trigger={
-            <Button
-              variant={"outline"}
-              className="border px-2 py-1 shadow-sm  cursor-pointer rounded-md"
-            >
-              View Details
-            </Button>
-          }
-          title="Transaction Audit"
-          subtitle={transaction.eventId}
-          width="md"
+        <Link
+          href={`/finance/yield-events/${eventId}`}
+          className="inline-flex items-center rounded-md border px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50"
         >
-          <TransactionAuditSkeleton />
-        </SlideInPanelDrawer>
+          View Details
+        </Link>
       );
     },
   },
