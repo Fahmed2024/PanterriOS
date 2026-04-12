@@ -111,7 +111,7 @@ export default function FormPreview({ previewData }: FormPreviewProps) {
           </p>{' '}
           <p className="flex flex-col space-y-1.5">
             <small className="text-xs sm:text-sm">Risk Rating</small>{' '}
-            <span className="font-semibold text-xs sm:text-sm">{previewData.riskRating} </span>
+            <span className="font-semibold capitalize text-xs sm:text-sm">{previewData.riskRating} </span>
           </p>{' '}
         </div>
       </div>

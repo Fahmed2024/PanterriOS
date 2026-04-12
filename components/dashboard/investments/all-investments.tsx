@@ -80,7 +80,7 @@ export function AllInvestments({
       accessorKey: "propertyType",
       header: "type",
       cell: ({ row }) => (
-        <div className="text-xs sm:text-sm break-words">{row.original.propertyType}</div>
+        <div className="text-xs sm:text-sm  reak-words">{row.original.propertyType}</div>
       ),
     },
     {

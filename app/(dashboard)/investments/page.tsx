@@ -1,5 +1,5 @@
 import InvestmentModule from "@/components/dashboard/investments/InvestmentModule";
 
-export default function InvestmenyPage() {
+export default function InvestmentPage() {
   return <InvestmentModule />;
 }

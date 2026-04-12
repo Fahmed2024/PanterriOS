@@ -60,9 +60,9 @@ const createInvestmentSchema = z.object({
   propertyType: z.string().min(1, "Select Property Type "),
   state: z.string().min(1, " Select State "),
   city: z.string().min(1, " City is required "),
-  propertySize: z.number().min(1, " Size is required "),
+  propertySize: z.number().optional(),
   address: z.string().min(1, "Address is required"),
-  units: z.number().min(1, "Units is required"),
+  units: z.number().optional(),
   description: z.string().min(1, "description is required"),
   features: z.array(z.string()).min(1, "Input at least one features"),
   targetAmount: z.number().min(1, "Target Amount is required"),
@@ -296,8 +296,8 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
       "state",
       "city",
       "address",
-      "propertySize",
-      "units",
+      // "propertySize",
+      // "units",
       "description",
       "features",
     ]);
@@ -455,7 +455,7 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
         propertyValue: values.propertyValue,
         expectedRoi: values.expectedROI,
         propertySizeSqm: values.propertySize,
-        propertyUnit: values.units.toString(),
+        propertyUnit: values.units?.toString(),
         keyHighlights: values.features,
         projectMilestones: values.projectMilestones,
         coverImage: values.coverImage,
@@ -517,7 +517,11 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
   };
 
   if (isEditMode && isEditLoading) {
-    return <div className="p-3 sm:p-6 text-xs sm:text-sm">Loading investment details...</div>;
+    return (
+      <div className="p-3 sm:p-6 text-xs sm:text-sm">
+        Loading investment details...
+      </div>
+    );
   }
 
   return (
@@ -538,7 +542,10 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
             {step === 1 && (
               <>
                 <div className=" items-center gap-4">
-                  <h1 className="text-lg sm:text-xl font-semibold"> Basic Information</h1>
+                  <h1 className="text-lg sm:text-xl font-semibold">
+                    {" "}
+                    Basic Information
+                  </h1>
                   <p className="text-xs sm:text-sm">
                     {isEditMode
                       ? "Update the fundamental details about the property"
@@ -688,8 +695,11 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
                     render={() => (
                       <FormItem>
                         <FormLabel className="flex items-center gap-2 text-xs sm:text-sm">
-                          <span className="font-bold"> PropertySize (Sqm)</span>{" "}
-                          <p className="text-red-500">*</p>
+                          <span className="font-bold">
+                            {" "}
+                            Property Size (Sqm)
+                          </span>
+                          {/* <p className="text-red-500">*</p> */}
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -711,8 +721,8 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
                     render={() => (
                       <FormItem>
                         <FormLabel className="flex items-center gap-2 text-xs sm:text-sm">
-                          <span className="font-bold">Total Units</span>
-                          <p className="text-red-500">*</p>
+                          <span className="font-bold">Property Units</span>
+                          {/* <p className="text-red-500">*</p> */}
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -803,8 +813,13 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
             {step === 2 && (
               <>
                 <div className=" items-center gap-4">
-                  <h1 className="text-lg sm:text-xl font-semibold"> Financial Details</h1>
-                  <p className="text-xs sm:text-sm">Define the investment terms and expected returns</p>
+                  <h1 className="text-lg sm:text-xl font-semibold">
+                    {" "}
+                    Financial Details
+                  </h1>
+                  <p className="text-xs sm:text-sm">
+                    Define the investment terms and expected returns
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 w-full">
@@ -1028,7 +1043,9 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
                 </div>
 
                 <div className="bg-green-50 border border-green-200 space-y-3 sm:space-y-4 p-3 sm:p-5 rounded-md m-2 sm:m-4 w-full">
-                  <h2 className="text-base sm:text-lg font-bold">Investment summary</h2>
+                  <h2 className="text-base sm:text-lg font-bold">
+                    Investment summary
+                  </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 w-full text-xs sm:text-sm">
                     <div className="">
                       <small>Target Amount</small>
@@ -1060,8 +1077,12 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
             {step === 3 && (
               <>
                 <div className=" items-center gap-4">
-                  <h1 className="text-lg sm:text-xl font-semibold">Media & Documents</h1>
-                  <p className="text-xs sm:text-sm">Define the investment terms and expected returns</p>
+                  <h1 className="text-lg sm:text-xl font-semibold">
+                    Media & Documents
+                  </h1>
+                  <p className="text-xs sm:text-sm">
+                    Define the investment terms and expected returns
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 w-full">
@@ -1155,8 +1176,12 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
             {step === 4 && (
               <>
                 <div className=" items-center gap-4">
-                  <h1 className="text-lg sm:text-xl font-semibold">Project Milestones</h1>
-                  <p className="text-xs sm:text-sm">Define key milestones for the project timeline</p>
+                  <h1 className="text-lg sm:text-xl font-semibold">
+                    Project Milestones
+                  </h1>
+                  <p className="text-xs sm:text-sm">
+                    Define key milestones for the project timeline
+                  </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 w-full">
                   <FormItem>
