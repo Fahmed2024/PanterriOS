@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { YieldDisbursementLedgerInvestor } from "@/interface";
 import { SlideInPanelDrawer, StatusBadge } from "@/components/shared";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import { formatCurrency } from "@/utils/helpers";
 
@@ -52,19 +52,19 @@ export const yieldDetailsColumns: ColumnDef<YieldDisbursementLedgerInvestor>[] =
       accessorKey: "action",
       header: "Action",
       cell: () => (
-        <SlideInPanelDrawer
-          trigger={
+        // <SlideInPanelDrawer
+        //   trigger={
             <MoreHorizontal className="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600" />
-          }
-          title="Yield Control Center"
-          subtitle="Manage Yield Disbursement Details"
-          width="md"
-          contentClassName={"mx-0"}
-        >
-          <div className="flex flex-col gap-4">
-            Coming Soon...........
-          </div>
-        </SlideInPanelDrawer>
+        //   }
+        //   title="Yield Control Center"
+        //   subtitle="Manage Yield Disbursement Details"
+        //   width="md"
+        //   contentClassName={"mx-0"}
+        // >
+        //   <div className="flex flex-col gap-4">
+        //     Coming Soon...........
+        //   </div>
+        // </SlideInPanelDrawer>
       ),
     },
   ];

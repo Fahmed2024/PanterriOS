@@ -1,9 +1,52 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { type ReactElement } from "react";
+import type { ReactNode } from "react";
 import { StatusBadge } from "@/components/shared";
+import { SlideInPanelDrawer } from "@/components/shared/SlideInPanel";
 import Link from "next/link";
 import { YieldDisbursementItem } from "@/interface";
 import { formatCurrency } from "@/utils/helpers";
+import { YieldDisburseDetails } from "./YieldDisburseDetail/YieldDisburseDetails";
+
+function renderStatusBreakdown(
+  statusBreakdown: YieldDisbursementItem["statusBreakdown"],
+) {
+  const badges: ReactNode[] = [];
+
+  if (statusBreakdown.disbursed > 0) {
+    badges.push(
+      <span
+        key="disbursed"
+        className="inline-flex items-center gap-2 rounded-sm border border-green-300 bg-green-50 px-3 py-1 text-xs font-medium text-green-700"
+      >
+        {statusBreakdown.disbursed} Disbursed
+      </span>,
+    );
+  }
+
+  if (statusBreakdown.flagged > 0) {
+    badges.push(
+      <span
+        key="flagged"
+        className="inline-flex items-center gap-2 rounded-sm border border-red-300 bg-red-50 px-3 py-1 text-xs font-medium text-red-700"
+      >
+        {statusBreakdown.flagged} Flagged
+      </span>,
+    );
+  }
+
+  if (statusBreakdown.pending > 0) {
+    badges.push(
+      <span
+        key="pending"
+        className="inline-flex items-center gap-2 rounded-sm border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700"
+      >
+        {statusBreakdown.pending} Pending
+      </span>,
+    );
+  }
+
+  return badges;
+}
 
 export const yieldColumns: ColumnDef<YieldDisbursementItem>[] = [
   {
@@ -63,21 +106,20 @@ export const yieldColumns: ColumnDef<YieldDisbursementItem>[] = [
     accessorKey: "dateTime",
     header: "Date & Time",
     cell: ({ row }) => (
-      <span className="text-gray-600">
-        {row.original.dateTime}
-      </span>
+      <span className="text-gray-600">{row.original.dateTime}</span>
     ),
   },
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.original.statusBreakdown;
-      const flagged = status.flagged;
-      const pending = status.pending;
-      const disbursed = status.disbursed;
+      const statusBreakdown = row.original.statusBreakdown;
+      const allDisbursed =
+        statusBreakdown.flagged === 0 &&
+        statusBreakdown.pending === 0 &&
+        statusBreakdown.disbursed > 0;
 
-      if (flagged === 0 && pending === 0 && disbursed > 0) {
+      if (allDisbursed) {
         return (
           <span className="inline-flex items-center gap-2 rounded-sm border border-green-300 bg-green-50 px-3 py-1 text-xs font-medium text-green-700">
             All Disbursed
@@ -85,40 +127,7 @@ export const yieldColumns: ColumnDef<YieldDisbursementItem>[] = [
         );
       }
 
-      const badges: ReactElement[] = [];
-
-      if (disbursed > 0) {
-        badges.push(
-          <span
-            key="disbursed"
-            className="inline-flex items-center gap-2 rounded-sm border border-green-300 bg-green-50 px-3 py-1 text-xs font-medium text-green-700"
-          >
-            {disbursed} Disbursed
-          </span>,
-        );
-      }
-
-      if (flagged > 0) {
-        badges.push(
-          <span
-            key="flagged"
-            className="inline-flex items-center gap-2 rounded-sm border border-red-300 bg-red-50 px-3 py-1 text-xs font-medium text-red-700"
-          >
-            {flagged} Flagged
-          </span>,
-        );
-      }
-
-      if (pending > 0) {
-        badges.push(
-          <span
-            key="pending"
-            className="inline-flex items-center gap-2 rounded-sm border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700"
-          >
-            {pending} Pending
-          </span>,
-        );
-      }
+      const badges = renderStatusBreakdown(statusBreakdown);
 
       return (
         <div className="flex flex-wrap items-center gap-2">
@@ -136,14 +145,40 @@ export const yieldColumns: ColumnDef<YieldDisbursementItem>[] = [
     accessorKey: "action",
     header: "Action",
     cell: ({ row }) => {
+      const status = row.original.status;
       const eventId = row.original.eventId;
+      const investmentId = row.original.investmentId;
+
+      if (status === "pending") {
+        return (
+          <SlideInPanelDrawer
+            trigger={
+              <button className="flex items-center rounded-md border px-2 py-2 text-[12px] font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50">
+                View Details
+              </button>
+            }
+            title="Yield Distribution Ledger"
+            subtitle="Review investors and disburse pending yield"
+            width="lg"
+            contentClassName="mx-0"
+          >
+            {(setOpen) => (
+              <YieldDisburseDetails
+                eventId={eventId}
+                investmentId={investmentId}
+                onSuccess={() => setOpen(false)}
+              />
+            )}
+          </SlideInPanelDrawer>
+        );
+      }
 
       return (
         <Link
           href={`/finance/yield-events/${eventId}`}
-          className="flex items-center rounded-md border px-2 py-2 text-[12px] font-medium text-slate-700 shdow-sm transition-colors hover:bg-slate-50"
+          className="flex items-center rounded-md border px-2 py-2 text-[12px] font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50"
         >
-          View Details
+          View Ledger
         </Link>
       );
     },

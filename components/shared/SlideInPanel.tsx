@@ -17,17 +17,19 @@ export interface SlideInPanelDrawerProps {
   trigger: React.ReactNode;
   title: string;
   subtitle?: string;
-  children: React.ReactNode;
+  children:
+    | React.ReactNode
+    | ((setOpen: React.Dispatch<React.SetStateAction<boolean>>) => React.ReactNode);
   width?: "sm" | "md" | "lg" | "xl";
   contentClassName?: string;
   direction?: "left" | "right";
 }
 
 const drawerWidthClasses = {
-  sm: "sm:min-w-[420px]",
-  md: "sm:min-w-[520px]",
-  lg: "sm:min-w-[640px]",
-  xl: "sm:w-[760px]",
+  sm: "data-[vaul-drawer-direction=right]:sm:!w-[420px] data-[vaul-drawer-direction=right]:sm:!max-w-[420px] data-[vaul-drawer-direction=left]:sm:!w-[420px] data-[vaul-drawer-direction=left]:sm:!max-w-[420px]",
+  md: "data-[vaul-drawer-direction=right]:sm:!w-[520px] data-[vaul-drawer-direction=right]:sm:!max-w-[520px] data-[vaul-drawer-direction=left]:sm:!w-[520px] data-[vaul-drawer-direction=left]:sm:!max-w-[520px]",
+  lg: "data-[vaul-drawer-direction=right]:sm:!w-[740px] data-[vaul-drawer-direction=right]:sm:!max-w-[740px] data-[vaul-drawer-direction=left]:sm:!w-[740px] data-[vaul-drawer-direction=left]:sm:!max-w-[740px]",
+  xl: "data-[vaul-drawer-direction=right]:sm:!w-[92vw] data-[vaul-drawer-direction=right]:sm:!max-w-[1200px] data-[vaul-drawer-direction=left]:sm:!w-[92vw] data-[vaul-drawer-direction=left]:sm:!max-w-[1200px]",
 };
 
 export function SlideInPanelDrawer({
@@ -40,6 +42,7 @@ export function SlideInPanelDrawer({
   direction = "right",
 }: SlideInPanelDrawerProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const content = typeof children === "function" ? children(setIsOpen) : children;
 
   return (
     <Drawer direction={direction} open={isOpen} onOpenChange={setIsOpen}>
@@ -77,7 +80,7 @@ export function SlideInPanelDrawer({
             </Button>
           </DrawerClose>
         </DrawerHeader>
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 sm:px-1">{children}</div>
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 sm:px-1">{content}</div>
       </DrawerContent>
     </Drawer>
   );
