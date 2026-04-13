@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { type InvestorWalletItem } from "@/interface";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { SlideInPanelDrawer } from "@/components/shared/SlideInPanel";
-import { Eye } from "lucide-react";
+import { Eye, MoreVertical } from "lucide-react";
 import { InvestorAudit } from "./InvestorAudit";
 
 function formatCurrency(value: number) {
@@ -19,10 +19,17 @@ export const investorsWalletColumns: ColumnDef<InvestorWalletItem>[] = [
     header: "INVESTOR",
     cell: ({ row }) => (
       <div>
-        <p className="font-medium text-gray-900">{row.original.investorName}</p>
-        <p className="text-sm text-gray-600">{row.original.investorEmail}</p>
-        <p className="text-xs text-gray-400">ID: {row.original.investorCode}</p>
+        <p className="font-medium text-[#111111]">{row.original.investorName}</p>
+        {/* <p className="text-sm text-gray-600">{row.original.investorEmail}</p>
+        <p className="text-xs text-gray-400">ID: {row.original.investorCode}</p> */}
       </div>
+    ),
+  },
+  {
+    accessorKey: "InvestorId",
+    header: " Investor ID",
+    cell: ({ row }) => (
+      <span className="text-sm text-gray-600">{row.original.investorId}</span>
     ),
   },
   {
@@ -30,34 +37,42 @@ export const investorsWalletColumns: ColumnDef<InvestorWalletItem>[] = [
     header: "BALANCE",
     cell: ({ row }) => (
       <div>
-        <p className="font-semibold text-gray-900">
+        <p className="font-semibold text-[#111111]">
           {formatCurrency(row.original.balance)}
         </p>
-        <p className="text-xs text-gray-400">
+        {/* <p className="text-xs text-gray-400">
           Available: {formatCurrency(row.original.availableBalance)}
+        </p> */}
+      </div>
+    ),
+  },
+  // {
+  //   accessorKey: "lockedBalance",
+  //   header: "LOCKED",
+  //   cell: ({ row }) => (
+  //     <span className="font-medium text-gray-900">
+  //       {formatCurrency(row.original.lockedBalance)}
+  //     </span>
+  //   ),
+  // },
+  {
+    accessorKey: "invested",
+    header: "Invested",
+    cell: ({ row }) => (
+      <div>
+        <p className="font-medium text-[#45556C]">
+          {formatCurrency(row.original.invested)}
         </p>
       </div>
     ),
   },
   {
-    accessorKey: "lockedBalance",
-    header: "LOCKED",
-    cell: ({ row }) => (
-      <span className="font-medium text-gray-900">
-        {formatCurrency(row.original.lockedBalance)}
-      </span>
-    ),
-  },
-  {
-    accessorKey: "invested",
-    header: "RETURNS",
+    accessorKey: "returns",
+    header: "Returns",
     cell: ({ row }) => (
       <div>
-        <p className="font-medium text-gray-900">
-          {formatCurrency(row.original.invested)}
-        </p>
-        <p className="text-xs text-gray-400">
-          Returns: {formatCurrency(row.original.returns)}
+        <p className="font-medium text-[#00A63E]">
+          {formatCurrency(row.original.returns)}
         </p>
       </div>
     ),
@@ -83,7 +98,7 @@ export const investorsWalletColumns: ColumnDef<InvestorWalletItem>[] = [
       return (
         <SlideInPanelDrawer
           trigger={
-            <Eye className="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600" />
+            <MoreVertical className="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600" />
           }
           title="Wallet Control Center"
           subtitle="Manage investor wallet settings "
