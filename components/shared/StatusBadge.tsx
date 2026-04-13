@@ -21,11 +21,15 @@ export function StatusBadge({
     "completed",
     "approved",
     "active",
+    "activated",
+    "balanced",
+    "funded",
     "published",
+    "investment",
     "paid",
     "disbursed",
   ].includes(normalizedStatus);
-  const isWarning = ["pending", "in progress", "processing"].includes(
+  const isWarning = ["pending", "in progress", "draft", "processing"].includes(
     normalizedStatus,
   );
   const isRejected = [

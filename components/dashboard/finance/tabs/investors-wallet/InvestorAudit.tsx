@@ -164,7 +164,7 @@ export function InvestorAudit({ investorId }: { investorId: number }) {
                 </div>
 
                 <div className="flex-shrink-0">
-                  <StatusBadge status={event.badge} showDot={false} />
+                  <StatusBadge status={event.badge} showDot={true} />
                 </div>
               </div>
             ))}
