@@ -30,8 +30,8 @@ const formatCurrency = (value: number) =>
 const mapInvestorRow = (investor: InvestmentInvestorItem, index: number): InvestorTableRow => ({
   id: investor.id ?? investor.investorId ?? index + 1,
   name: investor.investorName ?? "Unknown Investor",
-  amount: investor.amountInvested ?? 0,
-  date: investor.investmentDate ?? "-",
+  amount: investor.amount ?? 0,
+  date: investor.investedAt ?? "-",
   stakePercentage: investor.stakePercentage ?? 0,
   paymentStatus: investor.paymentStatus ?? "pending",
 });
