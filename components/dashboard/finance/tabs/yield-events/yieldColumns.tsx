@@ -176,7 +176,7 @@ export const yieldColumns: ColumnDef<YieldDisbursementItem>[] = [
       return (
         <Link
           href={`/finance/yield-events/${eventId}`}
-          className="flex items-center rounded-md border px-2 py-2 text-[12px] font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50"
+          className="flex items-center rounded-md border px-2 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
         >
           View Ledger
         </Link>

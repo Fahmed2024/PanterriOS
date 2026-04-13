@@ -61,8 +61,8 @@ export function InvestorsWallet({ onCountChange }: InvestorsWalletProps) {
           debouncedSetSearch(value);
         }}
         searchPlaceholder="Search by investor, code, or email..."
-        title="Investor Wallets"
-        subtitle="View investor wallet balances and account status"
+        title="Investor Vaults"
+        subtitle="Manage investor balances and wallet controls"
         filters={[
           {
             id: "status",
@@ -89,7 +89,7 @@ export function InvestorsWallet({ onCountChange }: InvestorsWalletProps) {
         <ReUseAbleTable
           data={walletsData?.data ?? []}
           columns={investorsWalletColumns}
-          entityName="investor wallets"
+          entityName="investor Vaults"
           pagination={
             walletsData?.pagination
               ? {

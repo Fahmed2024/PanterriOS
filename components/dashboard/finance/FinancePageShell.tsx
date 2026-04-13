@@ -38,9 +38,9 @@ export function FinancePageShell({
       bgColor: "bg-blue-100",
     },
     {
-      label: "Active Wallets",
+      label: "Active Vaults",
       value: summary?.activeVaults || 0,
-      description: "Investor wallets",
+      description: "Investor vaults",
       icon: "Users",
       color: "text-gray-900",
       iconColor: "text-purple-600",

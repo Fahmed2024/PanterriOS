@@ -3,6 +3,7 @@ import { DrawerClose } from "@/components/ui/drawer";
 import { CircleX, Download, Lock, RefreshCw } from "lucide-react";
 import { StatusBadge, TransactionAuditSkeleton } from "@/components/shared";
 import { useRetrieveInvestorWalletDetails } from "@/hook/wallet-finance";
+import { cn } from "@/lib/utils";
 
 function formatCompactNaira(value: number) {
   return new Intl.NumberFormat("en-NG", {
@@ -60,26 +61,39 @@ export function InvestorAudit({ investorId }: { investorId: number }) {
 
         {/* OVERVIEW */}
         <section className="space-y-2 sm:space-y-3">
-          <h4 className="text-sm sm:text-base font-semibold text-[#0F172A]">Overview</h4>
+          <h4 className="text-sm sm:text-base font-semibold text-[#0F172A]">
+            Overview
+          </h4>
 
           <div className="grid grid-cols-1 gap-2 sm:gap-3 sm:grid-cols-3">
             {[
               {
                 title: "Total Balance",
                 value: walletDetails?.overview?.totalBalance,
+                color: "bg-[#EFF6FF80] border-[#DBEAFE] text-[#0F172B]",
               },
               {
                 title: "Active Exposure",
                 value: walletDetails?.overview?.activeExposure,
+                color: "bg-[#FAF5FF80] border-[#F3E8FF] text-[#0F172B]",
               },
               {
                 title: "Accrued Yield",
                 value: walletDetails?.overview?.accruedYield,
+                color: "text-[#00A63E] border-[#DCFCE7] bg-[#F0FDF480]",
               },
             ].map((item) => (
-              <div key={item.title} className="rounded-lg border border-[#BFDBFE] bg-[#F8FAFC] p-3 sm:p-5">
-                <p className="text-xs sm:text-sm text-[#475569]">{item.title}</p>
-                <p className="mt-2 sm:mt-3 text-lg sm:text-2xl font-semibold text-[#0F172A]">
+              <div
+                key={item.title}
+                className={cn(
+                  "rounded-lg border p-3 sm:p-5",
+                  item.color,
+                )}
+              >
+                <p className="text-xs sm:text-sm min-h-10 text-[#475569]">
+                  {item.title}
+                </p>
+                <p className="mt-2 sm:mt-3 text-lg sm:text-2xl font-semibold text-inherit">
                   {formatCompactNaira(item.value || 0)}
                 </p>
               </div>
@@ -96,7 +110,7 @@ export function InvestorAudit({ investorId }: { investorId: number }) {
           <div className="grid grid-cols-1 gap-2 sm:gap-3 sm:grid-cols-2">
             <Button
               variant="outline"
-              className="h-12 sm:h-16 rounded-lg text-xs sm:text-sm flex items-center justify-center gap-2"
+              className="h-12 sm:h-18 rounded-lg text-xs sm:text-sm flex items-center justify-center gap-2"
             >
               <Download className="h-4 w-4" />
               <span className="hidden sm:inline">Export</span>
@@ -105,7 +119,7 @@ export function InvestorAudit({ investorId }: { investorId: number }) {
 
             <Button
               variant="outline"
-              className="h-12 sm:h-16 rounded-lg text-xs sm:text-sm flex items-center justify-center gap-2 border-[#FDBA74] text-[#C2410C]"
+              className="h-12 sm:h-18 rounded-lg text-xs sm:text-sm flex items-center justify-center gap-2 border-[#FDBA74] text-[#C2410C]"
             >
               <Lock className="h-4 w-4" />
               Freeze Vault
@@ -113,7 +127,7 @@ export function InvestorAudit({ investorId }: { investorId: number }) {
 
             <Button
               variant="outline"
-              className="h-12 sm:h-16 rounded-lg text-xs sm:text-sm flex items-center justify-center gap-2"
+              className="h-12 sm:h-18 rounded-lg text-xs sm:text-sm flex items-center justify-center gap-2"
             >
               <RefreshCw className="h-4 w-4" />
               Sync Balance
@@ -121,7 +135,7 @@ export function InvestorAudit({ investorId }: { investorId: number }) {
 
             <Button
               variant="outline"
-              className="h-12 sm:h-16 rounded-lg text-xs sm:text-sm flex items-center justify-center gap-2 border-[#FCA5A5] text-[#DC2626]"
+              className="h-12 sm:h-18 rounded-lg text-xs sm:text-sm flex items-center justify-center gap-2 border-[#FCA5A5] text-[#DC2626]"
             >
               <CircleX className="h-4 w-4" />
               <span className="hidden sm:inline">Terminate</span>
@@ -150,7 +164,7 @@ export function InvestorAudit({ investorId }: { investorId: number }) {
                 </div>
 
                 <div className="flex-shrink-0">
-                  <StatusBadge status={event.badge} showDot={false} />
+                  <StatusBadge status={event.badge} showDot={true} />
                 </div>
               </div>
             ))}

@@ -62,7 +62,7 @@ export function ReUseAbleTable<TData extends object>({
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
-                    className="h-14 whitespace-nowrap px-4 py-3 font-medium uppercase text-[#62748E] sm:px-6"
+                    className="h-14 whitespace-nowrap px-4 py-3 font-medium uppercase text-[#62748E] sm:px-4"
                   >
                     {header.isPlaceholder
                       ? null
@@ -85,7 +85,7 @@ export function ReUseAbleTable<TData extends object>({
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className="px-4 text-sm font-normal capitalize whitespace-normal break-words [overflow-wrap:anywhere] sm:px-6"
+                      className="px-4 text-sm font-normal  capitalize whitespace-normal break-words [overflow-wrap:anywhere] sm:px-4"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
