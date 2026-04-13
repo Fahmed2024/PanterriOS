@@ -50,7 +50,7 @@ export default function PropertyInfo({ propertyDetails }: PropertyInfoProps) {
           <p className="text-xs sm:text-sm">{propertyDetails.propertyUnit}</p>
         </div>
         <div className="rounded-md border p-2 sm:p-3">
-          <div className="font-semibold text-xs sm:text-sm">Total Units</div>
+          <div className="font-semibold text-xs sm:text-sm">Property Units</div>
           <p className="text-xs sm:text-sm">{propertyDetails.totalUnits}</p>
         </div>
       </div>

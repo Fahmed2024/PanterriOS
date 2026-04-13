@@ -60,9 +60,9 @@ const createInvestmentSchema = z.object({
   propertyType: z.string().min(1, "Select Property Type "),
   state: z.string().min(1, " Select State "),
   city: z.string().min(1, " City is required "),
-  propertySize: z.number().min(1, " Size is required "),
+  propertySize: z.number().optional(),
   address: z.string().min(1, "Address is required"),
-  units: z.number().min(1, "Units is required"),
+  units: z.number().optional(),
   description: z.string().min(1, "description is required"),
   features: z.array(z.string()).min(1, "Input at least one features"),
   targetAmount: z.number().min(1, "Target Amount is required"),
@@ -115,6 +115,12 @@ type CreateInvestmentFormData = z.infer<typeof createInvestmentSchema>;
 type MilestoneItem = CreateInvestmentFormData["projectMilestones"][number];
 type MilestoneInput = Omit<MilestoneItem, "status"> & {
   status: MilestoneItem["status"] | "";
+};
+type ExistingUploadItem = {
+  id: number;
+  name: string;
+  url: string;
+  type?: string;
 };
 
 const typeOptions = [
@@ -182,6 +188,15 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
   const investmentId = id ? Number(id) : undefined;
   const isEditMode = Boolean(investmentId);
   const [featureInput, setFeatureInput] = useState("");
+  const [existingCoverImage, setExistingCoverImage] = useState<
+    ExistingUploadItem[]
+  >([]);
+  const [existingPropertyImages, setExistingPropertyImages] = useState<
+    ExistingUploadItem[]
+  >([]);
+  const [existingLegalDocuments, setExistingLegalDocuments] = useState<
+    ExistingUploadItem[]
+  >([]);
   const [milestoneDate, setMilestoneDate] = useState<Date>();
   const [milestoneInput, setMilestoneInput] = useState<MilestoneInput>({
     title: "",
@@ -241,6 +256,46 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
       editDetails.propertyDetails.state,
       statesOption,
     );
+    const coverImageUrl = (
+      editDetails.propertyDetails as { coverImage?: string }
+    ).coverImage;
+    const mappedExistingImages = (editDetails.propertyDetails.images ?? []).map(
+      (img) => ({
+        id: img.id,
+        name: img.fileName,
+        url: img.url,
+        type: img.mimeType,
+      }),
+    );
+    const coverFromImages = coverImageUrl
+      ? mappedExistingImages.find((img) => img.url === coverImageUrl)
+      : undefined;
+
+    setExistingCoverImage(
+      coverImageUrl
+        ? [
+            {
+              id: coverFromImages?.id ?? 0,
+              name: coverFromImages?.name ?? "Cover image",
+              url: coverImageUrl,
+              type: coverFromImages?.type,
+            },
+          ]
+        : [],
+    );
+    setExistingPropertyImages(
+      coverImageUrl
+        ? mappedExistingImages.filter((img) => img.url !== coverImageUrl)
+        : mappedExistingImages,
+    );
+
+    const mappedExistingDocuments = (editDetails.documents ?? []).map((doc) => ({
+      id: doc.id,
+      name: doc.documentName,
+      url: doc.fileUrl,
+      type: doc.mimeType,
+    }));
+    setExistingLegalDocuments(mappedExistingDocuments);
 
     form.reset({
       propertyName: editDetails.propertyDetails.propertyName,
@@ -296,8 +351,8 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
       "state",
       "city",
       "address",
-      "propertySize",
-      "units",
+      // "propertySize",
+      // "units",
       "description",
       "features",
     ]);
@@ -452,10 +507,10 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
         expectedReturnPercentage: parseFloat(values.expectedReturns),
         riskRating: values.riskRating,
         investmentPublicationStatus: publicationStatus,
-        propertyValue: values.propertyValue,
-        expectedRoi: values.expectedROI,
+        propertyValue: values.propertyValue === 0 ? undefined : values.propertyValue,
+        expectedRoi: values.expectedROI  === 0 ? undefined : values.expectedROI,
         propertySizeSqm: values.propertySize,
-        propertyUnit: values.units.toString(),
+        propertyUnit: values.units?.toString(),
         keyHighlights: values.features,
         projectMilestones: values.projectMilestones,
         coverImage: values.coverImage,
@@ -517,7 +572,11 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
   };
 
   if (isEditMode && isEditLoading) {
-    return <div className="p-3 sm:p-6 text-xs sm:text-sm">Loading investment details...</div>;
+    return (
+      <div className="p-3 sm:p-6 text-xs sm:text-sm">
+        Loading investment details...
+      </div>
+    );
   }
 
   return (
@@ -538,7 +597,10 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
             {step === 1 && (
               <>
                 <div className=" items-center gap-4">
-                  <h1 className="text-lg sm:text-xl font-semibold"> Basic Information</h1>
+                  <h1 className="text-lg sm:text-xl font-semibold">
+                    {" "}
+                    Basic Information
+                  </h1>
                   <p className="text-xs sm:text-sm">
                     {isEditMode
                       ? "Update the fundamental details about the property"
@@ -688,8 +750,11 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
                     render={() => (
                       <FormItem>
                         <FormLabel className="flex items-center gap-2 text-xs sm:text-sm">
-                          <span className="font-bold"> PropertySize (Sqm)</span>{" "}
-                          <p className="text-red-500">*</p>
+                          <span className="font-bold">
+                            {" "}
+                            Property Size (Sqm)
+                          </span>
+                          {/* <p className="text-red-500">*</p> */}
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -711,8 +776,8 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
                     render={() => (
                       <FormItem>
                         <FormLabel className="flex items-center gap-2 text-xs sm:text-sm">
-                          <span className="font-bold">Total Units</span>
-                          <p className="text-red-500">*</p>
+                          <span className="font-bold">Property Units</span>
+                          {/* <p className="text-red-500">*</p> */}
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -803,8 +868,13 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
             {step === 2 && (
               <>
                 <div className=" items-center gap-4">
-                  <h1 className="text-lg sm:text-xl font-semibold"> Financial Details</h1>
-                  <p className="text-xs sm:text-sm">Define the investment terms and expected returns</p>
+                  <h1 className="text-lg sm:text-xl font-semibold">
+                    {" "}
+                    Financial Details
+                  </h1>
+                  <p className="text-xs sm:text-sm">
+                    Define the investment terms and expected returns
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 w-full">
@@ -1008,7 +1078,7 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
                         <FormItem>
                           <FormLabel className="flex items-center gap-2 text-xs sm:text-sm">
                             <span className="font-bold">Expected ROI (%)</span>{" "}
-                            <p className="text-red-500">*</p>
+                            {/* <p className="text-red-500">*</p> */}
                           </FormLabel>
                           <FormControl>
                             <Input
@@ -1028,7 +1098,9 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
                 </div>
 
                 <div className="bg-green-50 border border-green-200 space-y-3 sm:space-y-4 p-3 sm:p-5 rounded-md m-2 sm:m-4 w-full">
-                  <h2 className="text-base sm:text-lg font-bold">Investment summary</h2>
+                  <h2 className="text-base sm:text-lg font-bold">
+                    Investment summary
+                  </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 w-full text-xs sm:text-sm">
                     <div className="">
                       <small>Target Amount</small>
@@ -1043,12 +1115,12 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
                     <div className="">
                       <small>Expected ROI</small>
                       <div className="text-green-500">
-                        {form.getValues("expectedROI")}%
+                        {form.getValues("expectedReturns")}%
                       </div>
                     </div>
                     <div className="">
                       <small>Duration</small>
-                      <div className="text-green-500">
+                      <div className="text-green-500 capitalize">
                         {form.getValues("duration")} months
                       </div>
                     </div>
@@ -1060,8 +1132,12 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
             {step === 3 && (
               <>
                 <div className=" items-center gap-4">
-                  <h1 className="text-lg sm:text-xl font-semibold">Media & Documents</h1>
-                  <p className="text-xs sm:text-sm">Define the investment terms and expected returns</p>
+                  <h1 className="text-lg sm:text-xl font-semibold">
+                    Media & Documents
+                  </h1>
+                  <p className="text-xs sm:text-sm">
+                    Define the investment terms and expected returns
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 w-full">
@@ -1077,7 +1153,12 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
                           <div className="w-full min-h-28 sm:min-h-32 text-xs sm:text-sm">
                             <FileUpload
                               value={field.value ? [field.value] : []}
-                              onChange={(files) => field.onChange(files[0])}
+                              onChange={(files) => {
+                                setExistingCoverImage([]);
+                                field.onChange(files[0]);
+                              }}
+                              existingFiles={existingCoverImage}
+                              onRemoveExisting={() => setExistingCoverImage([])}
                               placeholder="Upload the cover image"
                               single
                             />
@@ -1101,6 +1182,12 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
                             <FileUpload
                               value={field.value || []}
                               onChange={field.onChange}
+                              existingFiles={existingPropertyImages}
+                              onRemoveExisting={(id) =>
+                                setExistingPropertyImages(
+                                  existingPropertyImages.filter((img) => img.id !== id),
+                                )
+                              }
                               placeholder="Upload other property images"
                               enableDrag={true}
                             />
@@ -1128,6 +1215,12 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
                             <FileUpload
                               value={field.value || []}
                               onChange={field.onChange}
+                              existingFiles={existingLegalDocuments}
+                              onRemoveExisting={(id) =>
+                                setExistingLegalDocuments(
+                                  existingLegalDocuments.filter((doc) => doc.id !== id),
+                                )
+                              }
                               placeholder="Upload Legal Documents"
                               type="file"
                             />
@@ -1155,8 +1248,12 @@ export function CreateInvestmentForm({ step, setStep, id }: Prop) {
             {step === 4 && (
               <>
                 <div className=" items-center gap-4">
-                  <h1 className="text-lg sm:text-xl font-semibold">Project Milestones</h1>
-                  <p className="text-xs sm:text-sm">Define key milestones for the project timeline</p>
+                  <h1 className="text-lg sm:text-xl font-semibold">
+                    Project Milestones
+                  </h1>
+                  <p className="text-xs sm:text-sm">
+                    Define key milestones for the project timeline
+                  </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 w-full">
                   <FormItem>

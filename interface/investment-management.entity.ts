@@ -198,8 +198,8 @@ export interface InvestmentInvestorItem {
   id?: number;
   investorId?: number;
   investorName?: string;
-  amountInvested?: number;
-  investmentDate?: string;
+  amount?: number;
+  investedAt?: string;
   stakePercentage?: number;
   paymentStatus?: string;
 }
