@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ReUseAbleTable } from "@/components/shared";
 import { articlesDashboardData } from "../data";
-import { publishedArticleColumns } from "./articleColumns";
+import { publishedArticleColumns } from "../articleColumns";
 
 interface ArticlesTabProps {
   category: string;

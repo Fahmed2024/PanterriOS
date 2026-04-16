@@ -122,7 +122,7 @@ export default function ArticlesContainer() {
       <div className="flex flex-col gap-4 rounded-2xl border border-[#E5E7EB] bg-white p-4 lg:flex-row lg:items-start lg:justify-between">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <TabsList className="inline-flex h-auto w-fit justify-start gap-3 rounded-none bg-slate-100 p-0 h-15">
+            <TabsList className="inline-flex h-auto w-fit justify-start gap-3 rounded-none bg-slate-100 p-0">
               {tabs.map((tab) => (
                 <TabsTrigger
                   key={tab.value}
