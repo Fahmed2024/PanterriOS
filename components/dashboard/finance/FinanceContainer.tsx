@@ -47,33 +47,60 @@ export function FinanceContainer() {
       title: "All Transactions",
       value: "all-transactions",
       count: activeTab === "all-transactions" ? allTransactionsCount : 0,
-      content: <AllTransactions />,
+      content: (
+        <AllTransactions
+          onCountChange={(count, summary) => {
+            setAllTransactionsCount(count);
+            if (summary) setSummary(summary);
+          }}
+        />
+      ),
     },
     {
       title: "Withdrawal Requests",
       value: "withdrawal-requests",
       count: activeTab === "withdrawal-requests" ? withdrawalCount : 0,
-      content: <WithdrawalRequests />,
+      content: (
+        <WithdrawalRequests
+          onCountChange={(count, summary) => {
+            setWithdrawalCount(count);
+            if (summary) setSummary(summary);
+          }}
+        />
+      ),
     },
 
     {
       title: "Reconciliation",
       value: "reconciliation",
-      count:
-        activeTab === "reconciliation" ? DUMMY_RECONCILIATION_DATA.length : 0,
+      count: activeTab === "reconciliation" ? DUMMY_RECONCILIATION_DATA.length : 0,
       content: <Reconciliation />,
     },
     {
       title: "Yield Events",
       value: "yield-events",
       count: activeTab === "yield-events" ? yieldCount : 0,
-      content: <YieldEvents />,
+      content: (
+        <YieldEvents
+          onCountChange={(count, summary) => {
+            setYieldCount(count);
+            if (summary) setSummary(summary);
+          }}
+        />
+      ),
     },
     {
       title: "Investors Wallet",
       value: "investors-wallet",
       count: activeTab === "investors-wallet" ? investorWalletCount : 0,
-      content: <InvestorsWallet />,
+      content: (
+        <InvestorsWallet
+          onCountChange={(count, summary) => {
+            setInvestorWalletCount(count);
+            if (summary) setSummary(summary);
+          }}
+        />
+      ),
     },
   ];
 
@@ -91,7 +118,6 @@ export function FinanceContainer() {
       label: "Active Wallets",
       value: summary?.activeVaults || 0,
       description: "Investor wallets",
-      status: "Active",
       icon: "Users",
       color: "text-gray-900",
       iconColor: "text-purple-600",
@@ -143,7 +169,6 @@ export function FinanceContainer() {
                 label={stat.label}
                 value={stat.value}
                 description={stat.description}
-                status={stat.status}
                 Icon={IconComponent}
                 iconColor={stat.iconColor}
                 bgColor={stat.bgColor}
@@ -166,7 +191,7 @@ export function FinanceContainer() {
                 className="relative flex h-9 items-center gap-2 whitespace-nowrap rounded-md border-0 bg-transparent px-3 py-2 text-sm font-medium text-gray-700 transition-all data-[state=active]:bg-white data-[state=active]:text-black sm:px-4"
               >
                 {tab.title}
-                {tab.count > 0 && (
+                {tab.count > 0  && (
                   <Badge
                     className={`rounded-sm px-2 py-1 ${badgeColors[tab.value]}`}
                   >

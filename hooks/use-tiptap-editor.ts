@@ -23,7 +23,6 @@ export function useTiptapEditor(providedEditor?: Editor | null): {
 
   useEffect(() => {
     if (!mainEditor) {
-      setStorageEditor(null)
       return
     }
 

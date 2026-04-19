@@ -185,7 +185,11 @@ export function useMenuNavigation<T>({
 
   useEffect(() => {
     if (query) {
-      setSelectedIndex(autoSelectFirstItem ? 0 : -1)
+      const nextIndex = autoSelectFirstItem ? 0 : -1
+      const frame = window.requestAnimationFrame(() => {
+        setSelectedIndex(nextIndex)
+      })
+      return () => window.cancelAnimationFrame(frame)
     }
   }, [query, autoSelectFirstItem])
 

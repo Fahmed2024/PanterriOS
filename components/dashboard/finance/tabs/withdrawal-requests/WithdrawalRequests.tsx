@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ReUseAbleTable } from "@/components/shared/reusableTable";
 import { TableSkeleton } from "@/components/shared/loader";
 import { withdrawalColumns } from "./withdrawalColumns";
 import { useRetrieveWithdrawalRequest } from "@/hook/wallet-finance";
 import { TableFilters } from "@/components/shared/TableFilters";
 import {
-  type WalletFinanceSummary,
   type WithdrawalApprovalStatusFilter,
   type WithdrawalApprovalRiskProfileFilter,
 } from "@/interface";

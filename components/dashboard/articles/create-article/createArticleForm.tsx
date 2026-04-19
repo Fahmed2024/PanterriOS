@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { z } from "zod";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,6 +19,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { ArticleEditor } from "./articleEditor";
 import { Eye, Save, Send, Upload } from "lucide-react";
+import Image from "next/image";
 
 const articleSchema = z.object({
   title: z.string().trim().min(5, "Title must be at least 5 characters"),
@@ -91,8 +92,6 @@ const CreateArticleForm = () => {
   const featureOnHomepage = watch("featureOnHomepage");
   const allowComments = watch("allowComments");
   const coverImage = watch("coverImage");
-  const formValues = watch();
-
   const activeBadges = useMemo(() => {
     const badges: string[] = [];
 
@@ -274,7 +273,7 @@ const CreateArticleForm = () => {
                 <div>
                   <div className="mb-2 flex items-center justify-between">
                     <p className="text-base font-medium text-slate-900">
-                      Editor's Pick
+                      Editor&apos;s Pick
                     </p>
                     <Controller
                       name="allowComments"
@@ -439,10 +438,12 @@ const CreateArticleForm = () => {
 
               {coverImage ? (
                 <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-                  <img
+                  <Image
                     src={coverImage}
                     alt="Featured preview"
                     className="h-56 w-full object-cover"
+                    width={439}
+                    height={280}
                   />
                 </div>
               ) : null}

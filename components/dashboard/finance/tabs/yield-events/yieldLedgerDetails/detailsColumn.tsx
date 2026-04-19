@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { YieldDisbursementLedgerInvestor } from "@/interface";
-import { SlideInPanelDrawer, StatusBadge } from "@/components/shared";
+import { StatusBadge } from "@/components/shared";
 // import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import { formatCurrency } from "@/utils/helpers";

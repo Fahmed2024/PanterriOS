@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react";
 import { cn } from "@/lib/utils";
 
@@ -244,11 +244,7 @@ export function ArticleEditor({
     }
   }, [editor, value]);
 
-  useEffect(() => {
-    if (!isMobile && mobileView !== "main") {
-      setMobileView("main");
-    }
-  }, [isMobile, mobileView]);
+  const activeMobileView = !isMobile ? "main" : mobileView;
 
   return (
     <div className="simple-editor-wrapper">
@@ -257,7 +253,7 @@ export function ArticleEditor({
           <Toolbar
             style={isMobile ? { bottom: 0, left: 0, right: 0 } : undefined}
           >
-            {mobileView === "main" ? (
+            {activeMobileView === "main" ? (
               <MainToolbarContent
                 onHighlighterClick={() => setMobileView("highlighter")}
                 onLinkClick={() => setMobileView("link")}
@@ -265,7 +261,7 @@ export function ArticleEditor({
               />
             ) : (
               <MobileToolbarContent
-                type={mobileView === "highlighter" ? "highlighter" : "link"}
+                type={activeMobileView === "highlighter" ? "highlighter" : "link"}
                 onBack={() => setMobileView("main")}
               />
             )}

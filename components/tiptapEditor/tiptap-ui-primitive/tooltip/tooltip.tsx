@@ -1,7 +1,6 @@
 "use client"
 
 import {
-  cloneElement,
   createContext,
   forwardRef,
   isValidElement,
@@ -176,15 +175,15 @@ export const TooltipTrigger = forwardRef<HTMLElement, TooltipTriggerProps>(
       const dataAttributes = {
         "data-tooltip-state": context.open ? "open" : "closed",
       }
+      const referenceProps = context.getReferenceProps({
+        ...props,
+        ...dataAttributes,
+      })
 
-      return cloneElement(
-        children,
-        context.getReferenceProps({
-          ref,
-          ...props,
-          ...(typeof children.props === "object" ? children.props : {}),
-          ...dataAttributes,
-        })
+      return (
+        <span ref={ref as React.Ref<HTMLSpanElement>} {...referenceProps}>
+          {children}
+        </span>
       )
     }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ReUseAbleTable } from "@/components/shared/reusableTable";
 import { transactionColumns } from "./transactionColumns";
 import { TableFilters } from "@/components/shared/TableFilters";
@@ -13,7 +13,6 @@ import {
   TrendingUp,
 } from "lucide-react";
 import {
-  type WalletFinanceSummary,
   type WalletFinanceTimeRangeFilter,
   type WalletFinanceTransactionStatusFilter,
   type WalletFinanceTransactionTypeFilter,

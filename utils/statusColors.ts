@@ -1,5 +1,3 @@
-import { ca } from "date-fns/locale";
-
 export function getStatusColor(status: string): {
   textColor: string;
   bgColor: string;

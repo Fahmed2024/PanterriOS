@@ -82,7 +82,10 @@ const useToolbarNavigation = (
 export const Toolbar = forwardRef<HTMLDivElement, ToolbarProps>(
   ({ children, className, variant = "fixed", ...props }, ref) => {
     const toolbarRef = useRef<HTMLDivElement>(null)
-    const composedRef = useComposedRef(toolbarRef, ref)
+    const setToolbarRef = useCallback((instance: HTMLDivElement | null) => {
+      toolbarRef.current = instance
+    }, [])
+    const composedRef = useComposedRef(setToolbarRef, ref)
     useToolbarNavigation(toolbarRef)
 
     return (

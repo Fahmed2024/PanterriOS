@@ -2,10 +2,8 @@
 
 import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { PageHead, StatCard } from "@/components/shared";
-import { formatCurrency } from "@/utils/helpers";
-import { Wallet, Users2, TrendingUp, Clock, Download } from "lucide-react";
-import { type WalletFinanceSummary } from "@/interface";
+import { PageHead } from "@/components/shared";
+import { Download } from "lucide-react";
 
 interface FinancePageShellProps {
   title: string;

@@ -40,6 +40,7 @@ export function ReUseAbleTable<TData extends object>({
   entityName = "results",
   pagination,
 }: TableProp<TData>) {
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,

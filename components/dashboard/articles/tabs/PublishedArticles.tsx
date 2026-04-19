@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ReUseAbleTable } from "@/components/shared";
 import { articlesDashboardData } from "../data";
 import { publishedArticleColumns } from "../articleColumns";
@@ -24,10 +24,6 @@ export function PublishedArticles({ category }: ArticlesTabProps) {
         article.category.toLowerCase() === category ||
         article.tags.some((tag) => tag.toLowerCase() === category),
     );
-  }, [category]);
-
-  useEffect(() => {
-    setPage(1);
   }, [category]);
 
   const paginatedArticles = filteredArticles.slice(

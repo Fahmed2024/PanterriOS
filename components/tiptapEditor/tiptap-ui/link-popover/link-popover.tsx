@@ -267,7 +267,10 @@ export const LinkPopover = forwardRef<HTMLButtonElement, LinkPopoverProps>(
 
     useEffect(() => {
       if (autoOpenOnLinkActive && isActive) {
-        setIsOpen(true)
+        const frame = window.requestAnimationFrame(() => {
+          setIsOpen(true)
+        })
+        return () => window.cancelAnimationFrame(frame)
       }
     }, [autoOpenOnLinkActive, isActive])
 
