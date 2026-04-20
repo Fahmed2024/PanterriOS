@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { type InvestorWalletItem } from "@/interface";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { SlideInPanelDrawer } from "@/components/shared/SlideInPanel";
-import { Eye, MoreVertical } from "lucide-react";
+import { MoreVertical } from "lucide-react";
 import { InvestorAudit } from "./InvestorAudit";
 
 function formatCurrency(value: number) {

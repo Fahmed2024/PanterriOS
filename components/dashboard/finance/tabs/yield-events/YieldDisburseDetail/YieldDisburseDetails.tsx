@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ReUseAbleTable } from "@/components/shared";
@@ -20,6 +20,12 @@ interface YieldDisburseDetailsProps {
   onSuccess?: () => void;
 }
 
+interface FlagDisbursementPayload {
+  eventId: string;
+  investmentFundId: number;
+  investorName: string;
+}
+
 export function YieldDisburseDetails({
   eventId,
   investmentId,
@@ -31,7 +37,7 @@ export function YieldDisburseDetails({
 
   const debouncedSetSearch = useMemo(
     () => debounce((value: string) => setDebouncedSearchValue(value), 600),
-    []
+    [],
   );
 
   const { data, isLoading } = useRetrieveYieldDisbursementLedger(eventId, {
@@ -54,36 +60,33 @@ export function YieldDisburseDetails({
       toast.success("Yield disbursement started successfully");
       onSuccess?.();
     } catch {
-    //   toast.error("Unable to disburse yield right now");
+      //   toast.error("Unable to disburse yield right now");
     }
   };
 
-  const handleFlagDisbursement = useCallback(
-    async ({ eventId, investmentFundId, investorName }: any) => {
-      try {
-        await flagDisbursement({ eventId, investmentFundId });
-        toast.success(`Disbursement for ${investorName} flagged`);
-      } catch {}
-    },
-    [flagDisbursement],
-  );
+  const handleFlagDisbursement = async ({
+    eventId,
+    investmentFundId,
+    investorName,
+  }: FlagDisbursementPayload) => {
+    try {
+      await flagDisbursement({ eventId, investmentFundId });
+      toast.success(`Disbursement for ${investorName} flagged`);
+    } catch {}
+  };
 
-  const columns = useMemo(
-    () =>
-      getDisburseColumns({
-        eventId,
-        isFlagging,
-        onFlagDisbursement: handleFlagDisbursement,
-      }),
-    [eventId, handleFlagDisbursement, isFlagging]
-  );
+  const columns = getDisburseColumns({
+    eventId,
+    isFlagging,
+    onFlagDisbursement: handleFlagDisbursement,
+  });
 
   const statusLabel =
     detail?.status === "pending"
       ? "Waiting to Disburse"
       : detail?.status === "disbursed"
-      ? "Disbursed"
-      : detail?.status || "";
+        ? "Disbursed"
+        : detail?.status || "";
 
   return (
     <div className="space-y-6 px-4">

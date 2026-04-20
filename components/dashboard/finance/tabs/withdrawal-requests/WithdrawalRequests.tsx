@@ -1,24 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ReUseAbleTable } from "@/components/shared/reusableTable";
 import { TableSkeleton } from "@/components/shared/loader";
 import { withdrawalColumns } from "./withdrawalColumns";
 import { useRetrieveWithdrawalRequest } from "@/hook/wallet-finance";
 import { TableFilters } from "@/components/shared/TableFilters";
 import {
-  type WalletFinanceSummary,
   type WithdrawalApprovalStatusFilter,
   type WithdrawalApprovalRiskProfileFilter,
 } from "@/interface";
 import { Check, Shield } from "lucide-react";
 import { debounce } from "@/utils/helpers";
 
-export function WithdrawalRequests({
-  onCountChange,
-}: {
-  onCountChange?: (count: number, summary?: WalletFinanceSummary) => void;
-}) {
+export function WithdrawalRequests() {
   const [searchValue, setSearchValue] = useState("");
   const [debouncedSearchValue, setDebouncedSearchValue] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -40,9 +35,6 @@ export function WithdrawalRequests({
     riskProfile: riskProfile as WithdrawalApprovalRiskProfileFilter,
     search: debouncedSearchValue || undefined,
   });
-  useEffect(() => {
-    onCountChange?.(data?.pagination?.totalItems ?? 0, data?.summary);
-  }, [data?.pagination?.totalItems, data?.summary, onCountChange]);
 
   return (
     <div className="w-full space-y-6">

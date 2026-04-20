@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Download, CheckCircle2, Section } from "lucide-react";
+import { Download, CheckCircle2 } from "lucide-react";
 import { StatusBadge, TransactionAuditSkeleton } from "@/components/shared";
 import { useRetrieveTransactionDetails } from "@/hook/wallet-finance";
 import { DrawerClose } from "@/components/ui/drawer";
