@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Eye, Trash2, Star } from "lucide-react";
-import { EventRecordRow } from "../data";
+
 
 function BadgePill({
   label,
@@ -24,6 +24,19 @@ function BadgePill({
   );
 }
 
+interface EventRecordRow {
+    id: number;
+    name: string;
+    organizer: string;
+    date: string;
+    time: string;
+    location: string;
+    category: string;
+    type: "Virtual" | "Physical" | "Hybrid";
+    source: "EventBrite" | "AI" | "Submitted";
+    price: string;
+    featured: boolean;
+}
 export const eventRecordColumns: ColumnDef<EventRecordRow>[] = [
   {
     accessorKey: "name",

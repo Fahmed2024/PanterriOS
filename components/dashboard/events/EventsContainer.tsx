@@ -1,24 +1,26 @@
-'use client';
+"use client";
 
-import { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, UsersRound, Star, Bot } from 'lucide-react';
-import Link from 'next/link';
-import { PageHead, StatCard, StatCardSkeleton } from '@/components/shared';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { eventsData, EventStatus } from './data';
-import { useRetrieveEventStats } from '@/hook/events';
+import { useEffect, useState } from "react";
+import { CalendarDays, UsersRound, Star, Bot } from "lucide-react";
+import Link from "next/link";
+import { PageHead, StatCard, StatCardSkeleton } from "@/components/shared";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import { useRetrieveEventStats } from "@/hook/events";
 import {
   AIDiscoveredEventsTab,
   EventsTabContent,
   SubmittedEventsTab,
-} from './tabs';
-import { useRetrievePublishedEvents } from '@/hook/events/useRetrievePublishedEvents';
+} from "./tabs";
+import { useRetrievePublishedEvents } from "@/hook/events/useRetrievePublishedEvents";
 
 export default function EventsContainer() {
-  const [activeTab, setActiveTab] = useState<EventStatus>('ai-discovered');
-  const [search, setSearch] = useState('');
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState<"ai-discovered" | "published">(
+    "published",
+  );
+  const [search, setSearch] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
   const { data: eventStatsResponse, isLoading } = useRetrieveEventStats();
   const { data: publishedEvents, isLoading: isPublished } =
@@ -37,82 +39,65 @@ export default function EventsContainer() {
     return () => clearTimeout(timeoutId);
   }, [search]);
   const eventStats = eventStatsResponse?.data;
-  const tabs: Array<{ label: string; value: EventStatus; count: number }> = [
+  const tabs: Array<{
+    label: string;
+    value: "ai-discovered" | "published";
+    count: number;
+  }> = [
     {
-      label: 'AI-Discovered',
-      value: 'ai-discovered',
-      count: eventStatsResponse?.meta.pagination?.total_count ?? 0,
-    },
-    {
-      label: 'Published Events',
-      value: 'published',
+      label: "Published Events",
+      value: "published",
       count: eventStats?.virtualEvents ?? 0,
     },
     {
-      label: 'Submissions',
-      value: 'submitted',
-      count: eventStats?.submitted ?? 0,
+      label: "AI-Discovered",
+      value: "ai-discovered",
+      count: eventStatsResponse?.meta.pagination?.total_count ?? 0,
     },
+
+    // {
+    //   label: 'Submissions',
+    //   value: 'submitted',
+    //   count: eventStats?.submitted ?? 0,
+    // },
   ];
-  const filteredEvents = useMemo(() => {
-    const loweredSearch = search.trim().toLowerCase();
-
-    return eventsData.filter((event) => {
-      const matchesTab = event.status === activeTab;
-
-      if (!matchesTab) {
-        return false;
-      }
-
-      if (!loweredSearch) {
-        return true;
-      }
-
-      return (
-        event.title.toLowerCase().includes(loweredSearch) ||
-        event.description.toLowerCase().includes(loweredSearch) ||
-        event.location.toLowerCase().includes(loweredSearch) ||
-        event.tags.some((tag) => tag.toLowerCase().includes(loweredSearch))
-      );
-    });
-  }, [activeTab, search]);
 
   const stats = [
     {
-      label: 'Total Events (this month)',
+      label: "Total Events (this month)",
       value: eventStats?.totalEvents ?? 0,
-      description: 'Published events',
+      description: "Published events",
       icon: CalendarDays,
-      color: 'text-gray-900',
-      iconColor: 'text-[#155DFC]',
-      bgColor: 'bg-[#DBEAFE]',
+      color: "text-gray-900",
+      iconColor: "text-[#155DFC]",
+      bgColor: "bg-[#DBEAFE]",
     },
     {
-      label: 'AI Discovered',
+      label: "AI Discovered",
       value: eventStats?.aiDiscovered ?? 0,
-      description: 'Awaiting review',
+      description: "Awaiting review",
       icon: Bot,
-      color: 'text-gray-900',
-      iconColor: 'text-[#F54900]',
-      bgColor: 'bg-[#FFEDD4]',
+      color: "text-gray-900",
+      iconColor: "text-[#F54900]",
+      bgColor: "bg-[#FFEDD4]",
     },
     {
-      label: 'Submitted Events',
+      label: "Submitted Events",
       value: eventStats?.submitted ?? 0,
-      description: 'External submissions',
+      description: "External submissions",
       icon: UsersRound,
-      color: 'text-gray-900',
-      iconColor: 'text-[#D08700]',
-      bgColor: 'bg-[#FEF9C2]',
+      color: "text-gray-900",
+      iconColor: "text-[#D08700]",
+      bgColor: "bg-[#FEF9C2]",
     },
     {
-      label: 'Expected Attendees',
+      label: "Expected Attendees",
       value: eventStats?.expectedAttendees ?? 0,
-      description: 'Projected attendance',
+      description: "Projected attendance",
       icon: Star,
-      color: 'text-gray-900',
-      iconColor: 'text-[#9810FA]',
-      bgColor: 'bg-[#E9D4FF]',
+      color: "text-gray-900",
+      iconColor: "text-[#9810FA]",
+      bgColor: "bg-[#E9D4FF]",
     },
   ];
 
@@ -156,7 +141,9 @@ export default function EventsContainer() {
       <div className="rounded-2xl  bg-white p-4">
         <Tabs
           value={activeTab}
-          onValueChange={(value) => setActiveTab(value as EventStatus)}
+          onValueChange={(value) =>
+            setActiveTab(value as "ai-discovered" | "published")
+          }
           className="w-full"
         >
           <TabsList className="inline-flex h-auto w-fit justify-start gap-3 rounded-none bg-slate-100 p-0">

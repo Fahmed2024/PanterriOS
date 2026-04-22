@@ -10,7 +10,7 @@ import {
 import { EventEntity } from '@/interface';
 import { dateAndTimeFormatter } from '@/utils/helpers';
 import Image from 'next/image';
-import EditCreateEvent from '../EditCreateEvent';
+import EditCreateEvent from './EditCreateEvent';
 
 interface EventListCardProps {
   event: EventEntity;
@@ -84,10 +84,10 @@ export function EventPublishedListCard({ event }: EventListCardProps) {
           </div>
 
           <div>
-            <h4 className="text-2xl leading-[1.25] font-semibold text-[#0F172B]">
+            <h4 className="text-xl leading-[1.25] font-semibold text-[#0F172B]">
               {event.title}
             </h4>
-            <p className="mt-1 text-base md:w-[90%] leading-6 text-[#4B5563] truncate">
+            <p className="mt-1 text-sm md:w-[90%] leading-6 text-[#4B5563] truncate">
               {event.excerpt}
             </p>
           </div>
@@ -130,7 +130,7 @@ export function EventPublishedListCard({ event }: EventListCardProps) {
               event.matchedKeywords.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-sm bg-[#EEF2F7] px-2 py-1 text-xs text-[#334155]"
+                  className="rounded-sm capitalize bg-[#EEF2F7] px-2 py-1 text-xs text-[#334155]"
                 >
                   {tag}
                 </span>

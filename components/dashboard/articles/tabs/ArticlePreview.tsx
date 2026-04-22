@@ -1,18 +1,20 @@
-import Image from 'next/image';
-import { CalendarDays, Clock, ExternalLink } from 'lucide-react';
-import { CrwalerArticle } from '@/interface';
-import { dateAndTimeFormatter } from '@/utils/helpers';
-import { extractAltOrText } from '@/utils/articles.helper';
+import Image from "next/image";
+import { CalendarDays, Clock, ExternalLink } from "lucide-react";
+import { CrwalerArticle } from "@/interface";
+import { dateAndTimeFormatter } from "@/utils/helpers";
+import { extractAltOrText } from "@/utils/articles.helper";
+import Link from "next/link";
 
 interface ArticlePreviewProps {
   article: CrwalerArticle;
 }
 
 export function ArticlePreview({ article }: ArticlePreviewProps) {
-  const excerpt = article.content ?? 'No article summary available.';
+  const excerpt = article.content ?? "No article summary available.";
   const publishedDate = article.publishedAt;
-  const readTime = '5 min';
-  const publisher = article.source.name ?? 'Vanguard Business';
+  const readTime = "5 min";
+  const publisher = article.source.name ?? "";
+  const source = article.source.baseUrl ?? "";
 
   return (
     <div className="mx-auto w-full pb-10 max-w-3xl space-y-5">
@@ -51,7 +53,7 @@ export function ArticlePreview({ article }: ArticlePreviewProps) {
         </div>
 
         <h3 className="mt-4 text-xl font-semibold leading-[1.3] text-[#0F172A] sm:text-3xl">
-          {article.title.replace('...', '')}
+          {article.title.replace("...", "")}
         </h3>
 
         <p
@@ -82,13 +84,16 @@ export function ArticlePreview({ article }: ArticlePreviewProps) {
         </div>
       </div>
 
-      <button
+      <Link
+        href={source}
         type="button"
+        target="_blank"
+        rel="noreferrer"
         className="inline-flex px-4 mt-3 items-center gap-2 text-sm font-medium text-[#111827] transition hover:text-[#1D4ED8] sm:text-base"
       >
         <ExternalLink className="h-5 w-5" />
         View Full article
-      </button>
+      </Link>
     </div>
   );
 }
