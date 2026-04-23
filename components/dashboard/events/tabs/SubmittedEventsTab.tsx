@@ -1,4 +1,4 @@
-import { submittedReviewItems } from "../data";
+
 import { EventListCard } from "./EventListCard";
 
 export function SubmittedEventsTab() {
@@ -10,9 +10,9 @@ export function SubmittedEventsTab() {
       </div>
 
       <div className="space-y-3 p-4">
-        {submittedReviewItems.map((event) => ( 
-           <EventListCard key={event._id} event={event} /> 
-        ))}
+        {/* {submittedReviewItems.map((event) => (  */}
+           {/* <EventListCard key={event._id} event={event} />  */}
+        {/* ))} */}
       </div>
     </div>
   );

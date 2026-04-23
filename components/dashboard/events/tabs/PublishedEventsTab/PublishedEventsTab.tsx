@@ -1,13 +1,13 @@
-import Image from 'next/image';
+import Image from "next/image";
 import {
   Search,
   Filter,
   MapPin,
   CalendarDays,
   ExternalLink,
-} from 'lucide-react';
-import { EventPublishedListCard } from './EventPublishedListCard';
-import { EventEntity } from '@/interface';
+} from "lucide-react";
+import { EventPublishedListCard } from "./EventPublishedListCard";
+import { EventEntity } from "@/interface";
 
 interface EventsTabContentProps {
   events: EventEntity[];
@@ -24,13 +24,13 @@ export function EventsTabContent({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-2xl font-semibold text-[#A21CAF]">
-          Featured Events
-        </h3>
-        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {featuredEvents &&
-            featuredEvents.map((event) => (
+      {featuredEvents && (
+        <div>
+          <h3 className="text-2xl font-semibold text-[#A21CAF]">
+            Featured Events
+          </h3>
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {featuredEvents.map((event) => (
               <div
                 key={event._id}
                 className="overflow-hidden rounded-md border border-[#111827] bg-black text-white"
@@ -58,8 +58,9 @@ export function EventsTabContent({
                 </div>
               </div>
             ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative w-full sm:max-w-sm">

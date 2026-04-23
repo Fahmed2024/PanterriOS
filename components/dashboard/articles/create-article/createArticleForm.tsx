@@ -209,7 +209,7 @@ const CreateArticleForm = () => {
         subTitle="Write and publish content for the platform"
       >
         <div className="flex flex-col gap-2 sm:flex-row">
-          <Button
+          {/* <Button
             variant="outline"
             size="sm"
             type="button"
@@ -226,7 +226,7 @@ const CreateArticleForm = () => {
           >
             <Save className="h-4 w-4" />
             <span>Save Draft</span>
-          </Button>
+          </Button> */}
           <Button
             size="sm"
             type="submit"

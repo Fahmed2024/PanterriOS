@@ -44,13 +44,14 @@ export default function ArticlesContainer() {
       value: 8,
       description: '6 published',
       icon: FileText,
+     
       color: 'text-gray-900',
       iconColor: 'text-[#255FDE]',
       bgColor: 'bg-[#DDEBFF]',
     },
     {
       label: 'Crawled Queue',
-      value: 5,
+      value:  crawledArticles?.meta?.pagination?.total_count ?? 0,
       description: 'Awaiting review',
       icon: BriefcaseBusiness,
       color: 'text-gray-900',
@@ -82,7 +83,7 @@ export default function ArticlesContainer() {
       {
         title: 'Published Articles',
         value: 'published',
-        count: tabCounts.published,
+        count: 0,
         content: (
           <PublishedArticles article={crawledArticles!} category={category} />
         ),
@@ -98,7 +99,7 @@ export default function ArticlesContainer() {
       {
         title: 'Drafts',
         value: 'drafts',
-        count: tabCounts.drafts,
+        count: 0,
         content: <Drafts category={category} />,
       },
     ],
