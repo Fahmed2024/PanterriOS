@@ -5,7 +5,7 @@ export interface RetrieveAuditLogsQuery {
   action?: string;
   entityType?: string;
   critical?: boolean | "true" | "false";
-  actorUserId?: string;
+  actorUserId?: number;
   startDate?: string;
   endDate?: string;
 }

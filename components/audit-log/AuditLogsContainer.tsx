@@ -1,22 +1,58 @@
 "use client";
 
+import { Activity, Check, Layers3, Shield, User2 } from "lucide-react";
 import {
-  Activity,
-  Layers3,
-  Shield,
-  User2,
-} from "lucide-react";
-import { PageHead, ReUseAbleTable, StatCard } from "@/components/shared";
+  PageHead,
+  ReUseAbleTable,
+  StatCard,
+  TableFilters2,
+  TableSkeleton,
+} from "@/components/shared";
 import { auditLogColumns } from "./auditLogColumns";
 import { useRetrieveAuditLogs } from "@/hook/audit-log";
+import { useMemo, useState } from "react";
+import { debounce } from "@/utils/helpers";
 
 export function AuditLogsContainer() {
-  const { data } = useRetrieveAuditLogs({
-    page: 1,
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [filterModule, setFilterModule] = useState("all");
+  const [filterAction, setFilterAction] = useState("all");
+  const [filterEntityType, setFilterEntityType] = useState("all");
+  const [filterCritical, setFilterCritical] = useState("all");
+  const [page, setPage] = useState(1);
+
+  const debouncedSetSearch = useMemo(
+    () => debounce((val: string) => setDebouncedSearch(val), 600),
+    [],
+  );
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+    debouncedSetSearch(value);
+  };
+  const actorUserId = debouncedSearch.trim()
+    ? Number(debouncedSearch)
+    : undefined;
+
+  const { data, isLoading } = useRetrieveAuditLogs({
+    page,
     limit: 10,
+    actorUserId,
+    module: filterModule === "all" ? undefined : filterModule,
+    action: filterAction === "all" ? undefined : filterAction,
+    entityType: filterEntityType === "all" ? undefined : filterEntityType,
+    critical:
+      filterCritical === "all"
+        ? undefined
+        : filterCritical === "true"
+          ? true
+          : false,
   });
 
   const rows = data?.data?.data ?? [];
+  const paginationData = data?.data?.pagination;
   const stats = data?.data?.stats;
 
   return (
@@ -68,12 +104,108 @@ export function AuditLogsContainer() {
           bgColor="bg-[#DBEAFE]"
         />
       </div>
-
-      <ReUseAbleTable
-        columns={auditLogColumns}
-        data={rows}
-        entityName="records"
+      <TableFilters2
+        searchValue={search}
+        search
+        searchPlaceholder="Search by User ID"
+        onSearchChange={handleSearchChange}
+        filters={[
+          {
+            id: "module",
+            label: "All Modules",
+            value: filterModule,
+            onChange: (value) => {
+              setFilterModule(value);
+              setPage(1);
+            },
+            icon: <Layers3 className="h-4 w-4 text-[#6B7280]" />,
+            options: [
+              { label: "All Modules", value: "all" },
+              { label: "Investments", value: "investments" },
+              { label: "Auth", value: "auth" },
+              { label: "Wallet", value: "wallet" },
+              { label: "Finance", value: "finance" },
+            ],
+          },
+          {
+            id: "action",
+            label: "All Actions",
+            value: filterAction,
+            onChange: (value) => {
+              setFilterAction(value);
+              setPage(1);
+            },
+            icon: <Activity className="h-4 w-4 text-[#6B7280]" />,
+            options: [
+              { label: "All Actions", value: "all" },
+              { label: "Create", value: "create" },
+              { label: "Update", value: "update" },
+              { label: "Delete", value: "delete" },
+              { label: "Login", value: "login" },
+              { label: "Approve", value: "approve" },
+              { label: "Reject", value: "reject" },
+            ],
+          },
+          {
+            id: "entityType",
+            label: "All Entity Types",
+            value: filterEntityType,
+            onChange: (value) => {
+              setFilterEntityType(value);
+              setPage(1);
+            },
+            icon: <User2 className="h-4 w-4 text-[#6B7280]" />,
+            options: [
+              { label: "All Entity Types", value: "all" },
+              { label: "User", value: "user" },
+              { label: "Transaction", value: "transaction" },
+              { label: "Wallet", value: "wallet" },
+              { label: "Vault", value: "vault" },
+              { label: "Admin", value: "admin" },
+            ],
+          },
+          {
+            id: "critical",
+            label: "All Severity",
+            value: filterCritical,
+            onChange: (value) => {
+              setFilterCritical(value);
+              setPage(1);
+            },
+            icon: <Check className="h-4 w-4 text-[#6B7280]" />,
+            options: [
+              { label: "All Severity", value: "all" },
+              { label: "Critical", value: "true" },
+              { label: "Non-Critical", value: "false" },
+            ],
+          },
+        ]}
       />
+      {isLoading ? (
+        <TableSkeleton />
+      ) : (
+        <ReUseAbleTable
+          columns={auditLogColumns}
+          data={rows}
+          entityName="Records"
+          pagination={
+            paginationData
+              ? {
+                  currentPage: paginationData.currentPage,
+                  totalPages: paginationData.totalPages,
+                  totalItems: paginationData.totalItems,
+                  limit: paginationData.limit,
+                  onPageChange: (newPage: number) => setPage(newPage),
+                }
+              : undefined
+          }
+        />
+      )}
     </div>
   );
 }
+
+// Proximity
+// Hierachy tellig tu the viaul shoould be direct and mot be visaully dominant tellig the user
+//  what to read first ,second, third
+// repeating leement ot create unty
