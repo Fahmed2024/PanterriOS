@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import {
   BriefcaseBusiness,
@@ -108,7 +108,7 @@ export default function ArticlesContainer() {
       title: 'Drafts',
       value: 'drafts',
       count: 0,
-      content: <Drafts category={category} />,
+      content: <Drafts />,
     },
   ];
 

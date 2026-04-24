@@ -18,8 +18,10 @@ import { debounce } from '@/utils/helpers';
 import { ReusableSelect } from '@/components/ui/ReusableSelect';
 import { Input } from '@/components/ui/input';
 import { useRetrievePublishedRejectedEvents } from '@/hook/events/useRetrievePublishedRejectedEvents';
+import { useRouter } from 'next/navigation';
 
 export default function EventsRecordContainer() {
+  const router = useRouter();
   const [searchValue, setSearchValue] = useState('');
   const [filterSource, setFilterSource] = useState('all');
   const [filterType, setFilterType] = useState('all');
@@ -61,14 +63,14 @@ export default function EventsRecordContainer() {
       icon: <Users className="h-6 w-6 text-[#90A1B9]" />,
     },
   ];
-  const handleReturnBack = () => {
-    navigation.back();
-  };
+
   return (
     <div className="w-full space-y-5 px-0">
       <div className="flex items-center gap-3 justify-between">
-        <Button onClick={handleReturnBack} className="gap-2 flex items-center">
-          {' '}
+        <Button
+          onClick={() => router.back()}
+          className="gap-2 flex items-center"
+        >
           <ChevronLeft /> Back
         </Button>
         <Button

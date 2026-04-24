@@ -47,16 +47,6 @@ export default function EventsContainer() {
     count: number;
   }> = [
     {
-<<<<<<< Updated upstream
-      label: "Published Events",
-      value: "published",
-      count: publishedEvents?.meta.pagination?.total_count ?? 0,
-    },
-    {
-      label: "AI-Discovered",
-      value: "ai-discovered",
-      count: eventStats?.aiDiscovered ?? 0,
-=======
       label: 'Published Events',
       value: 'published',
       count: publishedEvents?.meta.pagination?.total_count ?? 0,
@@ -65,7 +55,6 @@ export default function EventsContainer() {
       label: 'AI-Discovered',
       value: 'ai-discovered',
       count: eventStatsResponse?.data.aiDiscovered ?? 0,
->>>>>>> Stashed changes
     },
 
     // {
