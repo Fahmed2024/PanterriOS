@@ -1,18 +1,23 @@
 "use client";
 
 import { aiAgentCrawl } from "@/services/ai-agents";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useAIAgentCrawl() {
+  const queryClient = useQueryClient();
   const {
     mutateAsync: crawlAll,
     data: crawlAllData,
     isPending: isCrawlingAll,
     isError: isCrawlAllError,
     error: crawlAllError,
-   
   } = useMutation({
     mutationFn: aiAgentCrawl,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["articles", "article-stats"],
+      });
+    },
   });
   return {
     crawlAll,
