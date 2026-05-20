@@ -21,12 +21,12 @@ export function OverviewCard({
   pendingWithdrawal,
 }: {
   analyticsData: DashboardanalyticsData;
-  pendingWithdrawal: number;
+  pendingWithdrawal: number | undefined;
 }) {
   const cardData: CardData[] = [
     {
       title: 'Pending withdrawals',
-      value: pendingWithdrawal,
+      value: pendingWithdrawal ?? 0,
       desc: 'Awaiting approval',
       link: '/',
       icon: Banknote,
