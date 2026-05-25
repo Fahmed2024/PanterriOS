@@ -55,6 +55,15 @@ const MEDIA_API = axios.create({
     'x-api-key': process.env.NEXT_PUBLIC_S3BUCKET_MEDIA_API_KEY,
   },
 });
+
+export const ANALYTICS_API = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_ANALYTICS_BASE_API,
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
 export const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const setRegEmail = async (email: string) => {

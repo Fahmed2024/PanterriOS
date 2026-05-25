@@ -1,3 +1,5 @@
+import { MarketDataModule } from '@/components/dashboard/marketData';
+
 export default function MarketDataPage() {
-  return <div> page </div>;
+  return <MarketDataModule />;
 }
