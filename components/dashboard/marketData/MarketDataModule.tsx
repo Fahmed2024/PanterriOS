@@ -17,12 +17,11 @@ import { cn } from "@/lib/utils";
 
 import {
   useDetailedMarketData,
-  usePriceTrendSeries,
 } from "@/hook/marketData/marketData";
 import { MarketDataTable } from "./MarketDataTable";
 import { MarketPriceTrendChart } from "./marketPriceTrendChart";
 
-const MARKET_CITIES = ["Lagos", "Abuja", "Port Harcourt"] as const;
+const MARKET_CITIES = ["Lagos", "Abuja", "Port Harcourt"];
 
 const iconMap = {
   building: Building2,
@@ -96,29 +95,20 @@ export function MarketDataModule() {
     refetch: refetchMarketData,
   } = useDetailedMarketData({
     page: currentPage,
-    per_page: 9,
+    per_page: 10,
     city: selectedCity,
     all: false,
   });
 
-  const {
-    data: trendData,
-    isLoading: isTrendLoading,
-    refetch: refetchTrendData,
-  } = usePriceTrendSeries({
-    city: selectedCity,
-    months: 6,
-  });
+ 
 
   const marketRows = marketDataResponse?.data ?? [];
-  const priceTrendSeries = trendData?.data?.series ?? [];
-  const loading = isMarketLoading || isTrendLoading;
-
-  const totalCount =
-    marketDataResponse?.meta?.pagination?.total_count ?? marketRows.length;
+  const loading = isMarketLoading 
   const latestUpdate =
     marketRows[0]?.updatedAt ?? marketRows[marketRows.length - 1]?.updatedAt;
-
+  const totalItems = marketDataResponse?.meta?.pagination?.total_count ??  marketRows.length;
+  const limit =  marketDataResponse?.meta?.pagination?.per_page ?? 10;
+  const totalPages = Math.max(1, Math.ceil(totalItems / limit));
   const propertyTypeCount = useMemo(
     () => new Set(marketRows.map((row) => row.sampleAssetType)).size,
     [marketRows],
@@ -150,7 +140,7 @@ export function MarketDataModule() {
     () => [
       {
         label: "Total Volume",
-        value: totalCount.toLocaleString("en-NG"),
+        value: totalItems.toLocaleString("en-NG"),
         description: "Properties tracked",
         icon: iconMap.building,
         iconColor: "text-[#155DFC]",
@@ -189,11 +179,11 @@ export function MarketDataModule() {
         badgeClassName: "border-orange-200 bg-orange-50 text-orange-700",
       },
     ],
-    [averageGrowth, medianPrice, propertyTypeCount, totalCount],
+    [averageGrowth, medianPrice, propertyTypeCount, totalItems],
   );
 
   return (
-    <div className=" space-y-6">
+    <div className=" space-y-8">
       <PageHead
         pageTitle="Nigerian Real Estate Market Data"
         subTitle="Comprehensive property price analysis across major cities"
@@ -291,13 +281,18 @@ export function MarketDataModule() {
       {loading ? (
         <TableSkeleton rows={8} columns={9} />
       ) : (
-        <MarketDataTable city={selectedCity} rows={marketRows} />
+        <MarketDataTable city={selectedCity} rows={marketRows} pagination={{
+          currentPage,
+          totalPages:totalPages,
+          totalItems: totalItems,
+          limit: limit,
+          onPageChange: setCurrentPage,
+  }} />
       )}
+
 
       <MarketPriceTrendChart
         city={selectedCity}
-        series={priceTrendSeries}
-        loading={isTrendLoading}
       />
     </div>
   );
