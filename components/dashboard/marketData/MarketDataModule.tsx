@@ -83,14 +83,17 @@ function formatUpdatedAt(value?: string) {
 }
 
 export function MarketDataModule() {
-  const [selectedCity, setSelectedCity] = useState<"Lagos" | "Abuja" | "Port Harcourt">("Lagos");
+  const [selectedCity, setSelectedCity] = useState<
+    "Lagos" | "Abuja" | "Port Harcourt"
+  >("Lagos");
   const [currentPage, setCurrentPage] = useState(1);
 
   const {
     data: marketDataResponse,
     isLoading: isMarketLoading,
+    isFetching: isMarketFetching,
     error: marketError,
-    refetch: refetchMarketData,
+    refresh: refreshMarketData,
   } = useDetailedMarketData({
     page: currentPage,
     per_page: 10,
@@ -240,10 +243,11 @@ export function MarketDataModule() {
             type="button"
             variant="outline"
             className="h-8 rounded-sm border-[#F0C85B] bg-white px-2 text-xs font-medium text-black hover:bg-[#FFFDF5]"
-            onClick={() => refetchMarketData()}
+            onClick={refreshMarketData}
+            disabled={isMarketFetching}
           >
             <RefreshCcw
-              className={`h-3.5 w-3.5 ${isMarketLoading ? "animate-spin" : ""} `}
+              className={`h-3.5 w-3.5 ${isMarketFetching ? "animate-spin" : ""} `}
             />
             Refresh Data
           </Button>
