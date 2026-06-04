@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { MultiSelect } from '@/components/ui/multiSelect';
 import { Textarea } from '@/components/ui/textarea';
 import { RejectRequestDialog } from './RejectRequestDialog';
 import { useRetrieveApprovalQueueRequestDetails } from '@/hook/approval-queue/useRetrieveApprovalQueueRequestDetails';
@@ -13,6 +14,8 @@ import {
   useReturnApprovalQueueRequestForRevision,
   useTerminateApprovalQueueRequest,
 } from '@/hook/approval-queue';
+import { useRetrieveAllUsers } from '@/hook/user-management/useRetrieveAllUsers';
+import { ApprovalQueueCcUser } from '@/interface/approval-queue.entity';
 
 function formatSnapshotLabel(key: string) {
   return key
@@ -51,10 +54,12 @@ export function ApprovalQueueDetailView({ id }: { id: string }) {
   const [isRejectOpen, setIsRejectOpen] = useState(false);
   const [isApproveOpen, setIsApproveOpen] = useState(false);
   const [commentDraft, setCommentDraft] = useState('');
+  const [selectedCcUserIds, setSelectedCcUserIds] = useState<string[]>([]);
 
   const { data: approvalQueue } = useRetrieveApprovalQueueRequestDetails(
     Number(id),
   );
+  const { data: allUsers } = useRetrieveAllUsers();
   const { mutateAsync: approveRequest, isPending: isApproving } =
     useApproveApprovalQueueRequest();
   const { mutateAsync: rejectRequest, isPending: isRejecting } =
@@ -70,6 +75,30 @@ export function ApprovalQueueDetailView({ id }: { id: string }) {
   const requestId = Number(id);
   const isDecisionLoading =
     isApproving || isRejecting || isReturning || isTerminating;
+  const ccOptions = useMemo(
+    () =>
+      allUsers?.data.data
+        .filter((user) => user.id != null)
+        .map((user) => ({
+          label: user.fullName,
+          value: user.id.toString(),
+        })) || [],
+    [allUsers],
+  );
+  const selectedCcUsers = useMemo<ApprovalQueueCcUser[]>(
+    () =>
+      allUsers?.data.data
+        .filter(
+          (user) =>
+            user.id != null && selectedCcUserIds.includes(user.id.toString()),
+        )
+        .map((user) => ({
+          id: user.id,
+          email: user.email,
+          name: user.fullName,
+        })) || [],
+    [allUsers, selectedCcUserIds],
+  );
   const payloadSnapshotRows = useMemo(() => {
     if (!payloadSnapshot || typeof payloadSnapshot !== 'object') {
       return [];
@@ -130,9 +159,13 @@ export function ApprovalQueueDetailView({ id }: { id: string }) {
 
     await addComment({
       id: requestId,
-      payload: { comment: trimmedComment },
+      payload: {
+        comment: trimmedComment,
+        ccUsers: selectedCcUsers,
+      },
     });
     setCommentDraft('');
+    setSelectedCcUserIds([]);
   };
 
   return (
@@ -140,8 +173,8 @@ export function ApprovalQueueDetailView({ id }: { id: string }) {
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
         <div className="rounded-2xl border border-[#E5E7EB] bg-white p-8">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <h1 className=" font-bold tracking-tight text-[#0F172A]">
-              {detail?.workflowName}
+            <h1 className=" font-bold text-2xl tracking-tight text-[#0F172A]">
+              {detail?.module}
             </h1>
             {detail?.canCurrentUserAct && (
               <div className="grid gap-3 sm:grid-cols-2">
@@ -220,7 +253,7 @@ export function ApprovalQueueDetailView({ id }: { id: string }) {
                         {comment.authorName}
                       </p>
                       {/* <p className=" text-[#111827]">{comment.}</p> */}
-                      <p className="text-lg text-[#526581]">
+                      <p className="text-sm text-[#526581]">
                         {comment.createdAt}
                       </p>
                     </div>
@@ -254,21 +287,28 @@ export function ApprovalQueueDetailView({ id }: { id: string }) {
                       <div className="absolute top-6 h-24 w-px bg-[#A3A3A3]" />
                     ) : null}
                   </div>
-                  <div className="space-y-2">
-                    <p className=" text-[#111827] capitalize">
-                      {item.approvalType}
-                    </p>
-                    {item.approvalType === 'role' ? (
-                      <p className=" text-[#111827]">
-                        {item.role.replace('.', ' ')}
+                  <div className="space-y-2 ">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className=" text-[#111827] capitalize">
+                        {item.approvalType} :
                       </p>
-                    ) : (
-                      <p className=" text-[#111827]">{item.userNameSnapshot}</p>
-                    )}
+                      {item.approvalType === 'role' ? (
+                        <p className=" text-[#111827]">
+                          {item.role.replace('.', ' ')}
+                        </p>
+                      ) : (
+                        <p className=" text-[#111827]">
+                          {item.userNameSnapshot}
+                        </p>
+                      )}{' '}
+                      <StatusBadge status={item.status} />
+                    </div>
 
-                    <StatusBadge status={item.status} />
-                    <p className=" text-[#111827]">{item.actedAt}</p>
-                    <p className=" text-[#111827]">{item.actedByName}</p>
+                    <p className=" text-[#111827] text-sm">{item.actedAt}</p>
+                    <p className=" text-[#111827]">
+                      Action by:{' '}
+                      <span className="font-medium"> {item.actedByName}</span>
+                    </p>
                   </div>
                 </div>
               ))}
@@ -277,12 +317,22 @@ export function ApprovalQueueDetailView({ id }: { id: string }) {
 
           <div className="rounded-2xl border border-[#E5E7EB] bg-white p-6">
             <h3 className="text-base font-semibold text-[#111827]">Comments</h3>
+
             <Textarea
               placeholder="Add a comment relevant to this workflow request"
               value={commentDraft}
               onChange={(event) => setCommentDraft(event.target.value)}
               className="mt-5 min-h-36 rounded-xl px-5 py-5 "
             />
+            <div className="mt-5">
+              <p className="mb-2 text-sm font-medium text-[#111827]">CC</p>
+              <MultiSelect
+                options={ccOptions}
+                value={selectedCcUserIds}
+                onChange={setSelectedCcUserIds}
+                placeholder="Select users to cc"
+              />
+            </div>
             <Button
               className="mt-5 h-14 w-full rounded-xl bg-[#111111]  hover:bg-[#111111]/90"
               onClick={handleAddComment}
