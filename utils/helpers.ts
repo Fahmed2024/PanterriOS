@@ -23,11 +23,12 @@ export const formatTime = (value: string | undefined) => {
 /**
  * Format a number as currency
  */
-export function formatCurrency(amount: number, currency = 'NGN'): string {
+export function formatCurrency(amount: number | string, currency = 'NGN'): string {
+  const amountNum = typeof amount === 'string' ? parseFloat(amount) : amount;
   return new Intl.NumberFormat('en-NG', {
     style: 'currency',
     currency,
-  }).format(amount);
+  }).format(amountNum);
 }
 
 /**
