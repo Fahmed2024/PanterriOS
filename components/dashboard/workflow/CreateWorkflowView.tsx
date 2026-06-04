@@ -55,12 +55,6 @@ const approvalTypeOptions = [
   { label: 'Approve by Role', value: 'role' },
   { label: 'Approve by User', value: 'user' },
 ];
-const USER = [
-  {
-    label: 'test user',
-    value: '1',
-  },
-];
 
 const approverOptions = USER_ROLES.map((role) => ({
   label: role.title,
@@ -146,6 +140,13 @@ export function CreateWorkflowView({ id }: { id?: string }) {
     );
   }, [watchedModule, watchedSubModule]);
 
+  const USER =
+    platformUsers?.data.data
+      .filter((user) => user.id != null)
+      .map((user) => ({
+        label: user.fullName,
+        value: user.id.toString(),
+      })) || [];
   const handleDuplicateStep = (index: number) => {
     const step = form.getValues(`steps.${index}`);
     insert(index + 1, {
