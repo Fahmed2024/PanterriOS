@@ -61,7 +61,7 @@ export const marketDataColumns: ColumnDef<MarketData>[] = [
         <div className="font-medium text-[#334155]">
           {row.original.rentMin.includes('N/A') 
         ? '-'
-        :  {rentRange}
+        : rentRange
         }
         </div>
       );
