@@ -42,22 +42,7 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
     null,
   );
 
-  useEffect(() => {
-    const handleInvestmentDeleted = (event: Event) => {
-      const deletedInvestmentId = (event as CustomEvent<{ id: number }>).detail
-        ?.id;
 
-      if (deletedInvestmentId === id) {
-        setIsOpen(false);
-      }
-    };
-
-    window.addEventListener("investment-deleted", handleInvestmentDeleted);
-
-    return () => {
-      window.removeEventListener("investment-deleted", handleInvestmentDeleted);
-    };
-  }, [id]);
 
   const investmentDetails = data;
   const publicationStatus =
@@ -203,7 +188,19 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
                         ? "Unpublish"
                         : "Publish"}
                   </Button>
-                  <div className="w-24" aria-hidden="true" />
+                 <Button
+                    // variant="secondary"
+                    className="w-fit h-10 bg-primary-blue cursor-pointer text-xs sm:text-sm"
+                    // onClick={handlePublicationStatus}
+                    // disabled={isUpdatingPublicationStatus || !id}
+                  >
+                    {/* {isUpdatingPublicationStatus
+                      ? "Updating..."
+                      : isPublished
+                        ? "Unpublish"
+                        : "Publish"} */}
+                        Pause Yield Event
+                  </Button>
                 </div>
 
                 <Tabs
