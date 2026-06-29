@@ -209,7 +209,7 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
                   </Button>
                   <Button
                     variant="secondary"
-                    // className="w-fit h-10 bg-primary-blue cursor-pointer text-xs sm:text-sm"
+                    className="min-w-[100px] text-orange-500 bg-orange-100 cursor-pointer"
                     onClick={handlePauseYieldEvent}
                     disabled={isUpdatingPauseYield || !id}
                   >
