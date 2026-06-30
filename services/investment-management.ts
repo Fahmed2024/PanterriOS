@@ -10,8 +10,8 @@ import {
   UpdateInvestmentReq,
   UpdateInvestmentPublicationStatusRes,
   UpdateInvestmentRes,
-} from "@/interface";
-import { API } from "@/services/axios";
+} from '@/interface';
+import { API } from '@/services/axios';
 
 export const createInvestment = async (
   payload: CreateInvestmentReq,
@@ -19,81 +19,81 @@ export const createInvestment = async (
   const formData = new FormData();
 
   // Append basic fields
-  formData.append("propertyName", payload.propertyName);
-  formData.append("propertyType", payload.propertyType);
-  formData.append("state", payload.state);
-  formData.append("city", payload.city);
-  formData.append("fullAddress", payload.fullAddress);
-  formData.append("propertyDescription", payload.propertyDescription);
-  formData.append("targetAmount", payload.targetAmount.toString());
+  formData.append('propertyName', payload.propertyName);
+  formData.append('propertyType', payload.propertyType);
+  formData.append('state', payload.state);
+  formData.append('city', payload.city);
+  formData.append('fullAddress', payload.fullAddress);
+  formData.append('propertyDescription', payload.propertyDescription);
+  formData.append('targetAmount', payload.targetAmount.toString());
   formData.append(
-    "minimumInvestmentAmount",
+    'minimumInvestmentAmount',
     payload.minimumInvestmentAmount.toString(),
   );
   formData.append(
-    "returnDistributionSchedule",
+    'returnDistributionSchedule',
     payload.returnDistributionSchedule,
   );
-  formData.append("duration", payload.duration.toString());
+  formData.append('duration', payload.duration.toString());
   formData.append(
-    "expectedReturnPercentage",
+    'expectedReturnPercentage',
     payload.expectedReturnPercentage.toString(),
   );
-  formData.append("riskRating", payload.riskRating);
+  formData.append('riskRating', payload.riskRating);
   formData.append(
-    "investmentPublicationStatus",
+    'investmentPublicationStatus',
     payload.investmentPublicationStatus,
   );
 
   // Append optional fields
   if (payload.propertyValue !== undefined) {
-    formData.append("propertyValue", payload.propertyValue.toString());
+    formData.append('propertyValue', payload.propertyValue.toString());
   }
   if (payload.expectedRoi !== undefined) {
-    formData.append("expectedRoi", payload.expectedRoi.toString());
+    formData.append('expectedRoi', payload.expectedRoi.toString());
   }
   if (payload.propertySizeSqm !== undefined) {
-    formData.append("propertySizeSqm", payload.propertySizeSqm.toString());
+    formData.append('propertySizeSqm', payload.propertySizeSqm.toString());
   }
   if (payload.propertyUnit) {
-    formData.append("propertyUnit", payload.propertyUnit);
+    formData.append('propertyUnit', payload.propertyUnit);
   }
 
   // Append key highlights as JSON string array
   if (payload.keyHighlights && payload.keyHighlights.length > 0) {
-    formData.append("keyHighlights", JSON.stringify(payload.keyHighlights));
+    formData.append('keyHighlights', JSON.stringify(payload.keyHighlights));
   }
 
   // Append project milestones as JSON string array
   formData.append(
-    "projectMilestones",
+    'projectMilestones',
     JSON.stringify(payload.projectMilestones),
   );
 
   // Append document visibility if provided
   if (payload.documentVisibility && payload.documentVisibility.length > 0) {
     formData.append(
-      "documentVisibility",
+      'documentVisibility',
       JSON.stringify(payload.documentVisibility),
     );
   }
 
   // Append cover image as a single file
-  formData.append("coverImage", payload.coverImage);
+  formData.append('coverImage', payload.coverImage);
 
   // Append property images
   payload.propertyImages.forEach((file) => {
-    formData.append("propertyImages", file);
+    formData.append('propertyImages', file);
   });
 
   // Append property documents
   payload.propertyDocuments.forEach((file) => {
-    formData.append("propertyDocuments", file);
+    formData.append('propertyDocuments', file);
   });
 
-  const { data } = await API.post("/investments/admin/create", formData, {
+  const { data } = await API.post('/investments/admin/create', formData, {
     headers: {
-      "Content-Type": "multipart/form-data",
+      'Content-Type': 'multipart/form-data',
     },
   });
 
@@ -103,7 +103,7 @@ export const createInvestment = async (
 export const retrieveInvestments = async (
   query: RetrieveInvestmentsQuery,
 ): Promise<InvestmentListRes> => {
-  const { data } = await API.get("/investments/admin/published", {
+  const { data } = await API.get('/investments/admin/published', {
     params: query,
   });
 
@@ -113,7 +113,7 @@ export const retrieveInvestments = async (
 export const retrieveDraftInvestments = async (
   query: RetrieveInvestmentsQuery,
 ): Promise<DraftInvestmentListRes> => {
-  const { data } = await API.get("/investments/admin/drafts", {
+  const { data } = await API.get('/investments/admin/drafts', {
     params: query,
   });
 
@@ -144,51 +144,51 @@ export const updateInvestmentDetails = async (
     formData.append(key, String(value));
   };
 
-  appendIfDefined("propertyName", payload.propertyName);
-  appendIfDefined("propertyType", payload.propertyType);
-  appendIfDefined("state", payload.state);
-  appendIfDefined("city", payload.city);
-  appendIfDefined("fullAddress", payload.fullAddress);
-  appendIfDefined("propertyDescription", payload.propertyDescription);
-  appendIfDefined("targetAmount", payload.targetAmount);
-  appendIfDefined("minimumInvestmentAmount", payload.minimumInvestmentAmount);
+  appendIfDefined('propertyName', payload.propertyName);
+  appendIfDefined('propertyType', payload.propertyType);
+  appendIfDefined('state', payload.state);
+  appendIfDefined('city', payload.city);
+  appendIfDefined('fullAddress', payload.fullAddress);
+  appendIfDefined('propertyDescription', payload.propertyDescription);
+  appendIfDefined('targetAmount', payload.targetAmount);
+  appendIfDefined('minimumInvestmentAmount', payload.minimumInvestmentAmount);
   appendIfDefined(
-    "returnDistributionSchedule",
+    'returnDistributionSchedule',
     payload.returnDistributionSchedule,
   );
-  appendIfDefined("duration", payload.duration);
-  appendIfDefined("expectedReturnPercentage", payload.expectedReturnPercentage);
-  appendIfDefined("riskRating", payload.riskRating);
+  appendIfDefined('duration', payload.duration);
+  appendIfDefined('expectedReturnPercentage', payload.expectedReturnPercentage);
+  appendIfDefined('riskRating', payload.riskRating);
   appendIfDefined(
-    "investmentPublicationStatus",
+    'investmentPublicationStatus',
     payload.investmentPublicationStatus,
   );
-  appendIfDefined("propertyValue", payload.propertyValue);
-  appendIfDefined("expectedRoi", payload.expectedRoi);
-  appendIfDefined("propertySizeSqm", payload.propertySizeSqm);
-  appendIfDefined("propertyUnit", payload.propertyUnit);
-  appendIfDefined("keyHighlights", payload.keyHighlights);
-  appendIfDefined("projectMilestones", payload.projectMilestones);
-  appendIfDefined("documentVisibility", payload.documentVisibility);
-  appendIfDefined("coverImageIndex", payload.coverImageIndex);
-  appendIfDefined("documentUpdates", payload.documentUpdates);
-  appendIfDefined("imageUpdates", payload.imageUpdates);
+  appendIfDefined('propertyValue', payload.propertyValue);
+  appendIfDefined('expectedRoi', payload.expectedRoi);
+  appendIfDefined('propertySizeSqm', payload.propertySizeSqm);
+  appendIfDefined('propertyUnit', payload.propertyUnit);
+  appendIfDefined('keyHighlights', payload.keyHighlights);
+  appendIfDefined('projectMilestones', payload.projectMilestones);
+  appendIfDefined('documentVisibility', payload.documentVisibility);
+  appendIfDefined('coverImageIndex', payload.coverImageIndex);
+  appendIfDefined('documentUpdates', payload.documentUpdates);
+  appendIfDefined('imageUpdates', payload.imageUpdates);
 
   if (payload.coverImage) {
-    formData.append("coverImage", payload.coverImage);
+    formData.append('coverImage', payload.coverImage);
   }
 
   payload.propertyImages?.forEach((file) => {
-    formData.append("propertyImages", file);
+    formData.append('propertyImages', file);
   });
 
   payload.propertyDocuments?.forEach((file) => {
-    formData.append("propertyDocuments", file);
+    formData.append('propertyDocuments', file);
   });
 
   const { data } = await API.put(`/investments/admin/${id}`, formData, {
     headers: {
-      "Content-Type": "multipart/form-data",
+      'Content-Type': 'multipart/form-data',
     },
   });
 
@@ -228,10 +228,13 @@ export interface UpdatePauseYieldStartReq {
 }
 
 export const updatePauseYieldStart = async (
-  id: number,
+  id: number | string,
   query: UpdatePauseYieldStartReq,
 ): Promise<UpdateInvestmentPublicationStatusRes> => {
-  const { data } = await API.patch(`/investments/admin/${id}/yield-events`, query);
+  const { data } = await API.patch(
+    `/investments/admin/${id}/yield-events`,
+    query,
+  );
 
   return data;
 };

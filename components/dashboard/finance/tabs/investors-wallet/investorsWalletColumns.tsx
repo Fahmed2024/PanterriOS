@@ -100,7 +100,7 @@ export const investorsWalletColumns: ColumnDef<InvestorWalletItem>[] = [
           width="md"
           contentClassName={'mx-0'}
         >
-          <InvestorAudit investorId={wallet.investorPublicId} />
+          <InvestorAudit investorId={wallet.walletPublicId} />
         </SlideInPanelDrawer>
       );
     },

@@ -23,6 +23,8 @@ import {
   useUpdateInvestmentPublicationStatus,
 } from '@/hook/investment-management';
 import { InvestmentDetailsSkeleton, StatusBadge } from '@/components/shared';
+import { useUpdatePauseYieldStart } from '@/hook/investment-management/useUpdatePauseYieldStart';
+import { Spinner } from '@/components/ui/spinner';
 
 interface DetailsPageViewProp {
   children?: React.ReactNode;
@@ -39,16 +41,16 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
   } = useUpdateInvestmentPublicationStatus();
   const { updatePauseYieldFn, isPending: isUpdatingPauseYield } =
     useUpdatePauseYieldStart();
-  const [tab, setTab] = useState("overview");
-  const [togglingDocumentId, setTogglingDocumentId] = useState<number| string | null>(
-    null,
-  );
+  const [tab, setTab] = useState('overview');
+  const [togglingDocumentId, setTogglingDocumentId] = useState<
+    number | string | null
+  >(null);
 
   const investmentDetails = data;
   const publicationStatus =
     investmentDetails?.header?.investmentPublicationStatus?.toLowerCase() ??
-    "pending";
-  const isPublished = publicationStatus === "published";
+    'pending';
+  const isPublished = publicationStatus === 'published';
   const yieldStatus = investmentDetails?.yieldEvents?.paused;
 
   const handlePublicationStatus = () => {
@@ -69,7 +71,7 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
       id,
       payload: {
         paused: !yieldStatus,
-        reason: yieldStatus ? undefined : "Paused by admin",
+        reason: yieldStatus ? undefined : 'Paused by admin',
       },
     });
   };
@@ -166,7 +168,7 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
                   <p className="text-gray-500 pt-1 flex items-center text-xs sm:text-sm gap-1">
                     <MapPin className="w-4 h-4 shrink-0" />
                     <span className="capitalize break-words">
-                      {investmentDetails?.header.location ?? "-"}
+                      {investmentDetails?.header.location ?? '-'}
                     </span>
                   </p>
                 </div>
@@ -214,9 +216,9 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
                     {isUpdatingPauseYield ? (
                       <Spinner />
                     ) : yieldStatus ? (
-                      "Pause Yield"
+                      'Pause Yield'
                     ) : (
-                      "Resume Yield"
+                      'Resume Yield'
                     )}
                   </Button>
                 </div>
