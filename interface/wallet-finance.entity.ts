@@ -41,10 +41,10 @@ export interface WalletFinanceSummary {
 }
 
 export interface WalletFinanceTransaction {
-  id?: number;
-  publicId?: string;
+  publicId: string;
   reference: string;
   investorId: number;
+  investorPublicId?: string;
   investorName: string;
   type: WalletFinanceTransactionTypeFilter;
   amount: number;
@@ -73,10 +73,10 @@ export interface WalletFinanceAuditTrailItem {
 }
 
 export interface WalletFinanceTransactionDetails {
-  id?: number;
-  publicId?: string;
+  publicId: string;
   reference: string;
   investorId: number;
+  investorPublicId?: string;
   investorName: string;
   type: Exclude<WalletFinanceTransactionTypeFilter, 'all'>;
   typeLabel: string;
@@ -280,7 +280,9 @@ export interface RetrieveInvestorWalletsQuery {
 
 export interface InvestorWalletItem {
   walletId: number;
+  walletPublicId: string;
   investorId: number;
+  investorPublicId: string;
   investorCode: string;
   investorName: string;
   investorEmail: string;
@@ -319,8 +321,7 @@ export interface InvestorWalletOverview {
 }
 
 export interface InvestorWalletRecentActivityItem {
-  id?: number;
-  publicId?: string;
+  publicId: string;
   title: string;
   description: string;
   occurredAt: string;
@@ -334,7 +335,9 @@ export interface InvestorWalletRecentActivityItem {
 export interface InvestorWalletDetails {
   data: {
     walletId: number;
+    walletPublicId: string;
     investorId: number;
+    investorPublicId: string;
     investorCode: string;
     investorName: string;
     investorEmail: string;
