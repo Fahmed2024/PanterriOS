@@ -56,9 +56,7 @@ export function ApprovalQueueDetailView({ id }: { id: string }) {
   const [commentDraft, setCommentDraft] = useState('');
   const [selectedCcUserIds, setSelectedCcUserIds] = useState<string[]>([]);
 
-  const { data: approvalQueue } = useRetrieveApprovalQueueRequestDetails(
-    id,
-  );
+  const { data: approvalQueue } = useRetrieveApprovalQueueRequestDetails(id);
   const { data: allUsers } = useRetrieveAllUsers();
   const { mutateAsync: approveRequest, isPending: isApproving } =
     useApproveApprovalQueueRequest();
@@ -78,10 +76,10 @@ export function ApprovalQueueDetailView({ id }: { id: string }) {
   const ccOptions = useMemo(
     () =>
       allUsers?.data.data
-        .filter((user) => user.id != null)
+        .filter((user) => user.publicId != null)
         .map((user) => ({
           label: user.fullName,
-          value: user.id.toString(),
+          value: user.publicId as string,
         })) || [],
     [allUsers],
   );
@@ -90,10 +88,11 @@ export function ApprovalQueueDetailView({ id }: { id: string }) {
       allUsers?.data.data
         .filter(
           (user) =>
-            user.id != null && selectedCcUserIds.includes(user.id.toString()),
+            user.publicId != null && selectedCcUserIds.includes(user.publicId),
         )
         .map((user) => ({
           id: user.id,
+          publicId: user.publicId ?? '',
           email: user.email,
           name: user.fullName,
         })) || [],
@@ -278,7 +277,9 @@ export function ApprovalQueueDetailView({ id }: { id: string }) {
             <div className="mt-6 space-y-8">
               {detail?.steps.map((item, index) => (
                 <div
-                  key={item.publicId ?? item.id ?? `${item.stepNumber}-${index}`}
+                  key={
+                    item.publicId ?? item.id ?? `${item.stepNumber}-${index}`
+                  }
                   className="relative flex gap-4"
                 >
                   <div className="relative flex w-6 justify-center">

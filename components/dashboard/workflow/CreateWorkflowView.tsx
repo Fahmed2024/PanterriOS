@@ -69,7 +69,7 @@ const defaultStep = {
   userId: undefined,
 };
 
-export function CreateWorkflowView({ id }: { id?: string }) {
+export function CreateWorkflowView({ id }: { id?: number | string }) {
   const router = useRouter();
   const workflowId = id;
   const isEditMode = Boolean(workflowId);
@@ -145,7 +145,7 @@ export function CreateWorkflowView({ id }: { id?: string }) {
       .filter((user) => user.id != null)
       .map((user) => ({
         label: user.fullName,
-        value: user.id.toString(),
+        value: user.publicId as string,
       })) || [];
   const handleDuplicateStep = (index: number) => {
     const step = form.getValues(`steps.${index}`);
@@ -211,7 +211,7 @@ export function CreateWorkflowView({ id }: { id?: string }) {
 
     if (isEditMode) {
       const response = await updateWorkflowFn({
-        id: workflowId,
+        id: workflowId!,
         payload,
       });
       router.push(`/workflow/${response.data.publicId ?? response.data.id}`);

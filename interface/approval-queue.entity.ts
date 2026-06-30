@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Pagination } from './index';
 
 export interface ApprovalQueueCurrentStep {
