@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { MapPin, X } from "lucide-react";
 import Overview from "./overview";
 import { FinancialDetails } from "./financialDetails";
@@ -23,6 +23,8 @@ import {
   useUpdateInvestmentPublicationStatus,
 } from "@/hook/investment-management";
 import { InvestmentDetailsSkeleton, StatusBadge } from "@/components/shared";
+import { useUpdatePauseYieldStart } from "@/hook/investment-management/useUpdatePauseYieldStart";
+import { Spinner } from "@/components/ui/spinner";
 
 interface DetailsPageViewProp {
   children?: React.ReactNode;
@@ -37,33 +39,19 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
     mutate: updatePublicationStatus,
     isPending: isUpdatingPublicationStatus,
   } = useUpdateInvestmentPublicationStatus();
+  const { updatePauseYieldFn, isPending: isUpdatingPauseYield } =
+    useUpdatePauseYieldStart();
   const [tab, setTab] = useState("overview");
   const [togglingDocumentId, setTogglingDocumentId] = useState<number | null>(
     null,
   );
-
-  useEffect(() => {
-    const handleInvestmentDeleted = (event: Event) => {
-      const deletedInvestmentId = (event as CustomEvent<{ id: number }>).detail
-        ?.id;
-
-      if (deletedInvestmentId === id) {
-        setIsOpen(false);
-      }
-    };
-
-    window.addEventListener("investment-deleted", handleInvestmentDeleted);
-
-    return () => {
-      window.removeEventListener("investment-deleted", handleInvestmentDeleted);
-    };
-  }, [id]);
 
   const investmentDetails = data;
   const publicationStatus =
     investmentDetails?.header?.investmentPublicationStatus?.toLowerCase() ??
     "pending";
   const isPublished = publicationStatus === "published";
+  const yieldStatus = investmentDetails?.yieldEvents?.paused;
 
   const handlePublicationStatus = () => {
     if (!id) return;
@@ -77,6 +65,16 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
     });
   };
 
+  const handlePauseYieldEvent = () => {
+    if (!id) return;
+    updatePauseYieldFn({
+      id,
+      payload: {
+        paused: !yieldStatus,
+        reason: yieldStatus ? undefined : "Paused by admin",
+      },
+    });
+  };
   const tabs = [
     {
       title: "Overview",
@@ -169,12 +167,18 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
                   </div>
                   <p className="text-gray-500 pt-1 flex items-center text-xs sm:text-sm gap-1">
                     <MapPin className="w-4 h-4 shrink-0" />
-                    <span className="capitalize break-words">{investmentDetails?.header.location ?? "-"}</span>
+                    <span className="capitalize break-words">
+                      {investmentDetails?.header.location ?? "-"}
+                    </span>
                   </p>
                 </div>
               )}
               <DrawerClose asChild>
-                <button type="button" aria-label="Close investment details" className="h-10 w-10 inline-flex items-center justify-center">
+                <button
+                  type="button"
+                  aria-label="Close investment details"
+                  className="h-10 w-10 inline-flex items-center justify-center"
+                >
                   <X className="w-5 h-5" />
                 </button>
               </DrawerClose>
@@ -203,7 +207,20 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
                         ? "Unpublish"
                         : "Publish"}
                   </Button>
-                  <div className="w-24" aria-hidden="true" />
+                  <Button
+                    variant="secondary"
+                    className="min-w-[100px] text-orange-500 bg-orange-100 cursor-pointer"
+                    onClick={handlePauseYieldEvent}
+                    disabled={isUpdatingPauseYield || !id}
+                  >
+                    {isUpdatingPauseYield ? (
+                      <Spinner />
+                    ) : yieldStatus ? (
+                      "Pause Yield"
+                    ) : (
+                      "Resume Yield"
+                    )}
+                  </Button>
                 </div>
 
                 <Tabs
