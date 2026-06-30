@@ -122,6 +122,7 @@ export interface InvestmentDetails {
   propertyDetails: InvestmentPropertyDetails;
   documents: InvestmentDocument[];
   investors: InvestmentInvestors;
+  yieldEvents: InvestmentYieldEvent;
 }
 
 export interface InvestmentDetailsHeader {
@@ -130,7 +131,12 @@ export interface InvestmentDetailsHeader {
   investmentStatus: string;
   investmentPublicationStatus: string;
 }
-
+export interface InvestmentYieldEvent {
+  paused: boolean;
+  reason?: string;
+  pausedAt?: string;
+  pausedByName?: string;
+}
 export interface InvestmentDetailsOverview {
   createdBy: string;
   durationMonths: number;
