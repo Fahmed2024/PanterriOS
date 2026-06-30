@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import {
   Drawer,
   DrawerClose,
@@ -7,28 +7,26 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
-import { MapPin, X } from "lucide-react";
-import Overview from "./overview";
-import { FinancialDetails } from "./financialDetails";
-import PropertyInfo from "./propertyInfo";
-import { Documents } from "./documents";
-import PropertyInvestors from "./propertyInvestors";
-import { useRetrieveInvestmentDetails } from "@/hook/investment-management/useRetrieveInvestmentDetails";
+} from '@/components/ui/drawer';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useEffect, useState } from 'react';
+import { MapPin, X } from 'lucide-react';
+import Overview from './overview';
+import { FinancialDetails } from './financialDetails';
+import PropertyInfo from './propertyInfo';
+import { Documents } from './documents';
+import PropertyInvestors from './propertyInvestors';
+import { useRetrieveInvestmentDetails } from '@/hook/investment-management/useRetrieveInvestmentDetails';
 import {
   useToggleInvestmentDocumentVisibility,
   useUpdateInvestmentPublicationStatus,
-} from "@/hook/investment-management";
-import { InvestmentDetailsSkeleton, StatusBadge } from "@/components/shared";
-import { useUpdatePauseYieldStart } from "@/hook/investment-management/useUpdatePauseYieldStart";
-import { Spinner } from "@/components/ui/spinner";
+} from '@/hook/investment-management';
+import { InvestmentDetailsSkeleton, StatusBadge } from '@/components/shared';
 
 interface DetailsPageViewProp {
   children?: React.ReactNode;
-  id?: number;
+  id: number | string;
 }
 export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,7 +40,7 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
   const { updatePauseYieldFn, isPending: isUpdatingPauseYield } =
     useUpdatePauseYieldStart();
   const [tab, setTab] = useState("overview");
-  const [togglingDocumentId, setTogglingDocumentId] = useState<number | null>(
+  const [togglingDocumentId, setTogglingDocumentId] = useState<number| string | null>(
     null,
   );
 
@@ -58,7 +56,7 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
     updatePublicationStatus(id);
   };
 
-  const handleToggleDocumentVisibility = (documentId: number) => {
+  const handleToggleDocumentVisibility = (documentId: number | string) => {
     setTogglingDocumentId(documentId);
     toggleDocumentVisibility(documentId, {
       onSettled: () => setTogglingDocumentId(null),
@@ -77,15 +75,15 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
   };
   const tabs = [
     {
-      title: "Overview",
-      value: "overview",
+      title: 'Overview',
+      value: 'overview',
       content: investmentDetails?.overview && (
         <Overview overview={investmentDetails.overview} />
       ),
     },
     {
-      title: "Financial Details",
-      value: "financial-details",
+      title: 'Financial Details',
+      value: 'financial-details',
       content: investmentDetails?.financialDetails && (
         <FinancialDetails
           financialDetails={investmentDetails.financialDetails}
@@ -93,15 +91,15 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
       ),
     },
     {
-      title: "Property Details",
-      value: "property-info",
+      title: 'Property Details',
+      value: 'property-info',
       content: investmentDetails?.propertyDetails && (
         <PropertyInfo propertyDetails={investmentDetails.propertyDetails} />
       ),
     },
     {
-      title: "Documents",
-      value: "documents",
+      title: 'Documents',
+      value: 'documents',
       content: (
         <Documents
           documents={investmentDetails?.documents ?? []}
@@ -112,8 +110,8 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
       ),
     },
     {
-      title: "Investors",
-      value: "investors",
+      title: 'Investors',
+      value: 'investors',
       content: (
         <PropertyInvestors
           investors={
@@ -135,7 +133,7 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
         onOpenChange={(open) => {
           setIsOpen(open);
           if (open) {
-            setTab("overview");
+            setTab('overview');
           }
         }}
       >
@@ -155,12 +153,12 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
                 <div className="w-full">
                   <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 items-start sm:items-center">
                     <div className="text-base sm:text-xl font-bold break-words">
-                      {investmentDetails?.header.propertyName ?? "-"}
+                      {investmentDetails?.header.propertyName ?? '-'}
                     </div>
                     <StatusBadge
                       status={
                         investmentDetails?.header
-                          ?.investmentPublicationStatus ?? ""
+                          ?.investmentPublicationStatus ?? ''
                       }
                       showDot
                     />
@@ -202,10 +200,10 @@ export function InvestmentDetailsView({ children, id }: DetailsPageViewProp) {
                     disabled={isUpdatingPublicationStatus || !id}
                   >
                     {isUpdatingPublicationStatus
-                      ? "Updating..."
+                      ? 'Updating...'
                       : isPublished
-                        ? "Unpublish"
-                        : "Publish"}
+                        ? 'Unpublish'
+                        : 'Publish'}
                   </Button>
                   <Button
                     variant="secondary"
