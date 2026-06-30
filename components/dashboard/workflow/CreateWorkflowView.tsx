@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -110,8 +110,14 @@ export function CreateWorkflowView({ id }: { id?: number | string }) {
     value: p.module,
   }));
 
-  const watchedModule = form.watch('module');
-  const watchedSubModule = form.watch('subModule');
+  const watchedModule = useWatch({
+    control: form.control,
+    name: 'module',
+  });
+  const watchedSubModule = useWatch({
+    control: form.control,
+    name: 'subModule',
+  });
 
   const subModuleOptions = useMemo(() => {
     const selectedModule = modulePermission.find(
@@ -407,7 +413,7 @@ export function CreateWorkflowView({ id }: { id?: number | string }) {
                           }}
                           aria-label={`Remove step ${index + 1}`}
                         >
-                          <Trash2 className="h-5 w-5 text-[#FF1F1F]" />
+                          <Trash2 className="h-5 w-5 text-danger" />
                         </button>
                       </div>
                     </div>
