@@ -52,7 +52,7 @@ export function DraftInvestments({
   const { mutate: deleteInvestment, isPending: isDeleting } =
     useDeleteInvestment();
   const [selectedInvestment, setSelectedInvestment] = useState<{
-    id: number;
+    id: string;
     name: string;
   } | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -186,7 +186,7 @@ export function DraftInvestments({
         <span className="block text-xs sm:text-sm truncate">actions</span>
       ),
       cell: ({ row }) => {
-        const rowId = row.original.id;
+        const rowId = row.original.publicId;
 
         return (
           <div className="flex flex-wrap items-center justify-center gap-2">

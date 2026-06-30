@@ -71,8 +71,8 @@ const defaultStep = {
 
 export function CreateWorkflowView({ id }: { id?: string }) {
   const router = useRouter();
-  const workflowId = Number(id);
-  const isEditMode = Number.isFinite(workflowId);
+  const workflowId = id;
+  const isEditMode = Boolean(workflowId);
 
   const { mutateAsync: CreateWorkflowFn, isPending: isCreatingWorkflow } =
     useCreateWorkflow();
@@ -214,13 +214,13 @@ export function CreateWorkflowView({ id }: { id?: string }) {
         id: workflowId,
         payload,
       });
-      router.push(`/workflow/${response.data.id}`);
+      router.push(`/workflow/${response.data.publicId ?? response.data.id}`);
       return;
     }
 
     const response = await CreateWorkflowFn(payload);
     form.reset();
-    router.push(`/workflow/${response.data.id}`);
+    router.push(`/workflow/${response.data.publicId ?? response.data.id}`);
   };
 
   if (isEditMode && (isWorkflowLoading || !workflow)) {

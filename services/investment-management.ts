@@ -121,14 +121,14 @@ export const retrieveDraftInvestments = async (
 };
 
 export const retrieveInvestmentDetails = async (
-  id: number,
+  id: number | string,
 ): Promise<RetrieveInvestmentDetailsRes> => {
   const { data } = await API.get(`/investments/admin/${id}`);
   return data;
 };
 
 export const updateInvestmentDetails = async (
-  id: number,
+  id: number | string,
   payload: UpdateInvestmentReq,
 ): Promise<UpdateInvestmentRes> => {
   const formData = new FormData();
@@ -195,13 +195,15 @@ export const updateInvestmentDetails = async (
   return data;
 };
 
-export const deleteInvestment = async (id: number): Promise<CommonRes> => {
+export const deleteInvestment = async (
+  id: number | string,
+): Promise<CommonRes> => {
   const { data } = await API.delete(`/investments/admin/${id}`);
   return data;
 };
 
 export const toggleInvestmentDocumentVisibility = async (
-  documentId: number,
+  documentId: number | string,
 ): Promise<ToggleInvestmentDocumentVisibilityRes> => {
   const { data } = await API.patch(
     `/investments/admin/documents/${documentId}/toggle-visibility`,
@@ -211,7 +213,7 @@ export const toggleInvestmentDocumentVisibility = async (
 };
 
 export const updateInvestmentPublicationStatus = async (
-  id: number,
+  id: number | string,
 ): Promise<UpdateInvestmentPublicationStatusRes> => {
   const { data } = await API.patch(
     `/investments/admin/${id}/publication-status`,

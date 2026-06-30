@@ -57,7 +57,7 @@ export function ApprovalQueueDetailView({ id }: { id: string }) {
   const [selectedCcUserIds, setSelectedCcUserIds] = useState<string[]>([]);
 
   const { data: approvalQueue } = useRetrieveApprovalQueueRequestDetails(
-    Number(id),
+    id,
   );
   const { data: allUsers } = useRetrieveAllUsers();
   const { mutateAsync: approveRequest, isPending: isApproving } =
@@ -72,7 +72,7 @@ export function ApprovalQueueDetailView({ id }: { id: string }) {
     useAddApprovalQueueComment();
   const detail = approvalQueue?.data.data;
   const payloadSnapshot = detail?.payloadSnapshot;
-  const requestId = Number(id);
+  const requestId = id;
   const isDecisionLoading =
     isApproving || isRejecting || isReturning || isTerminating;
   const ccOptions = useMemo(
@@ -246,7 +246,10 @@ export function ApprovalQueueDetailView({ id }: { id: string }) {
             <h2 className="text-base font-semibold text-[#111827]">Comments</h2>
             <div className="mt-6 space-y-5">
               {detail?.comments.map((comment) => (
-                <div key={comment.id} className="rounded-2xl bg-[#EAF2FF] p-6">
+                <div
+                  key={comment.publicId ?? comment.id}
+                  className="rounded-2xl bg-[#EAF2FF] p-6"
+                >
                   <div className="grid gap-6 md:grid-cols-[220px_minmax(0,1fr)]">
                     <div className="space-y-2">
                       <p className=" font-semibold text-[#111827]">
@@ -274,7 +277,10 @@ export function ApprovalQueueDetailView({ id }: { id: string }) {
             </h3>
             <div className="mt-6 space-y-8">
               {detail?.steps.map((item, index) => (
-                <div key={item.id} className="relative flex gap-4">
+                <div
+                  key={item.publicId ?? item.id ?? `${item.stepNumber}-${index}`}
+                  className="relative flex gap-4"
+                >
                   <div className="relative flex w-6 justify-center">
                     <div
                       className={`mt-1 h-4 w-4 rounded-full ${

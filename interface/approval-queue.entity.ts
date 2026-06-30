@@ -24,7 +24,8 @@ export interface ApprovalQueueInitiatedBy {
 }
 
 export interface ApprovalQueueStepDetail {
-  id: number;
+  id?: number;
+  publicId: string;
   stepNumber: number;
   approvalType: 'role' | 'user';
   role: string | null;
@@ -39,7 +40,8 @@ export interface ApprovalQueueStepDetail {
 }
 
 export interface ApprovalQueueComment {
-  id: number;
+  id?: number;
+  publicId: string;
   comment: string;
   commentType: string;
   authorUserId: number;
@@ -49,20 +51,23 @@ export interface ApprovalQueueComment {
 }
 
 export interface ApprovalQueueDecisionResData {
-  id: number;
+  id?: number;
+  publicId: string;
   reference: string;
   requestStatus: string;
   currentStepNumber: number;
 }
 
 export interface ApprovalQueueCcUser {
-  id: number;
+  id?: number;
+  publicId: string;
   email: string;
   name: string;
 }
 
 export interface ApprovalQueueItem {
-  id: number;
+  id?: number;
+  publicId: string;
   reference: string;
   workflowName: string;
   module: string;
@@ -96,7 +101,8 @@ export interface RetrieveApprovalQueueRes {
 }
 
 export interface ApprovalQueueRequestDetails {
-  id: number;
+  id?: number;
+  publicId: string;
   reference: string;
   workflowName: string;
   module: string;
@@ -149,7 +155,8 @@ export interface ExecutionPayload {
 }
 
 export interface Actor {
-  id: number;
+  id?: number;
+  publicId: string;
   email: string;
   roles: string[];
   lastName: string;
@@ -171,7 +178,8 @@ export interface PayloadSnapshot {
 }
 
 export interface Step {
-  id: number;
+  id?: number;
+  publicId: string;
   stepNumber: number;
   approvalType: string;
   role: string;
