@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { VerifyOtpReq } from '@/interface';
-import { verifyResetPasswordOtp } from '@/services/auth';
-import { setOtp } from '@/services/axios';
-import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
+import { VerifyOtpReq } from "@/interface";
+import { verifyResetPasswordOtp } from "@/services/auth";
+import { setOtp } from "@/services/axios";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export function useVerifyResetPasswordOtp() {
   const router = useRouter();
@@ -15,11 +15,13 @@ export function useVerifyResetPasswordOtp() {
       mutationFn: async (payload: VerifyOtpReq) =>
         verifyResetPasswordOtp(payload),
       onSuccess: (data) => {
+        console.log(data.passwordResetToken);
         if (data.passwordResetToken) {
+          toast.info(data.passwordResetToken);
           setOtp(data.passwordResetToken);
         }
-        toast.success(data.message || 'OTP verified successfully');
-        router.push('/forgot-password/reset-password');
+        toast.success(data.message || "OTP verified successfully");
+        router.push("/forgot-password/reset-password");
       },
     });
 
