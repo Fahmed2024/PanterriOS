@@ -49,7 +49,6 @@ export default function ResetPasswordForm() {
       return;
     }
     const resetToken = storedResetToken.replace(/^"|"$/g, "");
-
     await resetPasswordFn({
       resetToken,
       newPassword: data.newPassword,
