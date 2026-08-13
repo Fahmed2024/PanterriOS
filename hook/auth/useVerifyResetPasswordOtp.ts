@@ -15,7 +15,6 @@ export function useVerifyResetPasswordOtp() {
       mutationFn: async (payload: VerifyOtpReq) =>
         verifyResetPasswordOtp(payload),
       onSuccess: (data) => {
-        console.log(data.passwordResetToken);
         if (data.passwordResetToken) {
           toast.info(data.passwordResetToken);
           setOtp(data.passwordResetToken);
