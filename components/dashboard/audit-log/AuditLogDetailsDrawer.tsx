@@ -120,12 +120,14 @@ function buildFieldsToDisplay(
 
 export function AuditLogDetailsDrawer({ row }: AuditLogDetailsDrawerProps) {
   const requestId = row.publicId || row.reference;
+  const platformKey = process.env.NEXT_PUBLIC_PLATFORM_KEY;
+
   const {
     data: detailsData,
     isPending,
     isLoading,
     refetch,
-  } = useRetrieveAuditLogRecord(requestId, false);
+  } = useRetrieveAuditLogRecord(requestId, platformKey, false);
 
   const details = detailsData?.data?.data;
   const changes = details?.changes;

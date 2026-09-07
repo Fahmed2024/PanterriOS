@@ -1,15 +1,20 @@
-"use client";
+'use client';
 
-import { useQuery } from "@tanstack/react-query";
-import { retrieveAuditLogRecord } from "@/services/audit-log";
+import { useQuery } from '@tanstack/react-query';
+import { retrieveAuditLogRecord } from '@/services/audit-log';
 
-export function useRetrieveAuditLogRecord(referenceOrId?: string, enabled = true) {
+export function useRetrieveAuditLogRecord(
+  referenceOrId?: string,
+  platform?: string,
+  enabled = true,
+) {
   const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["audit-logs", "details", referenceOrId],
-    queryFn: () => retrieveAuditLogRecord(referenceOrId as string),
+    queryKey: ['audit-logs', 'details', referenceOrId],
+    queryFn: () =>
+      retrieveAuditLogRecord(referenceOrId as string, platform as string),
     enabled:
       enabled &&
-      typeof referenceOrId === "string" &&
+      typeof referenceOrId === 'string' &&
       referenceOrId.trim().length > 0,
   });
 

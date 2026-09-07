@@ -17,8 +17,11 @@ export const retrieveAuditLogs = async (
 
 export const retrieveAuditLogRecord = async (
   referenceOrId: string,
+  platform: string,
 ): Promise<RetrieveAuditLogRecordRes> => {
-  const { data } = await API.get(`/admin/audit-logs/${referenceOrId}`);
+  const { data } = await API.get(`/admin/audit-logs/${referenceOrId}`, {
+    params: { platform },
+  });
 
   return data;
 };
